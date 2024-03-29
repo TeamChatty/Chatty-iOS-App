@@ -12,7 +12,7 @@ import SnapKit
 import Then
 
 import SharedDesignSystem
-import DomainUser
+import DomainUserInterface
 
 final class PreviewImageTableViewCell: UITableViewCell, Touchable {
   static let cellId = "PreviewImageTableViewCell"
@@ -54,7 +54,7 @@ final class PreviewImageTableViewCell: UITableViewCell, Touchable {
 }
 
 extension PreviewImageTableViewCell {
-  func updateCell(userData: UserData) {
+  func updateCell(userData: UserProfile) {
     
   }
 }

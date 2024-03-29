@@ -30,16 +30,9 @@ public protocol RepositoryDIcontainer: ServiceDIContainer {
 extension RepositoryDIcontainer {
   func makeUserAPIRepository() -> DefaultUserAPIRepository {
     return DefaultUserAPIRepository(
-      userAPIService: UserAPIServiceImpl(
-        authAPIService: AuthAPIServiceImpl(
-          keychainService: KeychainService.shared),
-        keychainService: KeychainService.shared
-      ),
-      profileAPIService: ProfileAPIServiceImpl(
-        authAPIService: AuthAPIServiceImpl(
-          keychainService: KeychainService.shared),
-        keychainService: KeychainService.shared
-      )
+      userAPIService: makeUserAPIService(),
+      profileAPIService: makeProfileAPIService(),
+      interestAPIService: makeInterestAPIService()
     )
   }
   
@@ -57,7 +50,7 @@ extension RepositoryDIcontainer {
   
   func makeUserDataRepository() -> DefaultUserDataRepository {
     return DefaultUserDataRepository(
-      userDataService: UserDataService.shared
+      userDataService: UserProfileService.shared
     )
   }
   
@@ -76,6 +69,7 @@ extension RepositoryDIcontainer {
   public func makeUserDefaultsRepository() -> DefaultUserDefaultsRepository {
     return DefaultUserDefaultsRepository(
       userDefaultService: makeUserDefaultsService()
+      )
   }
   
   func makeChatSTOMPRepository() -> DefaultChatSTOMPRepository {
@@ -84,11 +78,7 @@ extension RepositoryDIcontainer {
   
   func makeChatAPIRepository() -> DefaultChatAPIRepository {
     return DefaultChatAPIRepository(
-      chatAPIService: ChatAPIServiceImpl(
-        authAPIService: AuthAPIServiceImpl(
-          keychainService: KeychainService.shared
-        ),
-        keychainService: KeychainService.shared)
+      chatAPIService: makeChatAPIService()
     )
   }
 }

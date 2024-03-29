@@ -125,7 +125,7 @@ extension OnboardingPhoneAuthenticationReactor {
       signUseCase.requestLogin(mobileNumber: mobileNumber, authenticationNumber: authenticationNumber)
         .asObservable()
         .flatMap { loginResponse -> Observable<Mutation> in
-          self.getUserDataUseCase.execute(hasFetched: true)
+          self.getUserDataUseCase.executeSingle()
             .asObservable()
             .flatMap { userData -> Observable<Mutation> in
               if userData.authority == .user {

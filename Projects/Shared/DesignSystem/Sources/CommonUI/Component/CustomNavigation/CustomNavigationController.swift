@@ -178,7 +178,7 @@ extension CustomNavigationController {
     // 네비게이션 바의 백 버튼이 설정되지 않은 경우
     guard customNavigationBar.backButton == nil else { return }
     
-    let button = CustomNavigationBarButton(image: UIImage(asset: Images.arrowLeft)!)
+    let button = CustomNavigationBarButton(image: UIImage(asset: Images.vArrowLeft)!)
     customNavigationBar.backButton = button
   }
   

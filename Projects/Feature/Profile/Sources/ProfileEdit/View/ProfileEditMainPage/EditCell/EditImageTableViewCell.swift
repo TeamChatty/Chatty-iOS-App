@@ -12,7 +12,7 @@ import SnapKit
 import Then
 
 import SharedDesignSystem
-import DomainUser
+import DomainUserInterface
 
 final class EditImageTableViewCell: UITableViewCell, Touchable {
   static let cellId = "EditImageTableViewCell"
@@ -86,7 +86,7 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
 }
 
 extension EditImageTableViewCell {
-  func updateCell(userData: UserData) {
+  func updateCell(userData: UserProfile) {
     profileImageView.setImageKF(urlString: userData.imageUrl)
     
   }

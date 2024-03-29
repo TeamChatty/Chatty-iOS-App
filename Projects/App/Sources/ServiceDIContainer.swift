@@ -10,6 +10,7 @@ import DataNetwork
 import DataStorage
 
 public protocol ServiceDIContainer {
+  func makeChatAPIService() -> ChatAPIServiceImpl
   func makeUserAPIService() -> UserAPIServiceImpl
   func makeAuthAPIService() -> AuthAPIServiceImpl
   func makeLiveAPIService() -> LiveAPIServiceImpl
@@ -20,6 +21,13 @@ public protocol ServiceDIContainer {
 }
 
 extension ServiceDIContainer {
+  func makeChatAPIService() -> ChatAPIServiceImpl {
+    return ChatAPIServiceImpl(
+      authAPIService: makeAuthAPIService(),
+      keychainService: KeychainService.shared
+    )
+  }
+  
   func makeUserAPIService() -> UserAPIServiceImpl {
     return UserAPIServiceImpl(
       authAPIService: makeAuthAPIService(),

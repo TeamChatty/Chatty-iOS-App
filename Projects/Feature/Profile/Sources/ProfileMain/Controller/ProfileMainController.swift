@@ -25,7 +25,7 @@ protocol ProfileMainControllerDelegate: AnyObject {
 final class ProfileMainController: BaseController {
   // MARK: - View Property
   private let backgroundImageView: UIImageView = UIImageView().then {
-    $0.image = Images.matchHomeBackimage.image
+    $0.image = Images.matchHomeImage.image
     $0.backgroundColor = .white
     $0.contentMode = .scaleAspectFit
   }

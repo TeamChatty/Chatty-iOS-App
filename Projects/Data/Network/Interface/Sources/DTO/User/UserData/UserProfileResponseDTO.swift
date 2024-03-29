@@ -17,7 +17,8 @@ public struct UserProfileResponseDTO: CommonResponseDTO {
   
   public struct UserProfileData: Decodable {
     let id: Int
-    let mobileNumber, nickname, birth, gender, mbti: String
+    let mobileNumber, nickname, birth, mbti: String
+    let gender: Gender?
     let authority: Authority
     let interests: [String]
     let address, imageURL, job, introduce, school: String?
@@ -31,21 +32,25 @@ public struct UserProfileResponseDTO: CommonResponseDTO {
     }
   }
   
-  public func toDomain() -> UserProfile {
-    return UserProfile(
-      nickname: data.nickname,
-      mobileNumber: data.mobileNumber,
-      birth: data.birth,
-      gender: data.gender,
-      mbti: data.mbti,
-      interests: data.interests, 
-      authority: data.authority,
-      address: data.address, 
-      imageUrl: data.imageURL,
-      job: data.job,
-      introduce: data.introduce,
-      school: data.school,
-      blueCheck: data.blueCheck,
+  public func toDomain() -> SomeoneProfile {
+    return SomeoneProfile(
+      profile: .init(
+        nickname: data.nickname,
+        mobileNumber: data.mobileNumber,
+        birth: data.birth,
+        gender: data.gender,
+        mbti: data.mbti,
+        authority: data.authority, 
+        address: data.address,
+        imageUrl: data.imageURL,
+        interests: data.interests.enumerated().map({ index, item in
+            .init(id: index, name: item)
+        }),
+        job: data.job,
+        introduce: data.introduce,
+        school: data.school,
+        blueCheck: data.blueCheck
+        ),
       unlock: data.unlock
     )
   }

@@ -12,7 +12,6 @@ import DataNetworkInterface
 import RxSwift
 
 public final class ProfileAPIServiceImpl: ProfileAPIService {
-  
   public typealias Router = ProfileAPIRouter
   public var provider: MoyaProvider<ProfileAPIRouter>
   

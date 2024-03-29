@@ -1,6 +1,6 @@
 //
-//  UserData+Extension.swift
-//  DomainUser
+//  UserProfile+Extension.swift
+//  DomainUserInterface
 //
 //  Created by 윤지호 on 3/25/24.
 //
@@ -8,12 +8,12 @@
 import Foundation
 import SharedUtil
 
-extension UserData {
+extension UserProfile {
   public var genderStringKR: String {
     switch self.gender {
-    case "MALE":
+    case .male:
       return "남"
-    case "FEMALE":
+    case .female:
       return "여"
     default:
       return ""

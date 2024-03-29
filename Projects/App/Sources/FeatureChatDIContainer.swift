@@ -40,7 +40,7 @@ final class FeatureChatDIContainer: RepositoryDIcontainer, FeatureChatDependecyP
 
 extension FeatureChatDIContainer {
   func makeChatSTOMPRepository() -> DefaultChatSTOMPRepository {
-    return DefaultChatSTOMPRepository(chatSTOMPService: ChatSTOMPServiceImpl())
+    return DefaultChatSTOMPRepository(chatSTOMPService: ChatSTOMPServiceImpl.shared)
   }
   
   func makeChatAPIRepository() -> DefaultChatAPIRepository {

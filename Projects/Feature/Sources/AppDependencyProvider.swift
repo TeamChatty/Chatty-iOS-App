@@ -10,10 +10,15 @@ import FeatureOnboardingInterface
 import FeatureChatInterface
 import DomainAuth
 import DomainUser
+import FeatureLiveInterface
+import FeatureProfileInterface
 
 public protocol AppDependencyProvider {
   func makeFeatureOnboardingDependencyProvider() -> FeatureOnboardingDependencyProvider
+  func makeFeatureLiveDependencyProvider() -> FeatureLiveDependencyProvider
+  func makeFeatureProfileDependencyProvider() -> FeatureProfileDependencyProvider
   func makeFeatureChatDependencyProvider() -> FeatureChatDependecyProvider
+  
   
   func makeValiateAccessTokenUseCase() -> DefaultValidateAccessTokenUseCase
   func makeGetAccessTokenUseCase() -> DefaultGetAccessTokenUseCase

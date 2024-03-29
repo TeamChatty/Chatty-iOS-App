@@ -31,7 +31,7 @@ public final class OnboardingPhoneAuthenticationCoordinator: BaseCoordinator {
       type: type,
       sendVerificationCodeUseCase: dependencyProvider.makeSendVerificationCodeUseCase(),
       getDeviceIdUseCase: dependencyProvider.makeGetDeviceIdUseCase(),
-      signUseCase: dependencyProvider.makeSignUseCase(), getUserDataUseCase: dependencyProvider.makeGetUserDataUseCase()
+      signUseCase: dependencyProvider.makeSignUseCase(), getUserDataUseCase: dependencyProvider.makeGetProfileDataUseCase()
     )
     let onboardingPhoneNumberEntryController = OnboardingPhoneNumberEntryController(reactor: onboardingPhoneAuthenticationReactor)
     onboardingPhoneNumberEntryController.delegate = self

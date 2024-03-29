@@ -22,18 +22,16 @@ final class ProfileEditMainReactor: Reactor {
   }
   
   struct State {
-    var profileData: UserData = UserData(nickname: "jiho", mobileNumber: "01077777777", birth: "2000-11-14", gender: "MAIL", mbti: "INTP", authority: "authority", address: nil, imageData: nil, interests: [], job: nil, introduce: nil, blueCheck: false)
-    
+    var profileData: UserProfile
     var pageIndex: Int = 0
   }
-  
   
   var initialState: State
   
   public init(getUserDataUseCase: GetUserDataUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
 //    self.initialState = State()
-    self.initialState = State(profileData: getUserDataUseCase.execute() as! UserData)
+    self.initialState = State(profileData: getUserDataUseCase.execute())
   }
 }
 

@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 import SharedDesignSystem
-import DomainUser
+import DomainUserInterface
 
 final class EditBasicInfoTableViewCell: UITableViewCell {
   static let cellId = "EditBasicInfoTableViewCell"
@@ -62,7 +62,7 @@ final class EditBasicInfoTableViewCell: UITableViewCell {
 }
 
 extension EditBasicInfoTableViewCell {
-  func updateCell(userData: UserData) {
+  func updateCell(userData: UserProfile) {
     
   }
 }

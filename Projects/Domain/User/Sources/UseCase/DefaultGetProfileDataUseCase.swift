@@ -18,7 +18,7 @@ public final class DefaultGetUserDataUseCase: GetUserDataUseCase {
     self.userDataRepository = userDataRepository
   }
   
-  public func executeSingle() -> Single<UserDataProtocol> {
+  public func executeSingle() -> Single<UserProfile> {
     return userAPIRepository.getProfile()
       .flatMap { userData in
         self.userDataRepository.saveUserData(userData: userData)
@@ -26,7 +26,7 @@ public final class DefaultGetUserDataUseCase: GetUserDataUseCase {
       }
   }
   
-  public func execute() -> UserDataProtocol {
+  public func execute() -> UserProfile {
     return userDataRepository.getUserData()
   }
 }

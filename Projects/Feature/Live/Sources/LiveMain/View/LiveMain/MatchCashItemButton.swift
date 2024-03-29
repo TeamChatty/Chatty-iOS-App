@@ -24,7 +24,7 @@ final class MatchCashItemButton: UIControl, Touchable, Highlightable {
   }
   
   private let ticketimageView: UIImageView = UIImageView().then {
-    $0.image = Images.ticket.image
+    $0.image = Images.tickets.image
     $0.contentMode = .scaleAspectFit
   }
   private let ticketCountLabel: UILabel = UILabel().then {

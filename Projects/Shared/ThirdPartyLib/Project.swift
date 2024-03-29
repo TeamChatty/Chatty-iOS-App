@@ -27,7 +27,7 @@ let project = Project.makeModule(
           .external(name: "Realm"),
           .external(name: "Starscream"),
           .external(name: "Mantis"),
-          .external(name: "Gifu")
+          .external(name: "Gifu"),
           .external(name: "SwiftStomp"),
           .external(name: "Kingfisher")
         ]

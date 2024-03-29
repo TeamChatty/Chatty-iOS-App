@@ -11,8 +11,8 @@ import RxCocoa
 import SnapKit
 import Then
 
-import DomainUser
 import SharedDesignSystem
+import DomainUserInterface
 
 final class ProfileMainView: BaseView, Touchable {
   // MARK: - View Property
@@ -122,7 +122,7 @@ extension ProfileMainView {
     self.profileBoxView.setPercent(percent: percent)
   }
   
-  func setProfileData(_ data: UserData) {
+  func setProfileData(_ data: UserProfile) {
     self.profileBoxView.setProfileData(data)
   }
   

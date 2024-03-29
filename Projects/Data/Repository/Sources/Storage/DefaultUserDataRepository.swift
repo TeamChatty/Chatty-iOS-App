@@ -13,17 +13,17 @@ import DomainUserInterface
 
 public final class DefaultUserDataRepository: UserDataRepository {
   
-  private let userDataService: any UserDataServiceProtocol
+  private let userDataService: any UserProfileServiceProtocol
   
-  public init(userDataService: any UserDataServiceProtocol) {
+  public init(userDataService: any UserProfileServiceProtocol) {
     self.userDataService = userDataService
   }
   
-  public func saveUserData(userData: UserDataProtocol) {
+  public func saveUserData(userData: UserProfile) {
     userDataService.setData(userData: userData)
   }
   
-  public func getUserData() -> UserDataProtocol {
+  public func getUserData() -> UserProfile {
     return userDataService.getData()
   }
   

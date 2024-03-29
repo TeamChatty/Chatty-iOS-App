@@ -46,7 +46,7 @@ final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardi
     )
   }
   
-  func makeGetUserDataUseCase() -> DefaultGetUserDataUseCase {
+  func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
     return DefaultGetUserDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
       userDataRepository: makeUserDataRepository()

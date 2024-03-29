@@ -8,8 +8,8 @@
 import Foundation
 import DomainUserInterface
 
-public protocol UserDataServiceProtocol {
-  func getData() -> UserDataProtocol
-  func setData(userData: UserDataProtocol)
+public protocol UserProfileServiceProtocol {
+  func getData() -> UserProfile
+  func setData(userData: UserProfile)
   func saveAllInterests(interests: Interests)
 }

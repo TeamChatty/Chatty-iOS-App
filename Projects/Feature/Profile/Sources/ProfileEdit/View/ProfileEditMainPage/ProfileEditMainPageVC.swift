@@ -7,11 +7,11 @@
 
 import UIKit
 import SharedDesignSystem
-import DomainUser
 
 import SnapKit
 import RxSwift
 import RxCocoa
+import DomainUserInterface
 
 final class ProfileEditMainPageViewController: UIPageViewController {
   private let dataViewControllers: [UIViewController] = {
@@ -111,7 +111,7 @@ extension ProfileEditMainPageViewController: UIPageViewControllerDelegate {
 }
 
 extension ProfileEditMainPageViewController {
-  func setUserData(userData: UserData) {
+  func setUserData(userData: UserProfile) {
     self.viewControllers?.forEach { viewController in
       guard let vc = viewController as? ProfileEditMainPageTypeViewController else { return }
       vc.setUserData(userData: userData)

@@ -12,7 +12,7 @@ import SnapKit
 import Then
 
 import SharedDesignSystem
-import DomainUser
+import DomainUserInterface
 
 enum ProfileEditMainType {
   case edit
@@ -37,7 +37,7 @@ final class ProfileEditMainPageTypeViewController: UIViewController {
   
   private let pageType: ProfileEditMainType
   private let dataSource: [ProfileEditMainCellType]
-  private var userData: UserData? = nil
+  private var userData: UserProfile? = nil
   
   // MARK: - Initialize Method
   required init(pageType: ProfileEditMainType) {
@@ -157,7 +157,7 @@ extension ProfileEditMainPageTypeViewController {
   }
 }
 extension ProfileEditMainPageTypeViewController {
-  func setUserData(userData: UserData) {
+  func setUserData(userData: UserProfile) {
     self.userData = userData
     switch pageType {
     case .edit:
@@ -167,7 +167,7 @@ extension ProfileEditMainPageTypeViewController {
     }
   }
 
-  private func setUserDataEdit(_ userData: UserData) {
+  private func setUserDataEdit(_ userData: UserProfile) {
     if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? EditImageTableViewCell {
       cell.updateCell(userData: userData)
     }
@@ -181,7 +181,7 @@ extension ProfileEditMainPageTypeViewController {
     }
   }
   
-  private func setUserDataPreview(_ userData: UserData) {
+  private func setUserDataPreview(_ userData: UserProfile) {
     if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? PreviewImageTableViewCell {
       cell.updateCell(userData: userData)
     }

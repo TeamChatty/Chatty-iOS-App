@@ -20,7 +20,7 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
     self.userDataRepository = userDataRepository
   }
   
-  public func executeObs(gender: String, birth: String, imageData: Data?, interests: [DomainUserInterface.Interest], mbti: String) -> Observable<UserDataProtocol> {
+  public func executeObs(gender: String, birth: String, imageData: Data?, interests: [DomainUserInterface.Interest], mbti: String) -> Observable<UserProfile> {
     
     let saveGender = userAPIRepository.saveGender(gender: gender).asObservable()
     let saveBirth = userAPIRepository.saveBirth(birth: birth).asObservable()
@@ -30,19 +30,19 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
     if let imageData = imageData {
       let saveImage = userAPIRepository.saveImage(imageData: imageData).asObservable()
       return saveGender
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveBirth
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveBirth
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveInterests
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveImage
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveMbti.map { userData in
             /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
             self.userDataRepository.saveUserData(userData: userData)
@@ -51,16 +51,16 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
         }
     } else {
       return saveGender
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveBirth
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveBirth
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveInterests
         }
-        .flatMap { _ -> Observable<UserDataProtocol> in
+        .flatMap { _ -> Observable<UserProfile> in
           return saveMbti.map { userData in
             /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
             self.userDataRepository.saveUserData(userData: userData)

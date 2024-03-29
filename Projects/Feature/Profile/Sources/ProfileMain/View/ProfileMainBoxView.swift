@@ -11,8 +11,8 @@ import RxCocoa
 import SnapKit
 import Then
 
-import DomainUser
 import SharedDesignSystem
+import DomainUserInterface
 
 final class ProfileMainBoxView: BaseView, Touchable {
   // MARK: - View Property
@@ -148,7 +148,7 @@ extension ProfileMainBoxView {
     self.percentProgress.setCirclePercent(percent: percent)
   }
   
-  func setProfileData(_ data: UserData) {
+  func setProfileData(_ data: UserProfile) {
     self.profileImageView.setImageKF(urlString: data.imageUrl ?? "")
 
     self.nicknameLabel.text = data.nickname

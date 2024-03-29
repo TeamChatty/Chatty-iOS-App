@@ -46,17 +46,6 @@ extension Date {
     return formatter.string(from: self)
   }
   
-  public enum DateFormatType {
-    case ahhmm
-    
-    var formatString: String {
-      switch self {
-      case .ahhmm:
-        return "a hh:mm"
-      }
-    }
-  }
-  
   /// "yyyy-MM-dd" > 만나이
   public func toAmericanAge(_ string: String) -> Int {
     let birthDate = string.split(separator: "-").map{ Int($0)! }

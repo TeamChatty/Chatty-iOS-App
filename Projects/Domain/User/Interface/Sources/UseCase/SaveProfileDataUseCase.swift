@@ -15,5 +15,5 @@ public protocol SaveProfileDataUseCase {
     imageData: Data?,
     interests: [Interest],
     mbti: String
-  ) -> Observable<UserDataProtocol>
+  ) -> Observable<UserProfile>
 }

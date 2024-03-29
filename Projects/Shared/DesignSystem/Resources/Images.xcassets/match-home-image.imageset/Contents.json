@@ -1,16 +1,15 @@
 {
   "images" : [
     {
+      "filename" : "match-home-image.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Group bubble chat_Activated@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Group bubble chat_Activated@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

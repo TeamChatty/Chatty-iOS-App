@@ -15,9 +15,9 @@ public struct UserDataReponseDTO: Decodable {
   public let mobileNumber: String
   public let nickname: String
   public let birth: String?
-  public let gender: String?
+  public let gender: Gender?
   public let mbti: String?
-  public let authority: String
+  public let authority: Authority
   public let address: String?
   public let interests: [String]
   public let imageUrl: String?
@@ -26,8 +26,8 @@ public struct UserDataReponseDTO: Decodable {
   public let introduce: String?
   public let blueCheck: Bool
   
-  public func toDomain() -> UserData {
-    return UserData(
+  public func toDomain() -> UserProfile {
+    return UserProfile(
       nickname: self.nickname,
       mobileNumber: self.mobileNumber,
       birth: self.birth,

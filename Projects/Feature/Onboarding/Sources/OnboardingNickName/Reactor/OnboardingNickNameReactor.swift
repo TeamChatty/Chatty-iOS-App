@@ -11,7 +11,6 @@ import RxCocoa
 import ReactorKit
 import DomainUserInterface
 import DomainCommon
-import DataNetworkInterface
 
 public final class OnboardingNickNameReactor: Reactor {
   private let saveProfileNicknameUseCase: SaveProfileNicknameUseCase

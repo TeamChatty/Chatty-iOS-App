@@ -10,23 +10,23 @@ import RxSwift
 import DomainCommon
 
 public protocol UserAPIRepositoryProtocol: AnyObject {
-  func saveNickname(nickname: String) -> Single<UserDataProtocol>
-  func saveMBTI(mbti: String) -> Single<UserDataProtocol>
-  func saveImage(imageData: Data) -> Single<UserDataProtocol>
-  func saveGender(gender: String) -> Single<UserDataProtocol>
-  func saveBirth(birth: String) -> Single<UserDataProtocol>
+  func saveNickname(nickname: String) -> Single<UserProfile>
+  func saveMBTI(mbti: String) -> Single<UserProfile>
+  func saveImage(imageData: Data) -> Single<UserProfile>
+  func saveGender(gender: String) -> Single<UserProfile>
+  func saveBirth(birth: String) -> Single<UserProfile>
   func saveDeviceToken(deviceToken: String) -> Single<Void>
 
-  func saveSchool(school: String) -> Single<UserDataProtocol>
-  func saveJob(job: String) -> Single<UserDataProtocol>
-  func saveIntroduce(introduce: String) -> Single<UserDataProtocol>
-  func saveInterests(interest: [Interest]) -> Single<UserDataProtocol>
-  func saveAddress(address: String) -> Single<UserDataProtocol>
+  func saveSchool(school: String) -> Single<UserProfile>
+  func saveJob(job: String) -> Single<UserProfile>
+  func saveIntroduce(introduce: String) -> Single<UserProfile>
+  func saveInterests(interest: [Interest]) -> Single<UserProfile>
+  func saveAddress(address: String) -> Single<UserProfile>
   
   func login(mobileNumber: String, authenticationNumber: String, deviceId: String, deviceToken: String) -> Single<TokenProtocol>
   func join(mobileNumber: String, authenticationNumber: String, deviceId: String, deviceToken: String) -> Single<TokenProtocol>
   
-  func getProfile() -> Single<UserDataProtocol>
+  func getProfile() -> Single<UserProfile>
   
   func getInterests() -> Single<Interests>
 }

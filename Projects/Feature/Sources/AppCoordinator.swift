@@ -19,24 +19,24 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   
   public var window: UIWindow
   
-  private let featureDependencyProvider: AppDependencyProvider
+  private let appDependencyProvider: AppDependencyProvider
   
   private let disposeBag = DisposeBag()
   
   public init(window: UIWindow, navigationController: CustomNavigationController, featureDependencyProvider: AppDependencyProvider) {
     self.window = window
-    self.featureDependencyProvider = featureDependencyProvider
+    self.appDependencyProvider = featureDependencyProvider
     super.init(navigationController: navigationController)
     self.appFlowControl.delegete = self
   }
   
   public override func start() {
-    let validateAccessTokenUseCase = featureDependencyProvider.makeValiateAccessTokenUseCase()
-    let getProfileDataUseCase = featureDependencyProvider.makeGetProfileUseCase()
+    let validateAccessTokenUseCase = appDependencyProvider.makeValiateAccessTokenUseCase()
+    let getProfileDataUseCase = appDependencyProvider.makeGetProfileUseCase()
     
     do {
       let isValid = try validateAccessTokenUseCase.execute().toBlocking().single()
-      let profile = try getProfileDataUseCase.execute(hasFetched: true).toBlocking().single()
+      let profile = try getProfileDataUseCase.executeSingle().toBlocking().single()
       
       if isValid {
         if profile.authority == .anonymous {
@@ -59,7 +59,7 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   public func showOnboardingFlow() {
     let onboardingCoordinator = OnboardingRootCoordinator(
       navigationController: navigationController,
-      dependencyProvider: featureDependencyProvider.makeFeatureOnboardingDependencyProvider()
+      dependencyProvider: appDependencyProvider.makeFeatureOnboardingDependencyProvider()
     )
     
     childCoordinators.append(onboardingCoordinator)
@@ -70,7 +70,7 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   }
   
   public func showOnboardingProfileFlow() {
-    let onboardingNicknameCoordinator = OnboardingNickNameCoordinator(navigationController: navigationController, dependencyProvider: featureDependencyProvider.makeFeatureOnboardingDependencyProvider())
+    let onboardingNicknameCoordinator = OnboardingNickNameCoordinator(navigationController: navigationController, dependencyProvider: appDependencyProvider.makeFeatureOnboardingDependencyProvider())
     onboardingNicknameCoordinator.start()
     
     childCoordinators.removeAll()
@@ -82,7 +82,7 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   
   public func showMainFlow() {
     navigationController.setCustomNavigationBarHidden(true, animated: false)
-    let mainCoordinator = MainTabBarCoordinator(navigationController, featureChatDependencyProvider: featureDependencyProvider.makeFeatureChatDependencyProvider())
+    let mainCoordinator = MainTabBarCoordinator(navigationController, appDependencyProvider: appDependencyProvider)
     mainCoordinator.start()
     
     childCoordinators.removeAll()

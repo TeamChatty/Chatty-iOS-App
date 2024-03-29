@@ -1,5 +1,5 @@
 //
-//  UserDataService.swift
+//  UserProfileService.swift
 //  DataStorage
 //
 //  Created by 윤지호 on 1/28/24.
@@ -7,39 +7,21 @@
 
 import Foundation
 import DataStorageInterface
-import DomainUser
 import DomainUserInterface
 
-public final class UserDataService: UserDataServiceProtocol {
-  public static let shared = UserDataService()
+public final class UserProfileService: UserProfileServiceProtocol {
+  public static let shared = UserProfileService()
   
-  private var userData: UserDataProtocol
-  private var allInterests: [Interest]
+  private var userData: UserProfile = .init(nickname: nil, mobileNumber: "", authority: .anonymous, blueCheck: false)
+  private var allInterests: [Interest] = []
   
-  private init() {
-    self.userData = UserData(
-      nickname: "",
-      mobileNumber: "",
-      authority: "",
-      birth: "",
-      gender: .female,
-      mbti: "",
-      address: "",
-      imageUrl: "",
-      interests: [],
-      job: "",
-      introduce: "",
-      school: "",
-      blueCheck: false
-    )
-    self.allInterests = []
-  }
+  private init() { }
     
-  public func getData() -> UserDataProtocol {
+  public func getData() -> UserProfile {
     return userData
   }
   
-  public func setData(userData: UserDataProtocol) {
+  public func setData(userData: UserProfile) {
     var userData = userData
     userData.interests = userData.interests.map { interest in
       guard let index = allInterests.firstIndex(where: { $0.id == interest.id} ) else { return interest }

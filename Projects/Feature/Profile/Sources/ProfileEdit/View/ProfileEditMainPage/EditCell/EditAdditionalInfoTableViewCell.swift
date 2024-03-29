@@ -12,7 +12,7 @@ import SnapKit
 import Then
 
 import SharedDesignSystem
-import DomainUser
+import DomainUserInterface
 
 final class EditAdditionalInfoTableViewCell: UITableViewCell {
   static let cellId = "EditAdditionalInfoTableViewCell"
@@ -104,7 +104,7 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
 }
 
 extension EditAdditionalInfoTableViewCell {
-  func updateCell(userData: UserData) {
+  func updateCell(userData: UserProfile) {
     self.introduceButton.setIntroduceText(introduce: userData.introduce)
     
 

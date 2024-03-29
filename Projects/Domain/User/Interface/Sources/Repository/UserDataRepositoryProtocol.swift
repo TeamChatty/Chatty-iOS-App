@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 public protocol UserDataRepositoryProtocol {
-  func saveUserData(userData: UserDataProtocol)
-  func getUserData() -> UserDataProtocol
+  func saveUserData(userData: UserProfile)
+  func getUserData() -> UserProfile
   func saveAllInterests(interests: Interests)
 }
