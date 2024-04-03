@@ -37,7 +37,7 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
     $0.currentState = .enabled
 
     $0.title = "인증가이드"
-    $0.cornerRadius = 20
+    $0.cornerRadius = 10
   }
   
   private let profileImageView: UIImageView = UIImageView().then {
@@ -59,7 +59,8 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
-    
+    case imageGuide
+    case selectImage
   }
   
   // MARK: - Initialize Method
@@ -79,16 +80,24 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
     setupImage()
   }
   
+  
   // MARK: - UIBindable
   private func bind() {
+    certifiedGuideButton.touchEventRelay
+      .map { TouchEventType.imageGuide }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
     
+    cameraButton.rx.tap
+      .map { TouchEventType.selectImage }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
   }
 }
 
 extension EditImageTableViewCell {
   func updateCell(userData: UserProfile) {
     profileImageView.setImageKF(urlString: userData.imageUrl)
-    
   }
 }
 

@@ -30,6 +30,7 @@ final class ProfileEditMainPageViewController: UIPageViewController {
   }
   
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
+  private let disposeBag = DisposeBag()
   
   required init?(coder: NSCoder) {
     super.init(coder: coder)
@@ -45,15 +46,58 @@ final class ProfileEditMainPageViewController: UIPageViewController {
   private func configureUI() {
     reloadPageView()
   }
+  
   // MARK: - UIBindable
   private func bind() {
-    
+    self.dataViewControllers.forEach { vc in
+      guard let vc = vc as? ProfileEditMainPageTypeViewController else {
+        return
+      }
+      
+      vc.touchEventRelay
+        .map { event in
+          switch event {
+          case .imageGuide:
+            return TouchEventType.imageGuide
+          case .selectImage:
+            return TouchEventType.selectImage
+          case .nickname:
+            return TouchEventType.nickname
+          case .address:
+            return TouchEventType.address
+          case .job:
+            return TouchEventType.job
+          case .school:
+            return TouchEventType.school
+          case .introduce:
+            return TouchEventType.introduce
+          case .mbti:
+            return TouchEventType.mbti
+          case .interests:
+            return TouchEventType.interests
+          }
+        }
+        .bind(to: touchEventRelay)
+        .disposed(by: disposeBag)
+    }
   }
 }
 
 extension ProfileEditMainPageViewController {
   enum TouchEventType {
     case changePage(Int)
+    
+    case imageGuide
+    case selectImage
+    
+    case nickname
+    case address
+    case job
+    case school
+    
+    case introduce
+    case mbti
+    case interests
   }
 }
 
@@ -75,8 +119,6 @@ extension ProfileEditMainPageViewController: UIPageViewControllerDataSource {
         return dataViewControllers[nextIndex]
     }
   }
-  
-  
 }
 
 extension ProfileEditMainPageViewController: UIPageViewControllerDelegate {

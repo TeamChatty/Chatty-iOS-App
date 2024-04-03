@@ -15,7 +15,15 @@ import RxCocoa
 import ReactorKit
 
 protocol ProfileEditMainControllerDelegate: AnyObject {
-  
+  func presentImageGuide()
+  func presentSelectImage()
+  func presentNickname()
+  func presentAddress()
+  func presentJob()
+  func presentSchool()
+  func presentIntroduce()
+  func presentMBTI()
+  func presentInterests()
 }
 
 final class ProfileEditMainController: BaseController {
@@ -71,6 +79,26 @@ extension ProfileEditMainController: ReactorKit.View {
         switch event {
         case .changePage(let index):
           owner.reactor?.action.onNext(.changePage(index))
+          
+        case .imageGuide:
+          owner.delegate?.presentImageGuide()
+        case .selectImage:
+          owner.delegate?.presentSelectImage()
+          
+        case .nickname:
+          owner.delegate?.presentNickname()
+        case .address:
+          owner.delegate?.presentAddress()
+        case .job:
+          owner.delegate?.presentJob()
+        case .school:
+          owner.delegate?.presentSchool()
+        case .introduce:
+          owner.delegate?.presentIntroduce()
+        case .mbti:
+          owner.delegate?.presentMBTI()
+        case .interests:
+          owner.delegate?.presentInterests()
         }
       }
       .disposed(by: disposeBag)

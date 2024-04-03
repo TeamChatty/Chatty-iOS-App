@@ -92,9 +92,7 @@ extension OnboardingNickNameController: ReactorKit.View {
       .distinctUntilChanged()
       .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, result in
-        print("뭔데 시발 오냐?")
         if result {
-          print("뭔데 시발 오냐?")
           owner.delegate?.pushToProfiles()
           owner.reactor?.action.onNext(.didPushed)
         }

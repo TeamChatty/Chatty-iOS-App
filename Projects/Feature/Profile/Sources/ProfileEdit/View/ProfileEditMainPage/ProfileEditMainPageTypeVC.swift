@@ -60,7 +60,22 @@ final class ProfileEditMainPageTypeViewController: UIViewController {
   private func setEditCells() {
     
   }
-  
+}
+
+extension ProfileEditMainPageTypeViewController {
+  enum TouchEventType {
+    case imageGuide
+    case selectImage
+    
+    case nickname
+    case address
+    case job
+    case school
+    
+    case introduce
+    case mbti
+    case interests
+  }
 }
 
 extension ProfileEditMainPageTypeViewController: UITableViewDataSource {
@@ -81,14 +96,56 @@ extension ProfileEditMainPageTypeViewController: UITableViewDataSource {
       case .profileImage:
         guard let cell = tableView.dequeueReusableCell(withIdentifier: EditImageTableViewCell.cellId, for: indexPath) as? EditImageTableViewCell else { return UITableViewCell() }
         cell.updateCell(userData: userData!)
+        cell.touchEventRelay
+          .map { event in
+            switch event {
+            case .imageGuide:
+              return TouchEventType.imageGuide
+            case .selectImage:
+              return TouchEventType.selectImage
+            }
+          }
+          .bind(to: touchEventRelay)
+          .disposed(by: disposeBag)
+        
         return cell
       case .basicInformation:
         guard let cell = tableView.dequeueReusableCell(withIdentifier: EditBasicInfoTableViewCell.cellId, for: indexPath) as? EditBasicInfoTableViewCell else { return UITableViewCell() }
         cell.updateCell(userData: userData!)
+        cell.touchEventRelay
+          .map { event in
+            switch event {
+            case .nickname:
+              return TouchEventType.nickname
+            case .address:
+              return TouchEventType.address
+            case .job:
+              return TouchEventType.job
+            case .school:
+              return TouchEventType.school
+            }
+          }
+          .bind(to: touchEventRelay)
+          .disposed(by: disposeBag)
+          
         return cell
       case .additionalInformation:
         guard let cell = tableView.dequeueReusableCell(withIdentifier: EditAdditionalInfoTableViewCell.cellId, for: indexPath) as? EditAdditionalInfoTableViewCell else { return UITableViewCell() }
         cell.updateCell(userData: userData!)
+        cell.touchEventRelay
+          .map { event in
+            switch event {
+            case .introduce:
+              return TouchEventType.introduce
+            case .mbti:
+              return TouchEventType.mbti
+            case .interests:
+              return TouchEventType.interests
+            }
+          }
+          .bind(to: touchEventRelay)
+          .disposed(by: disposeBag)
+        
         return cell
       }
     case .preview:
@@ -151,11 +208,6 @@ extension ProfileEditMainPageTypeViewController {
   }
 }
 
-extension ProfileEditMainPageTypeViewController {
-  enum TouchEventType {
-    
-  }
-}
 extension ProfileEditMainPageTypeViewController {
   func setUserData(userData: UserProfile) {
     self.userData = userData

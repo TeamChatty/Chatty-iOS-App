@@ -23,20 +23,70 @@ final class EditBasicInfoTableViewCell: UITableViewCell {
     $0.textColor = SystemColor.basicBlack.uiColor
   }
   
-  private let genderButton: UIButton = UIButton()
-  private let ageButton: UIButton = UIButton()
-  private let nicknameButton: UIButton = UIButton()
-  private let addressButton: UIButton = UIButton()
-  private let jobButton: UIButton = UIButton()
-  private let schoolButton: UIButton = UIButton()
-
+  private let genderView: TitleContentView = TitleContentView().then {
+    $0.title = "성별"
+    $0.font = SystemFont.body02.font
+    $0.textColor = SystemColor.gray500.uiColor
+    $0.backgroundColor = SystemColor.gray100.uiColor
+    $0.layer.cornerRadius = 8
+  }
+  private let ageView: TitleContentView = TitleContentView().then {
+    $0.title = "나이"
+    $0.font = SystemFont.body02.font
+    $0.textColor = SystemColor.gray500.uiColor
+    $0.backgroundColor = SystemColor.gray100.uiColor
+    $0.layer.cornerRadius = 8
+  }
+  private let nicknameButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
+    typealias Configuration = ArrowSubtitleButton.Configuration
+    let emptyData = Configuration(
+      font: SystemFont.body01.font,
+      textColor: SystemColor.gray500.uiColor
+    )
+    $0.setState(emptyData, for: .emptyData)
+    
+    $0.title = "닉네임"
+  }
+  private let addressButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
+    typealias Configuration = ArrowSubtitleButton.Configuration
+    let emptyData = Configuration(
+      font: SystemFont.body01.font,
+      textColor: SystemColor.gray500.uiColor
+    )
+    $0.setState(emptyData, for: .emptyData)
+    
+    $0.title = "지역"
+  }
+  private let jobButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
+    typealias Configuration = ArrowSubtitleButton.Configuration
+    let emptyData = Configuration(
+      font: SystemFont.body01.font,
+      textColor: SystemColor.gray500.uiColor
+    )
+    $0.setState(emptyData, for: .emptyData)
+    
+    $0.title = "직업"
+  }
+  private let schoolButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
+    typealias Configuration = ArrowSubtitleButton.Configuration
+    let emptyData = Configuration(
+      font: SystemFont.body01.font,
+      textColor: SystemColor.gray500.uiColor
+    )
+    $0.setState(emptyData, for: .emptyData)
+    
+    $0.title = "학교"
+  }
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()
   
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
-    
+    case nickname
+    case address
+    case job
+    case school
   }
   
   // MARK: - Initialize Method
@@ -57,25 +107,48 @@ final class EditBasicInfoTableViewCell: UITableViewCell {
   
   // MARK: - UIBindable
   private func bind() {
+    nicknameButton.touchEventRelay
+      .map { TouchEventType.nickname }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
     
+    addressButton.touchEventRelay
+      .map { TouchEventType.address }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
+    jobButton.touchEventRelay
+      .map { TouchEventType.job }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
+    schoolButton.touchEventRelay
+      .map { TouchEventType.school }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
   }
 }
 
 extension EditBasicInfoTableViewCell {
   func updateCell(userData: UserProfile) {
-    
+    genderView.contentText = userData.gender?.stringKR
+    ageView.contentText = "만 \(userData.americanAge)세"
+    nicknameButton.contentText = userData.nickname
+    addressButton.contentText = userData.address
+    jobButton.contentText = userData.job
+    schoolButton.contentText = userData.school
   }
 }
 
 extension EditBasicInfoTableViewCell {
   private func setupButtons() {
-    addSubview(headerTitle)
-    addSubview(genderButton)
-    addSubview(ageButton)
-    addSubview(nicknameButton)
-    addSubview(addressButton)
-    addSubview(jobButton)
-    addSubview(schoolButton)
+    contentView.addSubview(headerTitle)
+    contentView.addSubview(genderView)
+    contentView.addSubview(ageView)
+    contentView.addSubview(nicknameButton)
+    contentView.addSubview(addressButton)
+    contentView.addSubview(jobButton)
+    contentView.addSubview(schoolButton)
 
     headerTitle.snp.makeConstraints {
       $0.top.equalToSuperview()
@@ -83,20 +156,20 @@ extension EditBasicInfoTableViewCell {
       $0.leading.equalToSuperview().inset(20)
     }
     
-    genderButton.snp.makeConstraints {
+    genderView.snp.makeConstraints {
       $0.top.equalTo(headerTitle.snp.bottom).offset(20)
       $0.height.equalTo(48)
       $0.horizontalEdges.equalToSuperview().inset(20)
     }
     
-    ageButton.snp.makeConstraints {
-      $0.top.equalTo(genderButton.snp.bottom).offset(12)
+    ageView.snp.makeConstraints {
+      $0.top.equalTo(genderView.snp.bottom).offset(12)
       $0.height.equalTo(48)
       $0.horizontalEdges.equalToSuperview().inset(20)
     }
     
     nicknameButton.snp.makeConstraints {
-      $0.top.equalTo(ageButton.snp.bottom).offset(12)
+      $0.top.equalTo(ageView.snp.bottom).offset(12)
       $0.height.equalTo(48)
       $0.horizontalEdges.equalToSuperview().inset(20)
     }
