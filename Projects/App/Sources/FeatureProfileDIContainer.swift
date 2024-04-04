@@ -25,4 +25,45 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
     )
   }
   
+  func makeSaveAddressUseCase() -> DefaultSaveAddressUseCase {
+    return DefaultSaveAddressUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeSaveJobUseCase() -> DefaultSaveJobUseCase {
+    return DefaultSaveJobUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeSaveSchoolUseCase() -> DefaultSaveSchoolUseCase {
+    return DefaultSaveSchoolUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeSaveIntroduceUseCase() -> DefaultSaveIntroduceUseCase {
+    return DefaultSaveIntroduceUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeSaveMBTIUseCase() -> DefaultSaveMBTIUseCase {
+    return DefaultSaveMBTIUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeSaveInterestsUseCase() -> DefaultSaveInterestsUseCase {
+    return DefaultSaveInterestsUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
 }
