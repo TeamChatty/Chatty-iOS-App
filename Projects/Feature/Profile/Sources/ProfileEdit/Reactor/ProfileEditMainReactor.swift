@@ -15,22 +15,25 @@ final class ProfileEditMainReactor: Reactor {
   
   enum Action {
     case changePage(Int)
+    case editSuccessed(ProfileEditType)
   }
   
   enum Mutation {
     case setPage(Int)
+    case setProfileData(UserProfile)
+    case setIsShowingToastView(Bool)
   }
   
   struct State {
     var profileData: UserProfile
     var pageIndex: Int = 0
+    var isShowingToastView: Bool = false
   }
   
   var initialState: State
   
   public init(getUserDataUseCase: GetUserDataUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
-//    self.initialState = State()
     self.initialState = State(profileData: getUserDataUseCase.execute())
   }
 }
@@ -40,6 +43,12 @@ extension ProfileEditMainReactor {
     switch action {
     case .changePage(let index):
       return .just(.setPage(index))
+    case .editSuccessed:
+      let userProfile = self.getUserDataUseCase.execute()
+      return .concat([
+        .just(.setProfileData(userProfile)),
+        .just(.setIsShowingToastView(true))
+      ])
     }
   }
   
@@ -48,6 +57,10 @@ extension ProfileEditMainReactor {
     switch mutation {
     case .setPage(let index):
       newState.pageIndex = index
+    case .setProfileData(let profileData):
+      newState.profileData = profileData
+    case .setIsShowingToastView(let bool):
+      newState.isShowingToastView = bool
     }
     return newState
   }

@@ -45,4 +45,5 @@ public enum NewDeviceAccessType {
 public enum ProfileType {
   case main
   case editMain
+  case editType
 }

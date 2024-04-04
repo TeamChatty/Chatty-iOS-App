@@ -34,13 +34,19 @@ public final class ProfileEditMainCoordinator: BaseCoordinator, ProfileEditMainC
   }
 }
 
-extension ProfileEditMainCoordinator {
+extension ProfileEditMainCoordinator: ProfileEditModalDelegate {
   func dismissModal() {
     navigationController.dismiss(animated: true)
   }
   
   func successEdit(editType: ProfileEditType) {
-    
+    DispatchQueue.main.async {
+      let vcCount = self.navigationController.viewControllers.count
+      if let vc = self.navigationController.viewControllers[vcCount - 1] as? ProfileEditMainController {
+        vc.reactor?.action.onNext(.editSuccessed(editType))
+      }
+      self.navigationController.dismiss(animated: true)
+    }
   }
 }
 
@@ -50,11 +56,20 @@ extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
   }
   
   func presentSelectImage() {
-    print("presentImageGuide")
+    print("presentSelectImage")
   }
 
   func presentNickname() {
-    print("presentNickname")
+    let profileEditNicknameModal = ProfileEditNicknameModal(
+      reactor: ProfileEditTypeReactor(
+        saveProfileNicknameUseCase: featureProfileDependencyProvider.makeSaveProfileNicknameUseCase(),
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase()
+      )
+    )
+    
+    profileEditNicknameModal.modalPresentationStyle = .pageSheet
+    profileEditNicknameModal.delegate = self
+    navigationController.present(profileEditNicknameModal, animated: true)
   }
   
   func presentAddress() {
