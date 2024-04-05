@@ -14,11 +14,12 @@ import SharedDesignSystem
 
 final class IntroduceButton: BaseControl, Touchable, Highlightable, Transformable {
   // MARK: - View Property
-  private let introduceLabel: UILabel = UILabel().then {
+  private let introduceLabel: VerticalAlignLabel = VerticalAlignLabel().then {
     $0.text = "내 소개를 10자 이상 작성해주세요. 예를 들면 최근 관심사, 쉬는 날에는 뭐 하는지 등 상관없어요. 다만 성적인 내용을 암시하는 내용이나 SNS계정을 공유하면 채티 계정이 정지될 수 있습니다."
     $0.textColor = SystemColor.gray500.uiColor
     $0.font = SystemFont.body01.font
     $0.numberOfLines = 0
+    $0.sizeToFit()
   }
   
   // MARK: - Touchable Property

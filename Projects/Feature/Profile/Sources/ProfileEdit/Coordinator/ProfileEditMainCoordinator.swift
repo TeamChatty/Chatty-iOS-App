@@ -73,19 +73,59 @@ extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
   }
   
   func presentAddress() {
-    print("presentAddress")
+    let profileEditAddressModal = ProfileEditAddressModal(
+      reactor: ProfileEditAddressReactor(
+        saveSaveAddressUseCase: featureProfileDependencyProvider.makeSaveAddressUseCase(),
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase()
+      )
+    )
+    
+    profileEditAddressModal.modalPresentationStyle = .pageSheet
+    profileEditAddressModal.delegate = self
+    navigationController.present(profileEditAddressModal, animated: true)
   }
   
   func presentJob() {
-    print("presentJob")
+    let profileEditJobModal = ProfileEditJobAndSchoolModal(
+      reactor: ProfileEditJobAndSchoolReactor(
+        editType: .job,
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase(),
+        saveSchoolUserCase: featureProfileDependencyProvider.makeSaveSchoolUseCase(),
+        saveJobUseCase: featureProfileDependencyProvider.makeSaveJobUseCase()
+      )
+    )
+    
+    profileEditJobModal.modalPresentationStyle = .pageSheet
+    profileEditJobModal.delegate = self
+    navigationController.present(profileEditJobModal, animated: true)
   }
   
   func presentSchool() {
-    print("presentSchool")
+    let profileEditJobModal = ProfileEditJobAndSchoolModal(
+      reactor: ProfileEditJobAndSchoolReactor(
+        editType: .school,
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase(),
+        saveSchoolUserCase: featureProfileDependencyProvider.makeSaveSchoolUseCase(),
+        saveJobUseCase: featureProfileDependencyProvider.makeSaveJobUseCase()
+      )
+    )
+    
+    profileEditJobModal.modalPresentationStyle = .pageSheet
+    profileEditJobModal.delegate = self
+    navigationController.present(profileEditJobModal, animated: true)
   }
   
   func presentIntroduce() {
-    print("presentIntroduce")
+    let profileEditIntroduceModal = ProfileEditIntroduceModal(
+      reactor: ProfileEditIntroduceReactor(
+        saveIntroduceUseCase: featureProfileDependencyProvider.makeSaveIntroduceUseCase(),
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase()
+      )
+    )
+    
+    profileEditIntroduceModal.modalPresentationStyle = .pageSheet
+    profileEditIntroduceModal.delegate = self
+    navigationController.present(profileEditIntroduceModal, animated: true)
   }
   
   func presentMBTI() {

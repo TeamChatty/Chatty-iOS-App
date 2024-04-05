@@ -23,12 +23,10 @@ final class PreviewAdditionalInfoTableViewCell: UITableViewCell {
     $0.font = SystemFont.title03.font
     $0.textColor = SystemColor.basicBlack.uiColor
   }
-  private let introduceLabel: TitleContentView = TitleContentView().then {
-    $0.title = "성별"
-    $0.font = SystemFont.body01.font
-    $0.textColor = SystemColor.basicBlack.uiColor
+  private let introduceLabel: IntroduceButton = IntroduceButton().then {
     $0.backgroundColor = SystemColor.gray100.uiColor
     $0.layer.cornerRadius = 8
+    $0.isEnabled = false
   }
   
   private let mbtiHeaderTitle: UILabel = UILabel().then {
@@ -117,7 +115,8 @@ final class PreviewAdditionalInfoTableViewCell: UITableViewCell {
 
 extension PreviewAdditionalInfoTableViewCell {
   func updateCell(userData: UserProfile) {
-    introduceLabel.title = userData.introduce == nil ? "자기소개를 입력해주세요." : userData.introduce
+    let introduce = userData.introduce == nil ? "자기소개를 입력해주세요." : userData.introduce
+    introduceLabel.setIntroduceText(introduce: introduce)
     mbtiLabel.title = userData.mbti == nil ? "MBTI를 입력해주세요." : userData.mbti
     
     interestsStackView.removeAllArrangedSubViews()
