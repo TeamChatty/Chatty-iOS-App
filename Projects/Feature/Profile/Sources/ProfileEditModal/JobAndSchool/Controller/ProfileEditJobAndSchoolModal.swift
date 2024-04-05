@@ -1,8 +1,8 @@
 //
-//  ProfileEditNicknameModal.swift
-//  FeatureProfileInterface
+//  ProfileEditJobModal.swift
+//  FeatureProfile
 //
-//  Created by 윤지호 on 4/4/24.
+//  Created by 윤지호 on 4/5/24.
 //
 
 import UIKit
@@ -13,12 +13,12 @@ import Then
 import SharedDesignSystem
 import ReactorKit
 
-final class ProfileEditNicknameModal: BaseController {
+final class ProfileEditJobAndSchoolModal: BaseController {
   // MARK: - View Property
-  private lazy var mainView = ProfileEditNicknameView()
+  private lazy var mainView = ProfileEditJobAndSchoolView()
   
   // MARK: - Reactor Property
-  public typealias Reactor = ProfileEditTypeReactor
+  public typealias Reactor = ProfileEditJobAndSchoolReactor
   
   // MARK: - LifeCycle Method
   public override func viewDidLoad() {
@@ -49,12 +49,12 @@ final class ProfileEditNicknameModal: BaseController {
   }
   
   deinit {
-    print("해제됨: ProfileEditNicknameModal")
+    print("해제됨: ProfileEditJobAndSchoolModal")
   }
 }
 
-extension ProfileEditNicknameModal: ReactorKit.View {
-  public func bind(reactor: ProfileEditTypeReactor) {
+extension ProfileEditJobAndSchoolModal: ReactorKit.View {
+  public func bind(reactor: ProfileEditJobAndSchoolReactor) {
     mainView.touchEventRelay
       .bind(with: self) { owner, event in
         switch event {
@@ -65,6 +65,13 @@ extension ProfileEditNicknameModal: ReactorKit.View {
         case .change:
           owner.reactor?.action.onNext(.tabChangeButton)
         }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.profileEditType)
+      .bind(with: self) { owner, profileType in
+        owner.mainView.setProfileType(profileType: profileType)
       }
       .disposed(by: disposeBag)
     
@@ -112,7 +119,7 @@ extension ProfileEditNicknameModal: ReactorKit.View {
   }
 }
 
-extension ProfileEditNicknameModal {
+extension ProfileEditJobAndSchoolModal {
   private func setupSheet() {
     if let sheet = self.sheetPresentationController {
       let contentHeight = mainView.frame.height
