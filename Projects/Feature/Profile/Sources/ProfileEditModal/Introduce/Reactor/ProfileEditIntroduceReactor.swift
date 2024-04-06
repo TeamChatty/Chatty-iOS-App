@@ -48,16 +48,10 @@ final class ProfileEditIntroduceReactor: Reactor {
   }
   
   public enum ErrorType: Error {
-    case wrongParameter
-    case duplicatedNickname
     case unknownError
     
     var description: String {
       switch self {
-      case .wrongParameter:
-        return "닉네임은 특수문자를 제외한 2~10자리여야 합니다."
-      case .duplicatedNickname:
-        return "누군가 이미 쓰고 있어요. 다른 닉네임을 입력해주세요."
       case .unknownError:
         return "문제가 생겼어요. 다시 시도해주세요."
       }
@@ -124,10 +118,6 @@ extension Error {
         return .just(.setError(.unknownError))
       }
       switch error.errorCase {
-      case .E000WrongParameter:
-        return .just(.setError(.wrongParameter))
-      case .E006AlreadyExistNickname:
-        return .just(.setError(.duplicatedNickname))
       default:
         return .just(.setError(.unknownError))
       }
