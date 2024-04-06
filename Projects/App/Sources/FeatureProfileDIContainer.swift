@@ -11,6 +11,7 @@ import FeatureProfileInterface
 import DomainUser
 
 final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDependencyProvider {
+  
   func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
     return DefaultGetUserDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
@@ -62,6 +63,13 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
   
   func makeSaveInterestsUseCase() -> DefaultSaveInterestsUseCase {
     return DefaultSaveInterestsUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userDataRepository: makeUserDataRepository()
+    )
+  }
+  
+  func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase {
+    return DefaultGetAllInterestsUseCase(
       userAPIRepository: makeUserAPIRepository(),
       userDataRepository: makeUserDataRepository()
     )

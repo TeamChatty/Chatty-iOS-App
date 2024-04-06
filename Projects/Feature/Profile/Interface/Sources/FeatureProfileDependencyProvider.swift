@@ -11,4 +11,5 @@ public protocol FeatureProfileDependencyProvider {
   func makeSaveIntroduceUseCase() -> DefaultSaveIntroduceUseCase
   func makeSaveMBTIUseCase() -> DefaultSaveMBTIUseCase
   func makeSaveInterestsUseCase() -> DefaultSaveInterestsUseCase
+  func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase
 }
