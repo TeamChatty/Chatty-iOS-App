@@ -19,7 +19,7 @@ public struct UserDataReponseDTO: Decodable {
   public let mbti: String?
   public let authority: Authority
   public let address: String?
-  public let interests: [String]
+  public let interests: [InterestsDTO]
   public let imageUrl: String?
   public let school: String?
   public let job: String?
@@ -36,7 +36,7 @@ public struct UserDataReponseDTO: Decodable {
       authority: self.authority,
       address: self.address,
       imageUrl: self.imageUrl,
-      interests: self.interests.map { Interest(id: -1, name: $0) },
+      interests: self.interests.map { Interest(id: $0.id, name: $0.name) },
       job: self.job,
       introduce: self.introduce,
       school: self.school,
