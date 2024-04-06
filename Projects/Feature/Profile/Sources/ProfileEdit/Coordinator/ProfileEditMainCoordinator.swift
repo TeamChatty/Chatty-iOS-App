@@ -129,7 +129,16 @@ extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
   }
   
   func presentMBTI() {
-    print("presentMBTI")
+    let profileEditIntroduceModal = ProfileEditMBTIModal(
+      reactor: ProfileEditMBTIReactor(
+        saveMBTIUseCase: featureProfileDependencyProvider.makeSaveMBTIUseCase(),
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase()
+      )
+    )
+    
+    profileEditIntroduceModal.modalPresentationStyle = .pageSheet
+    profileEditIntroduceModal.delegate = self
+    navigationController.present(profileEditIntroduceModal, animated: true)
   }
   
   func presentInterests() {

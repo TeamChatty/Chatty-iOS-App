@@ -348,6 +348,4 @@ extension OnboardingProfileView {
   public func updateMBTIView(_ mbti: MBTI) {
     mbtiView?.updateMBTIView(mbti)
   }
-  
- 
 }
