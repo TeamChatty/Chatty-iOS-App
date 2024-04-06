@@ -69,13 +69,20 @@ extension ProfileEditAddressModal: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
+      .map(\.addressArray)
+      .filter { !$0.isEmpty }
+      .distinctUntilChanged()
+      .bind(to: mainView.items)
+      .disposed(by: disposeBag)
+    
+    reactor.state
       .map(\.selectedAddress)
       .distinctUntilChanged()
       .bind(with: self) { owner, selectedAddress in
         if let selectedAddress {
           owner.mainView.setButtonState(selectedAddress: selectedAddress)
         }
-      }
+      } 
       .disposed(by: disposeBag)
     
     reactor.state

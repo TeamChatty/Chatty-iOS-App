@@ -142,7 +142,17 @@ extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
   }
   
   func presentInterests() {
-    print("presentInterests")
+    
+    let profileEditInterestsModal = ProfileEditInterestsModal(
+      reactor: ProfileEditInterestsReactor(
+        getAllInterestsUseCase: featureProfileDependencyProvider.makeGetAllInterestsUseCase(),
+        saveInterestsUseCase: featureProfileDependencyProvider.makeSaveInterestsUseCase(),
+        getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase())
+    )
+    
+    profileEditInterestsModal.modalPresentationStyle = .pageSheet
+    profileEditInterestsModal.delegate = self
+    navigationController.present(profileEditInterestsModal, animated: true)
   }
   
   
