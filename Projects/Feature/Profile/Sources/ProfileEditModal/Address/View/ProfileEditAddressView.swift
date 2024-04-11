@@ -107,9 +107,10 @@ extension ProfileEditAddressView {
   
   private func setupAddressButtonsView() {
     addSubview(addressButtonsScrollView)
+    let width = CGRect.appFrame.width - 40
+    addressButtonsScrollView.contentSize = CGSize(width: width, height: 1000)
     addressButtonsScrollView.addSubview(addressRadioSegmentView)
     
-    addressButtonsScrollView.contentLayoutGuide
     addressButtonsScrollView.snp.makeConstraints {
       $0.top.equalTo(titleLabel.snp.bottom).offset(12)
       $0.height.equalTo(400)
@@ -118,7 +119,7 @@ extension ProfileEditAddressView {
     
     addressRadioSegmentView.snp.makeConstraints {
       $0.top.equalTo(addressButtonsScrollView.contentLayoutGuide.snp.top)
-      $0.horizontalEdges.equalToSuperview()
+      $0.width.equalTo(addressButtonsScrollView.frameLayoutGuide.snp.width)
       $0.bottom.equalTo(addressButtonsScrollView.contentLayoutGuide.snp.bottom)
     }
   }

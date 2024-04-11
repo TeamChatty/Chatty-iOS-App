@@ -5,6 +5,7 @@
 //  Created by 윤지호 on 3/21/24.
 //
 
+import UIKit
 import ReactorKit
 import DomainUser
 import DomainUserInterface
@@ -16,18 +17,24 @@ final class ProfileEditMainReactor: Reactor {
   enum Action {
     case changePage(Int)
     case editSuccessed(ProfileEditType)
+    case selectImage(UIImage)
   }
   
   enum Mutation {
     case setPage(Int)
     case setProfileData(UserProfile)
     case setIsShowingToastView(Bool)
+    case isLoading(Bool)
+    case setError(ErrorType?)
   }
   
   struct State {
     var profileData: UserProfile
     var pageIndex: Int = 0
     var isShowingToastView: Bool = false
+    
+    var isLoading: Bool = false
+    var errorState: ErrorType? = nil
   }
   
   var initialState: State
@@ -35,6 +42,10 @@ final class ProfileEditMainReactor: Reactor {
   public init(getUserDataUseCase: GetUserDataUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
     self.initialState = State(profileData: getUserDataUseCase.execute())
+  }
+  
+  public enum ErrorType: Error {
+    case unknownError
   }
 }
 
@@ -49,6 +60,17 @@ extension ProfileEditMainReactor {
         .just(.setProfileData(userProfile)),
         .just(.setIsShowingToastView(true))
       ])
+    case .selectImage(let image):
+      return .concat([
+        .just(.isLoading(true)),
+        getUserDataUseCase.executeSingle()
+          .asObservable()
+          .map { .setProfileData($0) }
+          .catch { error -> Observable<Mutation> in
+            return error.toMutation()
+          },
+        .just(.isLoading(false))
+      ])
     }
   }
   
@@ -61,7 +83,31 @@ extension ProfileEditMainReactor {
       newState.profileData = profileData
     case .setIsShowingToastView(let bool):
       newState.isShowingToastView = bool
+    case .isLoading(let bool):
+      newState.isLoading = bool
+    case .setError(let error):
+      newState.errorState = error
     }
     return newState
   }
 }
+
+extension Error {
+  func toMutation() -> Observable<ProfileEditMainReactor.Mutation> {
+    let errorMutation: Observable<ProfileEditMainReactor.Mutation> = {
+      guard let error = self as? NetworkError else {
+        return .just(.setError(.unknownError))
+      }
+      switch error.errorCase {
+      default:
+        return .just(.setError(.unknownError))
+      }
+    }()
+    
+    return Observable.concat([
+      errorMutation,
+      .just(.setError(nil))
+    ])
+  }
+}
+

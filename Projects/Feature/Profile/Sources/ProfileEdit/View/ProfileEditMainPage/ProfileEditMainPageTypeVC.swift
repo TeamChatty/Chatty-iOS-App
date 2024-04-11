@@ -64,6 +64,7 @@ final class ProfileEditMainPageTypeViewController: UIViewController {
 
 extension ProfileEditMainPageTypeViewController {
   enum TouchEventType {
+    case chatImageGuide
     case imageGuide
     case selectImage
     
@@ -99,6 +100,8 @@ extension ProfileEditMainPageTypeViewController: UITableViewDataSource {
         cell.touchEventRelay
           .map { event in
             switch event {
+            case .chatImageGuide:
+              return TouchEventType.chatImageGuide
             case .imageGuide:
               return TouchEventType.imageGuide
             case .selectImage:

@@ -80,6 +80,16 @@ extension ProfileEditMainController: ReactorKit.View {
         case .changePage(let index):
           owner.reactor?.action.onNext(.changePage(index))
           
+        case .chatImageGuide:
+          owner.showErrorAlert(
+            subTitle:
+"""
+채팅 기능을 사용하지 않으면, 다른 사용자가 내 프로필을 볼 수 없어요.
+
+채팅 중에는 대화 상대가 재화를 사용하여 블러가 해제된 나의 사진을 볼 수 있어요.
+""",
+            positiveLabel: "확인"
+          )
         case .imageGuide:
           owner.delegate?.presentImageGuide()
         case .selectImage:

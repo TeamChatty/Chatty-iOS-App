@@ -57,6 +57,8 @@ final class ProfileEditMainPageViewController: UIPageViewController {
       vc.touchEventRelay
         .map { event in
           switch event {
+          case .chatImageGuide:
+            return TouchEventType.chatImageGuide
           case .imageGuide:
             return TouchEventType.imageGuide
           case .selectImage:
@@ -75,6 +77,7 @@ final class ProfileEditMainPageViewController: UIPageViewController {
             return TouchEventType.mbti
           case .interests:
             return TouchEventType.interests
+        
           }
         }
         .bind(to: touchEventRelay)
@@ -87,6 +90,7 @@ extension ProfileEditMainPageViewController {
   enum TouchEventType {
     case changePage(Int)
     
+    case chatImageGuide
     case imageGuide
     case selectImage
     

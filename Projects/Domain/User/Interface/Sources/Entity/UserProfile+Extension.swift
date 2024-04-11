@@ -9,12 +9,23 @@ import Foundation
 import SharedUtil
 
 extension UserProfile {
-  public var genderStringKR: String {
+  public var genderShortStringKR: String {
     switch self.gender {
     case .male:
       return "남"
     case .female:
       return "여"
+    default:
+      return ""
+    }
+  }
+  
+  public var genderStringKR: String {
+    switch self.gender {
+    case .male:
+      return "남자"
+    case .female:
+      return "여자"
     default:
       return ""
     }

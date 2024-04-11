@@ -5,7 +5,9 @@
 //  Created by 윤지호 on 3/21/24.
 //
 
-import Foundation
+import UIKit
+import PhotosUI
+import Mantis
 import Shared
 import SharedDesignSystem
 import FeatureProfileInterface
@@ -52,11 +54,21 @@ extension ProfileEditMainCoordinator: ProfileEditModalDelegate {
 
 extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
   func presentImageGuide() {
-    print("presentImageGuide")
+    let onboardingImageGuideContoller = OnboardingImageGuideController(reactor: OnboardingImageGuideReactor())
+
+    onboardingImageGuideContoller.modalPresentationStyle = .pageSheet
+    onboardingImageGuideContoller.delegate = self
+    
+    navigationController.present(onboardingImageGuideContoller, animated: true)
   }
   
   func presentSelectImage() {
-    print("presentSelectImage")
+    let onboardingImageGuideContoller = OnboardingImageGuideController(reactor: OnboardingImageGuideReactor())
+
+    onboardingImageGuideContoller.modalPresentationStyle = .pageSheet
+    onboardingImageGuideContoller.delegate = self
+    
+    navigationController.present(onboardingImageGuideContoller, animated: true)
   }
 
   func presentNickname() {
@@ -154,6 +166,63 @@ extension ProfileEditMainCoordinator: ProfileEditMainControllerDelegate {
     profileEditInterestsModal.delegate = self
     navigationController.present(profileEditInterestsModal, animated: true)
   }
+}
+
+extension ProfileEditMainCoordinator: ProfileImageGuideDelegate, PHPickerViewControllerDelegate {
+  public func pushToImagePicker() {
+    var configuration = PHPickerConfiguration()
+    configuration.selectionLimit = 1
+    configuration.filter = .any(of: [.images])
+    
+    let picker = PHPickerViewController(configuration: configuration)
+    picker.delegate = self
+    
+    navigationController.present(picker, animated: true)
+  }
+    
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    picker.dismiss(animated: true)
+    
+    let itemProvider = results.first?.itemProvider
+    
+    if let itemProvider = itemProvider,
+       itemProvider.canLoadObject(ofClass: UIImage.self) {
+      itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+        if let image = image as? UIImage {
+          DispatchQueue.main.async {
+            var config = Mantis.Config()
+            config.cropViewConfig.showAttachedRotationControlView = false
+            config.cropToolbarConfig.toolbarButtonOptions = []
+            config.presetFixedRatioType = .alwaysUsingOnePresetFixedRatio(ratio: 1 / 1)
+            let cropViewController = Mantis.cropViewController(
+              image: image,
+              config: config
+            )
+            cropViewController.delegate = self
+            
+            self.navigationController.present(cropViewController, animated: true)
+          }
+        }
+      }
+    }
+  }
+}
+
+extension ProfileEditMainCoordinator: CropViewControllerDelegate {
+  public func cropViewControllerDidCrop(_ cropViewController: Mantis.CropViewController, cropped: UIImage, transformation: Mantis.Transformation, cropInfo: Mantis.CropInfo) {
+    DispatchQueue.main.async {
+      let vcCount = self.navigationController.viewControllers.count
+      if let vc = self.navigationController.viewControllers[vcCount - 1] as? ProfileEditMainController {
+        vc.reactor?.action.onNext(.selectImage(cropped))
+      }
+      self.navigationController.dismiss(animated: true)
+
+    }
+  }
   
-  
+  public func cropViewControllerDidCancel(_ cropViewController: Mantis.CropViewController, original: UIImage) {
+    DispatchQueue.main.async {
+      self.navigationController.dismiss(animated: true)
+    }
+  }
 }

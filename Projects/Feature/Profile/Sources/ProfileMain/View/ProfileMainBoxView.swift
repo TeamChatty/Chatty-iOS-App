@@ -152,6 +152,6 @@ extension ProfileMainBoxView {
     self.profileImageView.setImageKF(urlString: data.imageUrl ?? "")
 
     self.nicknameLabel.text = data.nickname
-    self.ageAndGenderLabel.text = "만 \(data.americanAge)세 ・ \(data.genderStringKR)"
+    self.ageAndGenderLabel.text = "만 \(data.americanAge)세 ・ \(data.genderShortStringKR)"
   }
 }
