@@ -27,13 +27,19 @@ final class ProfileMainBoxView: BaseView, Touchable {
     $0.clipsToBounds = true
     $0.text = "20% 완성"
   }
-  private let percentProgress = CircularProgressBarView()
+//  private let percentProgress = CircularProgressBarView()
+  private let percentProgress = UIView().then {
+    $0.layer.cornerRadius = 154 / 2
+    $0.backgroundColor = SystemColor.primaryNormal.uiColor
+  }
+
+  
   
   private let profileImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
     $0.layer.cornerRadius = 148 / 2
-    $0.layer.borderWidth = 2
-    $0.layer.borderColor = SystemColor.basicBlack.uiColor.cgColor
+    $0.layer.borderWidth = 4
+    $0.layer.borderColor = SystemColor.basicWhite.uiColor.cgColor
     $0.clipsToBounds = true
     $0.backgroundColor = .lightGray
   }
@@ -145,11 +151,11 @@ extension ProfileMainBoxView {
 extension ProfileMainBoxView {
   func setPercent(percent: Double) {
     self.percentLabel.text = "\(Int(percent))% 완성"
-    self.percentProgress.setCirclePercent(percent: percent)
+//    self.percentProgress.setCirclePercent(percent: percent)
   }
   
   func setProfileData(_ data: UserProfile) {
-    self.profileImageView.setImageKF(urlString: data.imageUrl ?? "")
+    self.profileImageView.setImageKF(urlString: data.imageUrl ?? nil)
 
     self.nicknameLabel.text = data.nickname
     self.ageAndGenderLabel.text = "만 \(data.americanAge)세 ・ \(data.genderShortStringKR)"
