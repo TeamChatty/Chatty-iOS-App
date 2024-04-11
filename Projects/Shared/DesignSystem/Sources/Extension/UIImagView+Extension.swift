@@ -13,7 +13,6 @@ extension UIImageView {
     self.kf.indicatorType = .activity
     guard let urlString,
           let url = URL(string: urlString) else {
-      self.image = .add
       return
     }
     

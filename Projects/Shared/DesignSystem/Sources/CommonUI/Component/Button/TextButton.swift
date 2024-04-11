@@ -1,8 +1,8 @@
 //
-//  PlainButton.swift
+//  TextButton.swift
 //  SharedDesignSystem
 //
-//  Created by walkerhilla on 1/9/24.
+//  Created by 윤지호 on 4/11/24.
 //
 
 import UIKit
@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-open class PlainButton: BaseControl, Touchable, Highlightable {
+open class TextButton: BaseControl, Touchable, Highlightable {
   // MARK: - View Property
   private let titleLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicBlack.uiColor
@@ -89,8 +89,8 @@ open class PlainButton: BaseControl, Touchable, Highlightable {
   private func setupTitleLabel() {
     addSubview(titleLabel)
     titleLabel.snp.makeConstraints {
-      $0.horizontalEdges.equalToSuperview().inset(20)
-      $0.centerY.equalToSuperview()
+      $0.edges.equalToSuperview()
     }
   }
 }
+

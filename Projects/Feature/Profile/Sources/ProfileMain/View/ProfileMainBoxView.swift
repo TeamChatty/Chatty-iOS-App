@@ -42,6 +42,7 @@ final class ProfileMainBoxView: BaseView, Touchable {
     $0.layer.borderColor = SystemColor.basicWhite.uiColor.cgColor
     $0.clipsToBounds = true
     $0.backgroundColor = .lightGray
+    $0.backgroundColor = .white
   }
   
   private let editProfileButton: ChangeableImageButton = ChangeableImageButton().then {

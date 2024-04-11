@@ -13,6 +13,7 @@ public enum CoordinatorType {
   case live(LiveType)
   case onboarding(OnboardingType)
   case profile(ProfileType)
+  case setting(SettingType)
 }
 
 public enum LiveType {
@@ -46,4 +47,9 @@ public enum ProfileType {
   case main
   case editMain
   case editType
+}
+
+public enum SettingType {
+  case main
+  case changePhoneNumber
 }
