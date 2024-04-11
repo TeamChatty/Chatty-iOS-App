@@ -48,4 +48,13 @@ public enum Authority: String, Decodable {
 public enum Gender: String, Decodable {
   case male = "MALE"
   case female = "FEMALE"
+  
+  public var stringKR: String {
+    switch self {
+    case .male:
+      return "남자"
+    case .female:
+      return "여자"
+    }
+  }
 }

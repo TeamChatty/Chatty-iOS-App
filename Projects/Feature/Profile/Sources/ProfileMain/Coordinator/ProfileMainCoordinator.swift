@@ -34,8 +34,20 @@ public final class ProfileMainCoordinator: BaseCoordinator, ProfileMainCoordinat
 }
 
 extension ProfileMainCoordinator: ProfileMainControllerDelegate {
+  func pushNotificationView() {
+    print("push Notification View")
+  }
+  
+  func pushSettingView() {
+    let settingCoordinator = SettingCoordinator(
+      navigationController: navigationController,
+      featureProfileDependencyProvider: featureProfileDependencyProvider
+    )
+    childCoordinators.append(settingCoordinator)
+    settingCoordinator.start()
+  }
+  
   func pushProfileEditView() {
-    print("push Profile Edit")
     let profileEditMainCoordinator = ProfileEditMainCoordinator(
       navigationController: navigationController,
       featureProfileDependencyProvider: featureProfileDependencyProvider

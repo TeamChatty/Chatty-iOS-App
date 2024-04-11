@@ -14,27 +14,22 @@ import Then
 import SharedDesignSystem
 import DomainUserInterface
 
-final class PreviewBasicInfoTableViewCell: UITableViewCell, Touchable {
+final class PreviewBasicInfoTableViewCell: UITableViewCell {
   static let cellId = "PreviewBasicInfoTableViewCell"
 
+  private let basicInfoHeaderTitle: UILabel = UILabel().then {
+    $0.text = "기본 정보"
+    $0.font = SystemFont.title03.font
+    $0.textColor = SystemColor.basicBlack.uiColor
+  }
   private let address: UILabel = UILabel()
   private let jobLabel: UIView = UIView()
   private let schoolLabel: UIView = UIView()
-  
-  // MARK: - Rx Property
-  private let disposeBag = DisposeBag()
-  
-  // MARK: - Touchable Property
-  var touchEventRelay: PublishRelay<TouchEventType> = .init()
-  enum TouchEventType {
-    
-  }
   
   // MARK: - Initialize Method
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     configureUI()
-    bind()
   }
   
   required init?(coder: NSCoder) {
@@ -43,11 +38,14 @@ final class PreviewBasicInfoTableViewCell: UITableViewCell, Touchable {
   
   // MARK: - UIConfigurable
   private func configureUI() {
+    contentView.addSubview(basicInfoHeaderTitle)
     
-  }
-  
-  // MARK: - UIBindable
-  private func bind() {
+    basicInfoHeaderTitle.snp.makeConstraints {
+      $0.top.equalToSuperview()
+      $0.height.equalTo(19)
+      $0.leading.equalToSuperview().inset(20)
+      $0.bottom.equalToSuperview().inset(30)
+    }
     
   }
 }

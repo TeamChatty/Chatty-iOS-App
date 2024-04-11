@@ -19,7 +19,9 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
     $0.font = SystemFont.body02.font
   }
  
-  private let contentLabel: UILabel = UILabel()
+  private let contentLabel: UILabel = UILabel().then {
+    $0.textAlignment = .left
+  }
   private let arrowImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
     $0.image = Images.vArrowRight.image.withRenderingMode(.alwaysTemplate)
@@ -35,7 +37,7 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   
   var contentText: String? {
     didSet {
-      self.contentLabel.text = contentText
+      setStateForContentText()
     }
   }
   
@@ -74,8 +76,8 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
     
     contentLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.height.width.equalTo(24)
-      $0.trailing.equalToSuperview().inset(12)
+      $0.height.equalTo(24)
+      $0.trailing.equalTo(arrowImageView.snp.leading).offset(-12)
     }
   }
   
@@ -112,6 +114,22 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   }
 }
 extension ArrowSubtitleButton: StateConfigurable {
+  enum State {
+    case validData
+    case emptyData
+  }
+  
+  struct Configuration {
+    var contentText: String
+    let font: UIFont
+    let textColor: UIColor
+    
+    public init(contentText: String = "지역 입력하면 +10%", font: UIFont, textColor: UIColor) {
+      self.contentText = contentText
+      self.font = font
+      self.textColor = textColor
+    }
+  }
   
   func updateForCurrentState() {
     guard let currentState,
@@ -120,22 +138,20 @@ extension ArrowSubtitleButton: StateConfigurable {
     contentLabel.text = config.contentText
     contentLabel.font = config.font
     contentLabel.textColor = config.textColor
+    self.isEnabled = true
   }
   
-  enum State {
-    case validData
-    case emptyData
-  }
-  
-  struct Configuration {
-    var contentText: String = "지역 입력하면 +10%"
-    let font: UIFont
-    let textColor: UIColor
-    
-    public init(contentText: String, font: UIFont, textColor: UIColor) {
-      self.contentText = contentText
-      self.font = font
-      self.textColor = textColor
+  private func setStateForContentText() {
+    if let contentText {
+      let validData = Configuration(
+        contentText: contentText,
+        font: SystemFont.body01.font,
+        textColor: SystemColor.basicBlack.uiColor
+      )
+      setState(validData, for: .validData)
+      currentState = .validData
+    } else {
+      currentState = .emptyData
     }
   }
 }

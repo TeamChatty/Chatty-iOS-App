@@ -14,6 +14,9 @@ import RxCocoa
 import ReactorKit
 
 protocol ProfileMainControllerDelegate: AnyObject {
+  func pushNotificationView()
+  func pushSettingView()
+  
   func pushProfileEditView()
   func pushCashItemsView()
   func pushMembershipView()
@@ -74,9 +77,9 @@ final class ProfileMainController: BaseController {
       .bind(with: self) { owner, event in
         switch event {
         case .notification:
-          print("push noti")
+          owner.delegate?.pushNotificationView()
         case .setting:
-          print("push setting")
+          owner.delegate?.pushSettingView()
         }
       }
       .disposed(by: disposeBag)

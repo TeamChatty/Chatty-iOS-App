@@ -33,13 +33,15 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
     $0.font = SystemFont.title03.font
     $0.textColor = SystemColor.basicBlack.uiColor
   }
-//  private let mbtiButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
-//    $0.title = "MBTI"
-//  }
-  
-  private let mbtiButton: UIButton = UIButton().then {
-    $0.setTitle("MBTI", for: .normal)
-    $0.backgroundColor = .darkGray
+  private let mbtiButton: ArrowSubtitleButton = ArrowSubtitleButton().then {
+    typealias Configuration = ArrowSubtitleButton.Configuration
+    let emptyData = Configuration(
+      font: SystemFont.body01.font,
+      textColor: SystemColor.gray500.uiColor
+    )
+    $0.setState(emptyData, for: .emptyData)
+    
+    $0.title = "MBTI"
   }
   
   private let interestsHeaderTitle: UILabel = UILabel().then {
@@ -86,15 +88,10 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
-    mbtiButton.rx.tap
+    mbtiButton.touchEventRelay
       .map { TouchEventType.mbti }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
-    
-//    mbtiButton.touchEventRelay
-//      .map { TouchEventType.mbti }
-//      .bind(to: touchEventRelay)
-//      .disposed(by: disposeBag)
     
     interestsButton.touchEventRelay
       .map { TouchEventType.interests }
@@ -106,8 +103,9 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
 extension EditAdditionalInfoTableViewCell {
   func updateCell(userData: UserProfile) {
     self.introduceButton.setIntroduceText(introduce: userData.introduce)
-    
-
+    self.mbtiButton.title = userData.mbti
+    let joinedInterests: String = userData.interests.map { $0.name }.joined(separator: ",")
+    self.interestsButton.title = joinedInterests
   }
 }
 
@@ -123,7 +121,7 @@ extension EditAdditionalInfoTableViewCell {
     }
     introduceButton.snp.makeConstraints {
       $0.top.equalTo(introduceHeaderTitle.snp.bottom).offset(20)
-      $0.height.greaterThanOrEqualTo(50)
+      $0.height.greaterThanOrEqualTo(120)
       $0.horizontalEdges.equalToSuperview().inset(20)
     }
   }

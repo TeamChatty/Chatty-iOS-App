@@ -89,14 +89,14 @@ public final class LiveSocketServiceImpl: LiveSocketService {
 }
 
 extension LiveSocketServiceImpl: WebSocketDelegate {
-  public func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+  public func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocket) {
     switch event {
-    case .connected:
+    case .connected(let dictionary):
       print("socket receive / connected")
       socketStateSubject?.onNext(())
-    case .disconnected:
+    case .disconnected(let string, let uInt16):
       print("socket receive / disconnected")
-//      socketStateSubject?.onError(LiveSocketError.disconnected)
+      //      socketStateSubject?.onError(LiveSocketError.disconnected)
     case .text(let string):
       guard let jsonDict: [String: Any] = string.toJSON() as? [String: Any] else { return }
       let matchResponseDTO = MatchSocketResponseDTO(jsonDict: jsonDict)
@@ -115,7 +115,7 @@ extension LiveSocketServiceImpl {
   private func getError(_ error: Error?) {
     if let error = error as? Starscream.HTTPUpgradeError {
       switch error {
-      case .notAnUpgrade(let int, _):
+      case .notAnUpgrade(let int):
         switch int {
         case 401:
           handlrError(.refreshTokenExpiration401)

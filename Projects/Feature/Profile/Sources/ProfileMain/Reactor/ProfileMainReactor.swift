@@ -34,30 +34,28 @@ final class ProfileMainReactor: Reactor {
   }
   
   var inputFinishPercent: Double {
-    let fullCount: Double = 13
-    var emptyCount: Double = 0
-    if self.currentState.profileData.mbti == nil {
-      emptyCount += 1
-    }
-    if self.currentState.profileData.authority == nil {
-      emptyCount += 1
-    }
-    if self.currentState.profileData.address == nil {
-      emptyCount += 1
-    }
+    var percent: Double = 100
+
     if self.currentState.profileData.imageUrl == nil {
-      emptyCount += 1
+      percent -= 15
     }
-    if self.currentState.profileData.interests.count < 3 {
-      emptyCount += 1
-    }
-    if self.currentState.profileData.job == nil {
-      emptyCount += 1
+    if self.currentState.profileData.blueCheck == false {
+      percent -= 15
     }
     if self.currentState.profileData.introduce == nil {
-      emptyCount += 1
+      percent -= 20
     }
-    return 100 / fullCount * (fullCount - emptyCount)
+    if self.currentState.profileData.address == nil {
+      percent -= 10
+    }
+    if self.currentState.profileData.interests.count < 3 {
+      percent -= 10
+    }
+    if self.currentState.profileData.job == nil {
+      percent -= 10
+    }
+   
+    return percent
   }
   
   var initialState: State = State()

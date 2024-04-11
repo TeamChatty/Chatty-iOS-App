@@ -26,6 +26,26 @@ open class PlainButton: BaseControl, Touchable, Highlightable {
     }
   }
   
+  public var textColor: UIColor? {
+    didSet {
+      titleLabel.textColor = textColor
+    }
+  }
+  
+  public var font: UIFont? {
+    didSet {
+      titleLabel.font = font
+    }
+  }
+  
+  public var textAlignment: NSTextAlignment? {
+    didSet {
+      if let textAlignment {
+        titleLabel.textAlignment = textAlignment
+      }
+    }
+  }
+  
   // MARK: - Rx Property
   public let touchEventRelay: PublishRelay<Void> = .init()
   
