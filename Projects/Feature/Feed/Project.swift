@@ -3,10 +3,10 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project = Project.makeModule(
-  name: ModulePath.Feature.name+ModulePath.Feature.Chat.rawValue,
+  name: ModulePath.Feature.name+ModulePath.Feature.Feed.rawValue,
   targets: [
     .feature(
-      interface: .Chat,
+      interface: .Feed,
       factory: .init(
         dependencies: [
           .domain
@@ -14,35 +14,34 @@ let project = Project.makeModule(
       )
     ),
     .feature(
-      implements: .Chat,
+      implements: .Feed,
       factory: .init(
         dependencies: [
-          .feature(interface: .Chat)
+          .feature(interface: .Feed)
         ]
       )
     ),
     .feature(
-      testing: .Chat,
+      testing: .Feed,
       factory: .init(
         dependencies: [
-          .feature(interface: .Chat)
+          .feature(interface: .Feed)
         ]
       )
     ),
     .feature(
-      tests: .Chat,
+      tests: .Feed,
       factory: .init(
         dependencies: [
-          .feature(testing: .Chat)
+          .feature(testing: .Feed)
         ]
       )
     ),
     .feature(
-      example: .Chat,
+      example: .Feed,
       factory: .init(
         dependencies: [
-          .feature(implements: .Chat),
-          .feature(interface: .Chat)
+          .feature(interface: .Feed)
         ]
       )
     )

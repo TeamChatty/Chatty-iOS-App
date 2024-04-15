@@ -16,7 +16,8 @@ let targets: [Target] = [
         .feature(implements: .Onboarding),
         .feature(implements: .Live),
         .feature(implements: .Chat),
-        .feature(implements: .Profile)
+        .feature(implements: .Profile),
+        .feature(implements: .Feed)
       ]
     )
   )
