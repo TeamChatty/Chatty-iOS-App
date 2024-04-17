@@ -9,6 +9,7 @@ import Foundation
 import DomainUser
 import DomainAuth
 import DomainLive
+import DomainCommunity
 import DomainCommon
 
 import DataNetwork
@@ -25,6 +26,7 @@ public protocol RepositoryDIcontainer: ServiceDIContainer {
   func makeUserDefaultsRepository() -> DefaultUserDefaultsRepository
   func makeChatSTOMPRepository() -> DefaultChatSTOMPRepository
   func makeChatAPIRepository() -> DefaultChatAPIRepository
+  func makeCommunityAPIRepository() -> DefaultCommunityAPIRepository
 }
 
 extension RepositoryDIcontainer {
@@ -79,6 +81,12 @@ extension RepositoryDIcontainer {
   func makeChatAPIRepository() -> DefaultChatAPIRepository {
     return DefaultChatAPIRepository(
       chatAPIService: makeChatAPIService()
+    )
+  }
+  
+  func makeCommunityAPIRepository() -> DefaultCommunityAPIRepository {
+    return DefaultCommunityAPIRepository(
+      communityAPIService: makeCommunityAPIService()
     )
   }
 }

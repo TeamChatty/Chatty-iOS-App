@@ -61,22 +61,52 @@ public extension CommunityAPIRouter {
     switch self {
     case .getPost, .getPosts, .getComment, .getCommentReplies:
       return .requestPlain
-    case .writePost(let requestDTO):
+    case .writePost(let requestDTO):  
+      
+      if let images = requestDTO.images {
+        let data = createMultiImageMultiPartBody(boundary: "", imageDataArray: images)
+        let imagesMultipartFormData = MultipartFormData(provider: .data(data), name: "images", fileName: "feed_image", mimeType: "image/jpeg")
+        
+        
+        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
+        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
+        return .uploadMultipart([titleData, dataData, imagesMultipartFormData])
+      } else {
+        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
+        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
+        return .uploadMultipart([titleData, dataData])
+      }
+     
+    case .writeComment(_ , let requestDTO):
       return .requestJSONEncodable(requestDTO)
-    case .writeComment(let requestId, let requestDTO):
+    case .writeCommentReply(_ , let requestDTO):
       return .requestJSONEncodable(requestDTO)
-    case .writeCommentReply(let requestId, let requestDTO):
-      return .requestJSONEncodable(requestDTO)
-//    case .profileUnlock(_, let method):
-//      let param = ["unlockMethod": "\(method.rawValue)"]
-//      return .requestParameters(parameters: param, encoding: JSONEncoding.default)
     }
+  }
+  
+  func createMultiImageMultiPartBody(boundary : String,imageDataArray : [Data]) -> Data {
+    var body = Data()
+    
+    let mimetype = "image/jpg"
+    
+    for imageData in imageDataArray {
+      body.append("--\(boundary)\r\n".data(using: String.Encoding.utf8)!)
+      body.append("Content-Disposition: form-data; name=\"externalImages\"; filename=\"\(Date().timeIntervalSince1970).jpg\"\r\n".data(using: String.Encoding.utf8)!)
+      
+      body.append("Content-Type: \(mimetype)\r\n\r\n".data(using: String.Encoding.utf8)!)
+      body.append(imageData)
+      body.append("\r\n".data(using: String.Encoding.utf8)!)
+      
+    }
+    // Just take this line out of the images loop
+    body.append("--\(boundary)--\r\n".data(using: String.Encoding.utf8)!)
+    return body
   }
   
   var headers: [String : String]? {
     switch self {
     case .writePost:
-      return RequestHeader.getHeader([.json, .binary])
+      return RequestHeader.getHeader([.binary])
     case .writeComment, .writeCommentReply:
       return RequestHeader.getHeader([.json])
     default:
@@ -92,3 +122,6 @@ public extension CommunityAPIRouter {
   }
 }
 
+extension MultipartFormData {
+  
+}

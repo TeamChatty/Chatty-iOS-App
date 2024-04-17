@@ -16,9 +16,9 @@ public final class CommunityAPIServiceImpl: CommunityAPIService {
   public typealias Router = CommunityAPIRouter
   public var provider: MoyaProvider<CommunityAPIRouter>
   
-  private let authAPIService: any CommunityAPIService
+  private let authAPIService: any AuthAPIService
   
-  public init(authAPIService: any CommunityAPIService, keychainService: KeychainServiceProtocol) {
+  public init(authAPIService: any AuthAPIService, keychainService: KeychainServiceProtocol) {
     self.authAPIService = authAPIService
     self.provider = .init(plugins: [
       MoyaPlugin(keychainService: keychainService)

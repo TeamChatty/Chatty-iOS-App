@@ -7,7 +7,12 @@
 
 import Foundation
 import FeatureFeedInterface
+import DomainCommunity
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
-  
+  func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase {
+    return DefaultWriteFeedUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
 }

@@ -30,7 +30,7 @@ extension PrimitiveSequence where Trait == SingleTrait, Element == Response {
           print("네트워크 통신 에러")
           return Single.error(mappedError)
         } catch {
-          print("뭔 에러냐 시발 \(error)")
+          print("서버 에러 \(error)")
           print("서버 에러")
           return Single.error(error)
         }
