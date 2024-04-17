@@ -43,6 +43,7 @@ public extension ModulePath {
 
 public extension ModulePath {
   enum Domain: String, CaseIterable {
+    case Community
     case Live
     case Chat
     case Common

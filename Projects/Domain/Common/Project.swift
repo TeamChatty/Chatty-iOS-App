@@ -12,6 +12,6 @@ let project = Project.makeModule(
           .shared
         ]
       )
-    )
+    ),
   ]
 )
