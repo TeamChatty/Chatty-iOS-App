@@ -1,5 +1,5 @@
 //
-//  MatchRequestDTo.swift
+//  MatchRequestDTO.swift
 //  DataNetworkInterface
 //
 //  Created by 윤지호 on 3/4/24.
