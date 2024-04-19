@@ -21,7 +21,7 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
     self.communityAPIService = communityAPIService
   }
   
-  public func writeFeed(title: String, content: String, images: [Data]? = nil) -> Observable<Feed> {
+  public func writeFeed(title: String, content: String, images: [Data]? = nil) -> Observable<WritedFeed> {
     let requestDTO = WriteFeedRequestDTO(title: title, content: content, images: images)
     
     return communityAPIService.request(endPoint: .writePost(requestDTO), responseDTO: WriteFeedResponseDTO.self)

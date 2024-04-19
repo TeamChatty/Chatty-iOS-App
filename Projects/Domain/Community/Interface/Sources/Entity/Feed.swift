@@ -8,23 +8,23 @@
 import Foundation
 
 public struct Feed {
-  public let id: Int
+  public let postId: Int
   public let title: String
   public let content: String
-  public let userId: Int
-  public let nickname:String
-  public let profileImage: String
-  public let postImages: [String]
   public let viewCount: Int
+  public let createdAt: String // "2024-04-17T00:08:31.268Z"
+  public let userId: Int
+  public let nickname: String
+  public let imageUrl: String
   
-  public init(id: Int, title: String, content: String, userId: Int, nickname: String, profileImage: String, postImages: [String], viewCount: Int) {
-    self.id = id
+  public init(postId: Int, title: String, content: String, viewCount: Int, createdAt: String, userId: Int, nickname: String, imageUrl: String) {
+    self.postId = postId
     self.title = title
     self.content = content
+    self.viewCount = viewCount
+    self.createdAt = createdAt
     self.userId = userId
     self.nickname = nickname
-    self.profileImage = profileImage
-    self.postImages = postImages
-    self.viewCount = viewCount
+    self.imageUrl = imageUrl
   }
 }

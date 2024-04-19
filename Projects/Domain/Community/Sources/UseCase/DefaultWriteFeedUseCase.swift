@@ -19,7 +19,7 @@ public final class DefaultWriteFeedUseCase: WriteFeedUseCase {
     self.communityAPIRepository = communityAPIRepository
   }
   
-  public func execute(title: String, content: String, images: [Data]?) -> Observable<Feed> {
+  public func execute(title: String, content: String, images: [Data]?) -> Observable<WritedFeed> {
     return communityAPIRepository.writeFeed(title: title, content: content, images: images)
   }
 }

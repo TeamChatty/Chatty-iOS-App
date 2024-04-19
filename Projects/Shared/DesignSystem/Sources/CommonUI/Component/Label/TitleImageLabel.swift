@@ -42,6 +42,11 @@ public final class TitleImageLabel: UIView {
       self.imageView.image = image
     }
   }
+  public var imageViewTintColor: UIColor? {
+    didSet {
+      self.imageView.tintColor = imageViewTintColor
+    }
+  }
   
   // MARK: - Initialize Method
 
