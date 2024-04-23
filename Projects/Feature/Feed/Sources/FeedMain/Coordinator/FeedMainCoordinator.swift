@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PhotosUI
 import Shared
 import SharedDesignSystem
 import SharedUtil
@@ -16,6 +17,8 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   public override var type: CoordinatorType {
     .feed
   }
+  
+  private var madalNavigationController: UINavigationController?
   
   private let featureProfileDependencyProvider: FeatureFeedDependencyProvider
 
@@ -61,5 +64,68 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
     print("push - FeedProfileView")
   }
   
+  func presentFeedWriteModal() {
+   
+    let reactor = FeedWriteReactor(writefeedUseCase: featureProfileDependencyProvider.makeWriteFeedUseCase())
+    let modal = FeedWriteModal(reactor: reactor)
+    modal.delegate = self
+    
+    madalNavigationController = UINavigationController(rootViewController: modal)
+    if let madalNavigationController {
+      madalNavigationController.modalPresentationStyle = .fullScreen
+      navigationController.present(madalNavigationController, animated: true)
+    }
+  }
+}
+
+extension FeedMainCoordinator: FeedWriteModalDelegate {
+  func dismiss() {
+    navigationController.dismiss(animated: true)
+  }
   
+  func presentSelectImage(nowAddedCount: Int) {
+    var configuration = PHPickerConfiguration()
+    configuration.selectionLimit = 5 - nowAddedCount
+    configuration.filter = .any(of: [.images])
+    
+    let picker = PHPickerViewController(configuration: configuration)
+    picker.delegate = self
+    
+    if let madalNavigationController {
+      madalNavigationController.present(picker, animated: true)
+    }
+  }
+  
+  func successWrited() {
+    navigationController.dismiss(animated: true)
+  }
+}
+
+extension FeedMainCoordinator: PHPickerViewControllerDelegate {
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    var images: [UIImage] = []
+    
+    for result in results {
+      let itemProvider = result.itemProvider
+      
+      if itemProvider.canLoadObject(ofClass: UIImage.self) {
+        itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+          guard let image = image as? UIImage else { return }
+          images.append(image)
+          if images.count == results.count {
+            DispatchQueue.main.async {
+              if let madalNavigationController = self.madalNavigationController,
+                 let vc = madalNavigationController.viewControllers[0] as? FeedWriteModal {
+                vc.reactor?.action.onNext(.inputImage(images))
+              }
+              picker.dismiss(animated: true)
+            }
+          }
+        }
+        
+      }
+    }
+    
+   
+  }
 }

@@ -6,7 +6,7 @@
 //
 
 
-import UIKit
+import UIKit 
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -15,13 +15,17 @@ import SharedDesignSystem
 
 public class WriteFeedButton: BaseControl, Touchable, Highlightable {
   // MARK: - View Property
-  private let contentView: TitleImageLabel = TitleImageLabel(imageSize: 24, imagePosition: .left, space: 2).then {
-    $0.title = "글쓰기"
+  
+//  private let boxView: UIView = UIView()
+  private let imageView: UIImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+    $0.image = Images.plus.image.withRenderingMode(.alwaysTemplate)
+    $0.tintColor = SystemColor.basicWhite.uiColor
+  }
+  private let titleLabel: UILabel = UILabel().then {
+    $0.text = "글쓰기"
     $0.textColor = SystemColor.basicWhite.uiColor
     $0.font = SystemFont.title03.font
-    
-    $0.image = Images.plus.image.withRenderingMode(.alwaysTemplate)
-    $0.imageViewTintColor = SystemColor.basicWhite.uiColor
   }
   
   // MARK: - Rx Property
@@ -65,10 +69,24 @@ public class WriteFeedButton: BaseControl, Touchable, Highlightable {
   }
   
   private func setupContentView() {
-    addSubview(contentView)
-    contentView.snp.makeConstraints {
+//    addSubview(boxView)
+    addSubview(imageView)
+    addSubview(titleLabel)
+
+//    boxView.snp.makeConstraints {
+//      $0.width.equalTo(96)
+//      $0.height.equalTo(43)
+//      $0.centerY.centerX.equalToSuperview()
+//    }
+    imageView.snp.makeConstraints {
       $0.height.equalTo(24)
-      $0.centerY.centerX.equalToSuperview()
+      $0.leading.equalToSuperview().inset(12)
+      $0.centerY.equalToSuperview()
+    }
+    titleLabel.snp.makeConstraints {
+      $0.height.equalTo(24)
+      $0.leading.equalTo(imageView.snp.trailing).offset(2)
+      $0.centerY.equalToSuperview()
     }
   }
 }

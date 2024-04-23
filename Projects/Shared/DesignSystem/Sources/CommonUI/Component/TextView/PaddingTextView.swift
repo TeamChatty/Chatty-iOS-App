@@ -14,6 +14,7 @@ open class PaddingTextView: BaseView, InputReceivable {
   public let textView: UITextView = UITextView()
   
   private let maxTextLength: Int
+  private let paddingInset: Int
   
   public override var backgroundColor: UIColor? {
     didSet {
@@ -56,8 +57,9 @@ open class PaddingTextView: BaseView, InputReceivable {
   public let inputEventRelay: PublishRelay<String> = .init()
   
   // MARK: - Initialize Method
-  public init(maxTextLength: Int) {
+  public init(maxTextLength: Int, paddingInset: Int) {
     self.maxTextLength = maxTextLength
+    self.paddingInset = paddingInset
     super.init(frame: .zero)
     textView.delegate = self
   }
@@ -66,7 +68,7 @@ open class PaddingTextView: BaseView, InputReceivable {
   open override func configureUI() {
     addSubview(textView)
     textView.snp.makeConstraints {
-      $0.horizontalEdges.verticalEdges.equalToSuperview().inset(16)
+      $0.horizontalEdges.verticalEdges.equalToSuperview().inset(paddingInset)
     }
   }
 }

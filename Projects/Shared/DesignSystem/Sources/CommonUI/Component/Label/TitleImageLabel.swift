@@ -82,6 +82,9 @@ public final class TitleImageLabel: UIView {
         $0.trailing.equalToSuperview()
       }
     }
+  
+    titleLabel.isUserInteractionEnabled = true
+    imageView.isUserInteractionEnabled = true
   }
   
   required init?(coder: NSCoder) {

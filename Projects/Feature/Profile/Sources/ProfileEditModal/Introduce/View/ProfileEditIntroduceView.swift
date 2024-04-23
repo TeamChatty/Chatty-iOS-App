@@ -24,7 +24,7 @@ final class ProfileEditIntroduceView: BaseView, Touchable {
     $0.font = SystemFont.body01.font
   }
  
-  private let introduceTextField: PaddingTextView = PaddingTextView(maxTextLength: 500).then {
+  private let introduceTextField: PaddingTextView = PaddingTextView(maxTextLength: 500, paddingInset: 16).then {
     $0.textView.font = SystemFont.body01.font
     $0.textView.textColor = SystemColor.basicBlack.uiColor
     

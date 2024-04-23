@@ -16,6 +16,7 @@ import ReactorKit
 protocol FeedMainControllerDelegate: AnyObject {
   func pushToNotificationView()
   func pushToFeedProfileView()
+  func presentFeedWriteModal()
 }
 
 final class FeedMainController: BaseController {
@@ -101,6 +102,12 @@ extension FeedMainController: ReactorKit.View {
         case .changePage(let index):
           owner.reactor?.action.onNext(.changePage(index))
         }
+      }
+      .disposed(by: disposeBag)
+    
+    writeFeedButton.touchEventRelay
+      .bind(with: self) { owner, _ in
+        owner.delegate?.presentFeedWriteModal()
       }
       .disposed(by: disposeBag)
     
