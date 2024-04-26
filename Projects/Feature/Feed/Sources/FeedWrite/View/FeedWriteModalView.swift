@@ -83,6 +83,11 @@ final class FeedWriteModalView: BaseView, Touchable {
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
+    contentTextView.inputEventRelay
+      .map { TouchEventType.inputText($0) }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
     saveButton.touchEventRelay
       .map { TouchEventType.save }
       .bind(to: touchEventRelay)

@@ -15,7 +15,7 @@ import SharedDesignSystem
 protocol FeedWriteModalDelegate: AnyObject {
   func dismiss()
   func presentSelectImage(nowAddedCount: Int)
-  func successWrited()
+  func successWrited(postId: Int)
 }
 
 final class FeedWriteModal: BaseController {
@@ -63,10 +63,16 @@ extension FeedWriteModal: ReactorKit.View {
         case .removeImage(identifier: let identifier):
           owner.reactor?.action.onNext(.removeImage(imageId: identifier))
         case .save:
-          owner.mainView.removeButton()
-          owner.delegate?.successWrited()
-        
+          owner.reactor?.action.onNext(.tabChangeButton)
         }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isChangeButtonEnabled)
+      .distinctUntilChanged()
+      .bind(with: self) { onwer, bool in
+        onwer.mainView.updateSaveButtonEnabled(isEnabled: bool)
       }
       .disposed(by: disposeBag)
     
@@ -75,7 +81,6 @@ extension FeedWriteModal: ReactorKit.View {
       .distinctUntilChanged()
       .bind(with: self) { owner, images in
         guard let images else { return }
-        print("1. lastInputedImage ==> \(images)")
         owner.mainView.updateAddedImages(images: images)
       }
       .disposed(by: disposeBag)
@@ -84,7 +89,6 @@ extension FeedWriteModal: ReactorKit.View {
       .map(\.inputtedImages)
       .distinctUntilChanged()
       .bind(with: self) { owner, images in
-        print("2. inputtedImages ==> \(images)")
         owner.mainView.updateAddedImagesCount(count: images.count)
       }
       .disposed(by: disposeBag)
@@ -103,7 +107,8 @@ extension FeedWriteModal: ReactorKit.View {
       .distinctUntilChanged()
       .bind(with: self) { owner, postId in
         guard let postId else { return }
-        owner.delegate?.successWrited()
+        owner.mainView.removeButton()
+        owner.delegate?.successWrited(postId: postId)
       }
       .disposed(by: disposeBag)
   }

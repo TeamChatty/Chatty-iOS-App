@@ -9,5 +9,5 @@ import Foundation
 import RxSwift
 
 public protocol WriteFeedUseCase {
-  func execute(title: String, content: String, images: [Data]?) -> Observable<WritedFeed>
+  func execute(title: String, content: String, images: [Data]) -> Observable<WritedFeed>
 }

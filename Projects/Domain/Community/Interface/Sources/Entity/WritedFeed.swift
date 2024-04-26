@@ -8,8 +8,7 @@
 import Foundation
 
 public struct WritedFeed {
-  public let id: Int
-  public let title: String
+  public let postId: Int
   public let content: String
   public let userId: Int
   public let nickname:String
@@ -17,9 +16,8 @@ public struct WritedFeed {
   public let postImages: [String]
   public let viewCount: Int
   
-  public init(id: Int, title: String, content: String, userId: Int, nickname: String, profileImage: String, postImages: [String], viewCount: Int) {
-    self.id = id
-    self.title = title
+  public init(postId: Int, content: String, userId: Int, nickname: String, profileImage: String, postImages: [String], viewCount: Int) {
+    self.postId = postId
     self.content = content
     self.userId = userId
     self.nickname = nickname

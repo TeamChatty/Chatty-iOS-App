@@ -63,18 +63,18 @@ public extension CommunityAPIRouter {
       return .requestPlain
     case .writePost(let requestDTO):  
       
-      if let images = requestDTO.images {
-        let data = createMultiImageMultiPartBody(boundary: "", imageDataArray: images)
+      if requestDTO.images.isEmpty {
+        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
+        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
+        return .uploadMultipart([titleData, dataData])
+      } else {
+        let data = createMultiImageMultiPartBody(boundary: "", imageDataArray: requestDTO.images)
         let imagesMultipartFormData = MultipartFormData(provider: .data(data), name: "images", fileName: "feed_image", mimeType: "image/jpeg")
         
         
         let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
         let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
         return .uploadMultipart([titleData, dataData, imagesMultipartFormData])
-      } else {
-        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
-        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
-        return .uploadMultipart([titleData, dataData])
       }
      
     case .writeComment(_ , let requestDTO):

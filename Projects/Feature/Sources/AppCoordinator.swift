@@ -40,8 +40,7 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
       
       if isValid {
         if profile.authority == .anonymous {
-//          self.showOnboardingFlow()
-          self.showMainFlow()
+          self.showOnboardingFlow()
         }
         if profile.authority == .user {
           self.showMainFlow()
@@ -49,14 +48,11 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
       } else {
         // 유효성 검사 실패 처리
         print("자동 로그인 실패! 온보딩으로~")
-//        self.showOnboardingFlow()
-        self.showMainFlow()
+        self.showOnboardingFlow()
       }
     } catch {
       print("에러 처리: \(error)")
-//      self.showOnboardingFlow()
-      self.showMainFlow()
-
+      self.showOnboardingFlow()
     }
   }
   

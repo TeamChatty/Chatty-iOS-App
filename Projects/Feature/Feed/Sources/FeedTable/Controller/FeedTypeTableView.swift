@@ -20,15 +20,23 @@ import DomainCommunityInterface
 final class FeedTypeTableView: BaseController {
   // MARK: - View Property
   private var tableView: UITableView = UITableView()
-  
+  private let refreshControl: UIRefreshControl = UIRefreshControl()
+  private lazy var emptyFeedView: EmptyFeedView = EmptyFeedView()
   
   // MARK: - Reactor Property
   typealias Reactor = FeedTypeTableReactor
-  
-  
+    
   // MARK: - Life Method
   override func viewDidLoad() {
     super.viewDidLoad()
+    reactor?.action.onNext(.viewDidLoad)
+  }
+  
+  // MARK: - Touchable Property
+  var touchEventRelay: PublishRelay<TouchEventType> = .init()
+  enum TouchEventType {
+    case pushToWriteFeed
+    case popToFeedMain
   }
   
   // MARK: - Initialize Method
@@ -38,10 +46,12 @@ final class FeedTypeTableView: BaseController {
     }
     super.init()
   }
+
   
   // MARK: - UIConfigurable
   override func configureUI() {
     setTableView()
+    setupRefreshControl()
   }
   
   deinit {
@@ -51,10 +61,69 @@ final class FeedTypeTableView: BaseController {
 
 extension FeedTypeTableView: ReactorKit.View {
   func bind(reactor: FeedTypeTableReactor) {
+    refreshControl.rx.controlEvent(.valueChanged)
+      .bind(with: self) { owner, _ in
+        owner.reactor?.action.onNext(.refresh)
+      }
+      .disposed(by: disposeBag)
+    
+    emptyFeedView.touchEventRelay
+      .withUnretained(self)
+      .map { owner, _ in
+        switch owner.reactor?.currentState.feedType {
+        case .savedFeed:
+          return TouchEventType.popToFeedMain
+        default:
+          return TouchEventType.pushToWriteFeed
+        }
+      }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
     reactor.state
-      .map(\.feeds)
-      .bind(with: self) { owner, feeds in
-        owner.tableView.reloadData()
+      .map(\.newPageItemCount)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, pageItemCount in
+        let feedType = reactor.currentState.feedType
+        switch feedType {
+        case .wirtedFeed, .savedFeed:
+          let isShowing = reactor.currentState.feeds.isEmpty
+          owner.setupEmptyView(feedListType: feedType, isShowing: isShowing)
+        default:
+          print("")
+        }
+        
+        guard let pageItemCount else { return }
+        switch pageItemCount {
+        case 0, -1:
+          owner.tableView.reloadData()
+        default:
+          owner.tableView.reloadRows(at: reactor.newPageIndexPath, with: .automatic)
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isReloading)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, isReloading in
+        if isReloading == false {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            owner.refreshControl.endRefreshing()
+          })
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isLoading)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, isLoading in
+        if isLoading {
+          owner.showLoadingIndicactor()
+        } else {
+          owner.hideLoadingIndicator()
+        }
       }
       .disposed(by: disposeBag)
   }
@@ -94,7 +163,6 @@ extension FeedTypeTableView: UITableViewDataSource {
         case .favorite(let postId):
           owner.reactor?.action.onNext(.favorite(postId: postId))
           print("favorite - \(postId)")
-
         }
       }
       .disposed(by: cell.disposeBag)
@@ -130,4 +198,19 @@ extension FeedTypeTableView {
     tableView.register(FeedTableViewCell.self, forCellReuseIdentifier: FeedTableViewCell.cellId)
   }
   
+  private func setupRefreshControl() {
+    tableView.refreshControl = refreshControl
+  }
+  
+  private func setupEmptyView(feedListType: FeedListType, isShowing: Bool) {
+    if isShowing {
+      view.addSubview(emptyFeedView)
+      emptyFeedView.snp.makeConstraints {
+        $0.horizontalEdges.verticalEdges.equalTo(tableView)
+      }
+      emptyFeedView.updateLadel(feedListType: feedListType)
+    } else {
+      emptyFeedView.removeFromSuperview()
+    }
+  }
 }

@@ -86,31 +86,27 @@ extension FeedWriteReactor {
         return .just(.setImages(images))
       }
       
+    case .inputText(let text):
+      var isChangeButtonEnabled: Bool = text.isEmpty ? false : true
+      return .concat([
+        .just(.setInputText(text)),
+        .just(.setIsChangeButtonEnabled(isChangeButtonEnabled))
+      ])
+      
+      
     case .tabChangeButton:
       let images = currentState.inputtedImages.map { $0.image.toProfileRequestData() }
       let content = currentState.inputedNicknameText
       return .concat([
         .just(.isLoading(true)),
-        writefeedUseCase.execute(title: "", content: content, images: images)
+        writefeedUseCase.execute(title: "1", content: content, images: images)
           .map { post in
-            return .setIsSaveSuccess(postId: post.id)
+            return .setIsSaveSuccess(postId: post.postId)
           }
           .catch { error -> Observable<Mutation> in
             return error.toMutation()
           },
         .just(.isLoading(false))
-      ])
-      
-    case .inputText(let text):
-      var isChangeButtonEnabled: Bool = false
-      if text.count < 10 || text.isEmpty {
-        isChangeButtonEnabled = false
-      } else {
-        isChangeButtonEnabled = true
-      }
-      return .concat([
-        .just(.setInputText(text)),
-        .just(.setIsChangeButtonEnabled(isChangeButtonEnabled))
       ])
     }
   }

@@ -97,5 +97,12 @@ extension HeaderSecionView {
     profileImageView.setImageKF(urlString: feedData.imageUrl)
     nicknameLabel.text = feedData.nickname
     timeLabel.text = feedData.createdAt
+    if feedData.postId == 0 {
+      timeLabel.text = "1분 전"
+
+    } else {
+      timeLabel.text = "3분 전"
+
+    }
   }
 }

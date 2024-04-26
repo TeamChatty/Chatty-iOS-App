@@ -112,19 +112,17 @@ extension ContentSectionView {
   func setData(feedData: Feed) {
     var images: [String] = []
 
-    if feedData.postId == 1 {
+    if feedData.postId == 0 {
       images = [
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
+        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg"
       ]
       imagesButton.updateImageViews(images: images)
 
-    } else if feedData.postId == 0 {
+    } else if feedData.postId == 1 {
       images = [
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
-        "https://chatty-dev-s3.s3.ap-northeast-2.amazonaws.com/profile/29.jpg",
+        "https://ichef.bbci.co.uk/ace/ws/624/cpsprodpb/4118/production/_119546661_gettyimages-1294130887.jpg",
+        "https://img.hankyung.com/photo/202309/PYH2023092500770034000_P4.jpg",
+        "https://img.hankyung.com/photo/202309/PYH2023092500770034000_P4.jpg"
       ]
       imagesButton.updateImageViews(images: images)
 

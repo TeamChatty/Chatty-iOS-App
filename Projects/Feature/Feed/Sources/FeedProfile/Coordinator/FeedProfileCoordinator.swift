@@ -1,9 +1,10 @@
 //
-//  FeedMainCoordinator.swift
+//  FeedProfileCoordinator.swift
 //  FeatureFeed
 //
-//  Created by 윤지호 on 4/15/24.
+//  Created by 윤지호 on 4/26/24.
 //
+
 
 import UIKit
 import PhotosUI
@@ -13,9 +14,9 @@ import SharedUtil
 import FeatureFeedInterface
 
 import RxSwift
-public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
+public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
   public override var type: CoordinatorType {
-    .feed(.main)
+    .feed(.profile)
   }
   
   private var madalNavigationController: UINavigationController?
@@ -28,29 +29,22 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   }
   
   deinit {
-    print("해제됨: FeedMainCoordinator")
+    print("해제됨: FeedProfileCoordinator")
   }
   
   let disposeBag = DisposeBag()
+  
   public override func start() {
-    let reactor = FeedMainReactor()
-    let feedMainController = FeedMainController(reactor: reactor)
-    feedMainController.delegate = self
-    navigationController.pushViewController(feedMainController, animated: true)
+    let reactor = FeedProfileReactor()
+    let feedProfileController = FeedProfileController(reactor: reactor)
+    feedProfileController.delegate = self
+    navigationController.pushViewController(feedProfileController, animated: true)
   }
 }
 
-extension FeedMainCoordinator: FeedMainControllerDelegate {
-  func pushToNotificationView() {
-    print("push - NotificationView")
-  }
-  
-  func pushToFeedProfileView() {
-    let feedProfileCoordinator = FeedProfileCoordinator(navigationController: navigationController, featureProfileDependencyProvider: featureProfileDependencyProvider)
-    
-    childCoordinators.append(feedProfileCoordinator)
-    feedProfileCoordinator.finishDelegate = self
-    feedProfileCoordinator.start()
+extension FeedProfileCoordinator: FeedProfileControllerDelegate {
+  func popToFeedMain() {
+    _ = navigationController.popViewController(animated: true)
   }
   
   func presentFeedWriteModal() {
@@ -67,7 +61,7 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
   }
 }
 
-extension FeedMainCoordinator: FeedWriteModalDelegate {
+extension FeedProfileCoordinator: FeedWriteModalDelegate {
   func dismiss() {
     navigationController.dismiss(animated: true)
   }
@@ -86,11 +80,14 @@ extension FeedMainCoordinator: FeedWriteModalDelegate {
   }
   
   func successWrited(postId: Int) {
+    if let feedProfileController = navigationController.viewControllers.last as? FeedProfileController {
+      feedProfileController.reactor?.action.onNext(.feedWrited)
+    }
     navigationController.dismiss(animated: true)
   }
 }
 
-extension FeedMainCoordinator: PHPickerViewControllerDelegate {
+extension FeedProfileCoordinator: PHPickerViewControllerDelegate {
   public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     var images: [UIImage] = []
     

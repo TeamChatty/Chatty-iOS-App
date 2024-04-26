@@ -22,8 +22,7 @@ public struct WriteFeedResponseDTO: CommonResponseDTO {
 }
 
 public struct WritedFeedResponseDTO: Decodable {
-  public let id: Int
-  public let title: String
+  public let postId: Int
   public let content: String
   public let userId: Int
   public let nickname:String
@@ -32,6 +31,6 @@ public struct WritedFeedResponseDTO: Decodable {
   public let viewCount: Int
   
   public func toDomain() -> WritedFeed {
-    return WritedFeed(id: self.id, title: self.title, content: self.content, userId: self.userId, nickname: self.nickname, profileImage: self.profileImage, postImages: self.postImages, viewCount: self.viewCount)
+    return WritedFeed(postId: self.postId, content: self.content, userId: self.userId, nickname: self.nickname, profileImage: self.profileImage, postImages: self.postImages, viewCount: self.viewCount)
   }
 }
