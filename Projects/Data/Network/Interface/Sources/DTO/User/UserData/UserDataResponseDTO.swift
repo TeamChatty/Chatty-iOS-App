@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import DomainUserInterface
 import DomainUser
 import DomainUserInterface
 
@@ -28,6 +27,7 @@ public struct UserDataReponseDTO: Decodable {
   
   public func toDomain() -> UserProfile {
     return UserProfile(
+      userId: self.id, 
       nickname: self.nickname,
       mobileNumber: self.mobileNumber,
       birth: self.birth,

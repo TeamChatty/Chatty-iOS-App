@@ -96,9 +96,10 @@ extension LiveSocketServiceImpl: WebSocketDelegate {
       socketStateSubject?.onNext(())
     case .disconnected(let string, let uInt16):
       print("socket receive / disconnected")
-      //      socketStateSubject?.onError(LiveSocketError.disconnected)
+      // socketStateSubject?.onError(LiveSocketError.disconnected)
     case .text(let string):
       guard let jsonDict: [String: Any] = string.toJSON() as? [String: Any] else { return }
+      print(jsonDict)
       let matchResponseDTO = MatchSocketResponseDTO(jsonDict: jsonDict)
       resultSubject?.onNext(matchResponseDTO.toDomain())
     case .error(let error):

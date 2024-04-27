@@ -10,6 +10,7 @@ import Foundation
 public enum SocketState {
   case socketConnected
   case stompConnected
+  case stompDisconnected
 }
 
 public protocol STOMPRouter {

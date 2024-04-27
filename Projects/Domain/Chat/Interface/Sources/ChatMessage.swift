@@ -1,14 +1,13 @@
 //
 //  ChatMessage.swift
-//  FeatureChatInterface
+//  DomainChatInterface
 //
 //  Created by HUNHIE LEE on 2/9/24.
 //
 
 import Foundation
-import DomainChatInterface
 
-public struct ChatMessage: ChatMessageProtocol {
+public struct ChatMessage {
   public let content: MessageContentType
   public let senderId: Int
   public let sendTime: Date?
@@ -22,3 +21,13 @@ public struct ChatMessage: ChatMessageProtocol {
   }
 }
 
+public enum MessageContentType: Hashable {
+  case text(String)
+  
+  public var textValue: String {
+    switch self {
+    case .text(let string):
+      return string
+    }
+  }
+}

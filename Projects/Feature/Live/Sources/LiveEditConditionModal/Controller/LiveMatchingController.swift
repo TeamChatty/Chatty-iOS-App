@@ -11,10 +11,12 @@ import RxCocoa
 import SnapKit
 import ReactorKit
 import SharedDesignSystem
+import DomainLiveInterface
+import DomainChatInterface
 
 protocol LiveMatchingDelegate: AnyObject {
   func dismiss()
-  func successMatching()
+  func successMatching(room: ChatRoom)
 }
 
 final class LiveMatchingController: BaseController {
@@ -27,10 +29,24 @@ final class LiveMatchingController: BaseController {
   // MARK: - Delegate
   weak var delegate: LiveMatchingDelegate?
   
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+  }
+  
   // MARK: - Life Method
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+  }
+  
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
     reactor?.action.onNext(.matchingStart)
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    reactor?.action.onNext(.matchingExit)
   }
   
   // MARK: - Initialize Method
@@ -75,11 +91,13 @@ extension LiveMatchingController: ReactorKit.View {
         switch state {
         case .matching:
           print("matchingState - success match api")
-        case .successMatching:
-          print("matchingState - successMatching")
+        case .successMatching(let result):
+          print("컨트롤러에서 매칭된 채팅방 받았음! \(result)")
+          owner.delegate?.successMatching(room: result)
         default:
           print("do")
         }
+        print(state)
         owner.mainView.setMatchingState(state)
       }
       .disposed(by: disposeBag)

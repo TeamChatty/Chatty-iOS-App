@@ -35,6 +35,26 @@ open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAle
     setNavigationBar()
     setupBackgroundIfNotSet()
     bind()
+    
+    // 앱의 Inactive 상태를 감지하는 Observer 등록
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(handleAppInactive),
+                                           name: UIApplication.willResignActiveNotification,
+                                           object: nil)
+    
+    // 앱의 Active 상태를 감지하는 Observer 등록
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(handleAppActive),
+                                           name: UIApplication.didBecomeActiveNotification,
+                                           object: nil)
+  }
+  
+  @objc open func handleAppInactive() {
+    
+  }
+  
+  @objc open func handleAppActive() {
+    
   }
   
   public init() {
@@ -44,6 +64,15 @@ open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAle
   @available(*, unavailable)
   required public init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self,
+                                              name: UIApplication.willResignActiveNotification,
+                                              object: nil)
+    NotificationCenter.default.removeObserver(self,
+                                              name: UIApplication.didBecomeActiveNotification,
+                                              object: nil)
   }
   
   // MARK: - Set UI

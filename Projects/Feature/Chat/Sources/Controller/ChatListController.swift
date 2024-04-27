@@ -8,13 +8,14 @@
 import UIKit
 import ReactorKit
 import SharedDesignSystem
+import FeatureChatInterface
 
 public final class ChatListController: BaseController {
   private let mainView = ChatListView()
   private lazy var chatAdapter = ChatListCollectionViewAdapter(collectionView: mainView.collectionView)
   private let header = ChatListHeaderView()
   
-  public weak var delegate: ChatCoordinatorDelegate?
+  public weak var delegate: (any ChatCoordinatorDelegate)?
   public typealias Reactor = ChatListReactor
   
   public override func loadView() {
@@ -33,8 +34,6 @@ public final class ChatListController: BaseController {
     setupCollectionView()
   }
   
-
-  
   public override func configureUI() {
     
   }
@@ -52,7 +51,7 @@ public final class ChatListController: BaseController {
       .subscribe(with: self, onNext: { owner, bar in
         switch bar {
         case .alarm:
-          owner.reactor?.action.onNext(.subscribeChatRoom)
+          print("push noti")
         }
       })
       .disposed(by: disposeBag)
@@ -70,7 +69,7 @@ extension ChatListController: ReactorKit.View {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    rx.viewDidAppear
+    rx.viewDidLoad
       .map { _ in .connectSocketServer }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
@@ -82,10 +81,9 @@ extension ChatListController: ReactorKit.View {
         if rooms.isEmpty {
           owner.mainView.setEmptyView()
         } else {
-          print("새로고침")
           owner.mainView.removeEmptyView()
-          owner.chatAdapter.applySnapShot(rooms: rooms)
         }
+        owner.chatAdapter.applySnapShot(rooms: rooms)
       }
       .disposed(by: disposeBag)
     
@@ -96,9 +94,10 @@ extension ChatListController: ReactorKit.View {
         guard let state else { return }
         switch state {
         case .socketConnected:
+          print("소켓 연결됨~")
           return
         case .stompConnected:
-          reactor.action.onNext(.loadChatRooms)
+          print("스톰프 연결됨~")
           reactor.action.onNext(.observeChatMessage)
         default:
           return

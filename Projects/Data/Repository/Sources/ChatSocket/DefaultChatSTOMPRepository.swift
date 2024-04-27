@@ -9,23 +9,27 @@ import Foundation
 import DataNetworkInterface
 import DomainChatInterface
 import RxSwift
+import DataStorageInterface
 
 public struct DefaultChatSTOMPRepository: ChatSTOMPRepositoryProtocol {
   private let chatSTOMPService: any ChatSTOMPService
+  private let keychainService: KeychainServiceProtocol
   
-  public init(chatSTOMPService: any ChatSTOMPService) {
+  public init(chatSTOMPService: any ChatSTOMPService, keychainService: KeychainServiceProtocol) {
     self.chatSTOMPService = chatSTOMPService
+    self.keychainService = keychainService
   }
   
   public func connectSocket() -> PublishSubject<SocketState> {
-    return chatSTOMPService.connectSocket()
+    let token = keychainService.read(type: .accessToken()) ?? ""
+    return chatSTOMPService.connectSocket(token: token)
   }
   
   public func send(_ router: ChatSTOMPRouter) {
     return chatSTOMPService.send(router)
   }
   
-  public func socketObserver() -> PublishSubject<ChatMessageProtocol> {
+  public func socketObserver() -> PublishSubject<ChatMessage> {
     return chatSTOMPService.socketObserver()
   }
   

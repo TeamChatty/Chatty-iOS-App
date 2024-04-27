@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import DomainLiveInterface
+import DomainChatInterface
 
 public enum MatchingState {
   case stop
   case ready
   case matching
-  case successMatching
+  case successMatching(ChatRoom)
   
   var stateText: String {
     switch self {

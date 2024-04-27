@@ -67,9 +67,9 @@ extension AccountSecurityQuestionController: ReactorKit.View {
         case .correct:
           switch owner.step {
           case .birth:
-            owner.delegate?.pushToCompleted()
+            break
           case .nickname:
-            owner.delegate?.pushToQuestion(step: .birth)
+            break
           }
         case .incorrect(let count):
           if count < 2 {
@@ -81,23 +81,19 @@ extension AccountSecurityQuestionController: ReactorKit.View {
       }
       .disposed(by: disposeBag)
     
-    switch step {
-    case .nickname:
-      reactor.state
-        .map(\.nickname)
-        .filter { !$0.isEmpty }
-        .distinctUntilChanged()
-        .bind(to: mainView.items)
-        .disposed(by: disposeBag)
-      reactor.action.onNext(.getQuestion(.nickname))
-    case .birth:
-      reactor.state
-        .map(\.birth)
-        .filter { !$0.isEmpty }
-        .distinctUntilChanged()
-        .bind(to: mainView.items)
-        .disposed(by: disposeBag)
-      reactor.action.onNext(.getQuestion(.birth))
-    }
+    reactor.state
+      .map(\.questions)
+      .bind(with: self) { owner, questionType in
+        guard let questionType else { return }
+        switch questionType {
+        case .birth(let question):
+          let items = question.map { RadioSegmentItem(id: $0.id, title: $0.title) }
+          owner.mainView.items.accept(items)
+        case .nickname(let question):
+          let items = question.map { RadioSegmentItem(id: $0.id, title: $0.title) }
+          owner.mainView.items.accept(items)
+        }
+      }
+      .disposed(by: disposeBag)
   }
 }

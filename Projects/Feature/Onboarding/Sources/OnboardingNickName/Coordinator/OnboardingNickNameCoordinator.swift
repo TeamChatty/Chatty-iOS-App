@@ -39,7 +39,6 @@ public final class OnboardingNickNameCoordinator: BaseCoordinator, OnboardingNic
   }
   
   public func pushToProfiles() {
-    print("아아아~")
     let onboardingProfileCoordinator = OnboardingProfileCoordinator(
       navigationController: self.navigationController,
       dependencyProvider: dependencyProvider

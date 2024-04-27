@@ -13,7 +13,7 @@ import Then
 
 open class FillButton: BaseControl, Touchable, Highlightable, Transformable {
   // MARK: - View Property
-  private let titleLabel: UILabel = UILabel().then {
+  public let titleLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicWhite.uiColor
     $0.textAlignment = .center
   }
@@ -91,8 +91,7 @@ open class FillButton: BaseControl, Touchable, Highlightable, Transformable {
   private func setupTitleLabel() {
     addSubview(titleLabel)
     titleLabel.snp.makeConstraints {
-      $0.horizontalEdges.equalToSuperview().inset(horizontalInset)
-      $0.centerY.equalToSuperview()
+      $0.center.equalToSuperview()
     }
   }
 }

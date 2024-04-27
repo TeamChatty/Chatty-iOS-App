@@ -11,7 +11,7 @@ import RxSwift
 public protocol ChatSTOMPRepositoryProtocol {
   func connectSocket() -> PublishSubject<SocketState>
   func connectSTOMP()
-  func socketObserver() -> PublishSubject<ChatMessageProtocol>
+  func socketObserver() -> PublishSubject<ChatMessage>
   func subscribeChatRoom(roomId: String)
   func unsubscribeChatRoom(roomId: String)
   func sendMessage(roomdId: Int, _ type: messageRequestType)

@@ -11,12 +11,18 @@ import SharedDesignSystem
 
 public final class ChatRoomController: BaseController {
   private let mainView = ChatRoomView()
-  private lazy var chatAdapter = ChatRoomCollectionViewAdapter(collectionView: mainView.collectionView)
+  private lazy var chatAdapter = ChatRoomCollectionViewAdapter(collectionView: mainView.collectionView, chatRoomType: .unlimited)
   
   public typealias Reactor = ChatReactor
   
   public override func loadView() {
     view = mainView
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    mainView.chatRoomType = reactor?.roomViewData.chatRoomActiveStatus
   }
   
   required init(reactor: Reactor) {
@@ -30,8 +36,36 @@ public final class ChatRoomController: BaseController {
     guard let title = reactor?.roomViewData.recieverProfile.name else { return }
     self.customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
       titleView: .init(title: title),
+      rightButtons: [.init(image: UIImage(asset: Images._3DotHorizontal)!)],
       backgroundColor: SystemColor.basicWhite.uiColor,
-      backgroundAlpha: 0.97)
+      backgroundAlpha: 0.97
+    )
+    
+    customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
+      .subscribe(with: self) { owner, event in
+        switch event {
+        case .notification:
+          let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+          let declaration = UIAlertAction(title: "신고하기", style: .default) { action in
+            
+          }
+          let block = UIAlertAction(title: "차단하기", style: .default) { action in
+            
+          }
+          let cancel = UIAlertAction(title: "취소", style: .cancel)
+          
+          alert.addAction(declaration)
+          alert.addAction(block)
+          alert.addAction(cancel)
+          
+          owner.present(alert, animated: true)
+        }
+      }
+      .disposed(by: disposeBag)
+  }
+  
+  enum BarTouchEvent: Int, IntCaseIterable {
+    case notification
   }
 }
 
@@ -42,13 +76,13 @@ extension ChatRoomController: ReactorKit.View {
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    self.rx.viewDidLoad
-      .map { .connectChatServer }
+    self.rx.viewIsAppear
+      .map { _ in .observeChatMessage }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
     self.rx.viewDidAppear
-      .map { _ in .scrollToUnreadMessaged }
+      .map { _ in .scrollToUnreadMessage }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
@@ -58,24 +92,23 @@ extension ChatRoomController: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map(\.socketState)
-      .distinctUntilChanged()
-      .subscribe(with: self) { owner, state in
-        print("소켓 상태 변한다!!!!")
-        switch state {
-        case .stompConnected:
-          owner.reactor?.action.onNext(.observeChatMessage)
-        default:
-          break
-        }
+      .map(\.messages)
+      .subscribe(with: self) { owner, messages in
+        owner.chatAdapter.applySnapshot(messages: messages.0, animatingDifferences: messages.1)
       }
       .disposed(by: disposeBag)
     
-    reactor.state
-      .map(\.messages)
-      .distinctUntilChanged()
-      .subscribe(with: self) { owner, messages in
-        owner.chatAdapter.applySnapshot(messages: messages, animatingDifferences: false)
+    mainView.touchEventRelay
+      .subscribe(with: self) { owner, touchEvent in
+        switch touchEvent {
+        case .chatRoomIsNotActive:
+          let bottomSheetView = ChatRoomActivationSheetView().then {
+            $0.title = "채팅 연장하기"
+            $0.subTitle = "무제한으로 소통하는 채팅방이 만들어져요."
+          }
+          let bottomSheetController = CustomBottomSheetController(contentView: bottomSheetView)
+          owner.present(bottomSheetController, animated: false)
+        }
       }
       .disposed(by: disposeBag)
   }

@@ -11,8 +11,9 @@ import RxCocoa
 import SnapKit
 import SharedDesignSystem
 import DomainChatInterface
+import FeatureChatInterface
 
-public final class ChatRoomView: BaseView, InputReceivable {
+public final class ChatRoomView: BaseView, InputReceivable, Touchable {
   public lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
     $0.contentInset = .init(top: 52, left: 0, bottom: 0, right: 0)
     $0.scrollIndicatorInsets = .init(top: 52, left: 0, bottom: 0, right: 0)
@@ -22,7 +23,22 @@ public final class ChatRoomView: BaseView, InputReceivable {
     $0.textView.delegate = self
   }
   
+  public var chatRoomType: ChatRoomType? {
+    didSet {
+      guard let chatRoomType else { return }
+      switch chatRoomType {
+      case .temporary(creationTime: let date):
+        guard let date else { return }
+        chatInputBar.textView.isUserInteractionEnabled = date.isDateMoreThanTenMinutesAhead()
+        print("터치 비허용")
+      case .unlimited:
+        print("터치 허용")
+        chatInputBar.textView.isUserInteractionEnabled = true
+      }
+    }
+  }
   public var inputEventRelay: PublishRelay<MessageContentType> = .init()
+  public var touchEventRelay: PublishRelay<TouchEventType> = .init()
   
   private let disposeBag = DisposeBag()
   
@@ -52,6 +68,23 @@ public final class ChatRoomView: BaseView, InputReceivable {
     chatInputBar.inputEventRelay
       .bind(to: inputEventRelay)
       .disposed(by: disposeBag)
+    
+    chatInputBar.touchEventRelay
+      .filter { [weak self] _ in
+        guard let self = self,
+              let chatRoomType = self.chatRoomType else { return false }
+        switch chatRoomType {
+        case .temporary:
+          print("임시 채팅방입니다")
+          return true
+        case .unlimited:
+          print("영구 채팅방입니다")
+          return false
+        }
+      }
+      .map { _ in .chatRoomIsNotActive }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
   }
   
   private func createLayout() -> UICollectionViewLayout {
@@ -63,14 +96,21 @@ public final class ChatRoomView: BaseView, InputReceivable {
       let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
       
       let section = NSCollectionLayoutSection(group: group)
-
-      let supplementarySize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(50))
-      let supplementaryItem = NSCollectionLayoutSupplementaryItem(layoutSize: supplementarySize, elementKind: UICollectionView.elementKindSectionHeader, containerAnchor: NSCollectionLayoutAnchor(edges: [.top], absoluteOffset: CGPoint(x: 0, y: -50)))
-      group.supplementaryItems = [supplementaryItem]
+      
+      section.boundarySupplementaryItems = [
+        NSCollectionLayoutBoundarySupplementaryItem(
+          layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)),
+          elementKind: UICollectionView.elementKindSectionHeader,
+          alignment: .top)
+      ]
       
       return section
     }
     return layout
+  }
+  
+  public enum TouchEventType {
+    case chatRoomIsNotActive
   }
 }
 
@@ -99,5 +139,19 @@ extension ChatRoomView: UITextViewDelegate {
   
   private func updateSendButtonIsEnabeld(_ textView: UITextView) {
     chatInputBar.updateSendButtonIsEnabled(textView.hasText)
+  }
+
+  public func textViewDidEndEditing(_ textView: UITextView) {
+    if textView.text.isEmpty {
+      textView.text = "메시지를 입력하세요"
+      textView.textColor = SystemColor.gray500.uiColor
+    }
+  }
+  
+  public func textViewDidBeginEditing(_ textView: UITextView) {
+    if textView.textColor == SystemColor.gray500.uiColor {
+      textView.text = nil
+      textView.textColor = SystemColor.basicBlack.uiColor
+    }
   }
 }

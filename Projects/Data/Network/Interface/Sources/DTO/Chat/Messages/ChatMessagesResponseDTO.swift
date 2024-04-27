@@ -6,31 +6,39 @@
 //
 
 import Foundation
-import DomainChat
+import DomainChatInterface
 import SharedUtil
 
 public struct ChatMessagesResponseDTO: CommonResponseDTO {
   public let code: Int
   public let status: String
   public let message: String
-  public let data: ChatMessagesResponse
-  
-  public struct ChatMessagesResponse: Decodable {
-    let contents: [ChatMessageResponse]
-  }
+  public let data: [ChatMessageResponse]
   
   public func toDomain() -> [ChatMessage] {
-    self.data.contents.map {
-      ChatMessage(content: .text($0.content), senderId: $0.senderId, sendTime: $0.sendTime.toDateFromISO8601(), roomId: $0.roomId)
+    self.data.map {
+      ChatMessage(content: .text($0.content), senderId: $0.senderID, sendTime: $0.sendTime.toDateFromISO8601(), roomId: $0.roomID)
     }
   }
 }
 
 public struct ChatMessageResponse: Decodable {
-  let messageId: Int
-  let content: String
-  let sendTime: String
-  let senderId: Int
-  let receiverId: Int
-  let roomId: Int
+  let chatMessageID, roomID, yourID: Int
+  let yourNickname: String
+  let yourImageURL: String?
+  let yourBlueCheck: Bool
+  let senderID: Int
+  let content, sendTime: String
+  let yourIsRead: Bool
+
+  enum CodingKeys: String, CodingKey {
+      case chatMessageID = "chatMessageId"
+      case roomID = "roomId"
+      case yourID = "yourId"
+      case yourNickname
+      case yourImageURL = "yourImageUrl"
+      case yourBlueCheck
+      case senderID = "senderId"
+      case content, sendTime, yourIsRead
+  }
 }

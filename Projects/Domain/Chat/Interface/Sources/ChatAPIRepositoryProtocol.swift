@@ -9,7 +9,8 @@ import Foundation
 import RxSwift
 
 public protocol ChatAPIRepositoryProtocol {
-  func fetchChatMessages(roomId: Int) -> Single<[ChatMessageProtocol]>
-  func saveChatMessage(with message: ChatMessageProtocol) -> Single<Void>
-  func fetchChatRooms() -> Single<[ChatRoomProtocol]>
+  func fetchChatMessages(roomId: Int) -> Single<[ChatMessage]>
+  func saveChatMessage(with message: ChatMessage) -> Single<Void>
+  func fetchChatRooms() -> Single<[ChatRoom]>
+  func fetchChatRoom(roomId: Int) -> Single<ChatRoom>
 }

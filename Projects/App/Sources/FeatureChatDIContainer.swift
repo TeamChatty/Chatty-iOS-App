@@ -37,19 +37,3 @@ final class FeatureChatDIContainer: RepositoryDIcontainer, FeatureChatDependecyP
     return DefaultChatSTOMPConnectUseCase(chatSTOMPRepository: makeChatSTOMPRepository())
   }
 }
-
-extension FeatureChatDIContainer {
-  func makeChatSTOMPRepository() -> DefaultChatSTOMPRepository {
-    return DefaultChatSTOMPRepository(chatSTOMPService: ChatSTOMPServiceImpl.shared)
-  }
-  
-  func makeChatAPIRepository() -> DefaultChatAPIRepository {
-    return DefaultChatAPIRepository(
-      chatAPIService: ChatAPIServiceImpl(
-        authAPIService: AuthAPIServiceImpl(
-          keychainService: KeychainService.shared
-        ),
-        keychainService: KeychainService.shared)
-    )
-  }
-}

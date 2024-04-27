@@ -10,11 +10,13 @@ import Then
 import SharedDesignSystem
 import SharedUtil
 import Kingfisher
+import FeatureChatInterface
 
 public final class ChatRoomListCell: UICollectionViewCell {
   private let containerView: UIView = UIView()
   private let profileImageView: UIImageView = UIImageView().then {
     $0.backgroundColor = SystemColor.gray300.uiColor
+    $0.layer.masksToBounds = true
   }
   private let nameLabel: UILabel = UILabel().then {
     $0.font = SystemFont.body01.font
@@ -55,7 +57,6 @@ public final class ChatRoomListCell: UICollectionViewCell {
   }
   
   private func setLastestMessage(message: ChatMessageViewData?) {
-    print("asdasd \(message?.content.textValue)")
     guard let message else { return }
     switch message.content {
     case .text(let string):
@@ -69,7 +70,12 @@ public final class ChatRoomListCell: UICollectionViewCell {
   
   private func setLastestMessageTime(message: ChatMessageViewData?) {
     guard let sendTime = message?.sendTime else { return }
-    lastestMessageTimeLabel.text = sendTime.toCustomString(format: .ahhmm)
+    lastestMessageTimeLabel.text = toMessageTimeString(sendTime)
+  }
+  
+  private func toMessageTimeString(_ time: Date?) -> String? {
+    guard let time else { return nil }
+    return time.toCustomString()
   }
                
   private func configureUI() {

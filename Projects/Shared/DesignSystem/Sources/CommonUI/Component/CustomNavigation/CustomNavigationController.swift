@@ -129,9 +129,11 @@ extension CustomNavigationController {
     if hidden {
       if animated {
         customNavigationBar.fadeOut([customNavigationBar], alpha: .transparent) { [weak self] in
+          self?.customNavigationBarBackgroundView.removeFromSuperview()
           self?.customNavigationBar.removeFromSuperview()
         }
       } else {
+        customNavigationBarBackgroundView.removeFromSuperview()
         customNavigationBar.removeFromSuperview()
       }
     } else {

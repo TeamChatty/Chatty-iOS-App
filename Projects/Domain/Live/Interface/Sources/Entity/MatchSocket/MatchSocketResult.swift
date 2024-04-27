@@ -1,6 +1,6 @@
 //
 //  MatchResult.swift
-//  DomainCommonInterface
+//  DomainLiveInterface
 //
 //  Created by 윤지호 on 2/13/24.
 //
@@ -8,9 +8,9 @@
 import Foundation
 
 public struct MatchSocketResult {
-  let roomId: Int
-  let senderId: Int
-  let receiverId: Int
+  public let roomId: Int
+  public let senderId: Int
+  public let receiverId: Int
   
   public init(roomId: Int, senderId: Int, receiverId: Int) {
     self.roomId = roomId

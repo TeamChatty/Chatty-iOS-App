@@ -11,9 +11,9 @@ import RxSwift
 
 public final class DefaultSaveProfileNicknameUseCase: SaveProfileNicknameUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
-  private let userDataRepository: any UserDataRepositoryProtocol
+  private let userDataRepository: any UserProfileRepositoryProtocol
   
-  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserDataRepositoryProtocol) {
+  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserProfileRepositoryProtocol) {
     self.userAPIRepository = userAPIRepository
     self.userDataRepository = userDataRepository
   }
@@ -24,7 +24,7 @@ public final class DefaultSaveProfileNicknameUseCase: SaveProfileNicknameUseCase
         /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
         /// Single로 데이터를 전달받으니 weak self  사용시 self를 찾지 못했습니다.
         /// 추후 원인을 찾아보고 해결하겠습니다.
-        self.userDataRepository.saveUserData(userData: userData)
+        self.userDataRepository.saveUserProfile(userProfile: userData)
         return .just(true)
       }
   }

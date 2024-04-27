@@ -8,7 +8,7 @@
 import UIKit
 
 public extension UICollectionView {
-  func scrollToBottomSkipping() {
+  func scrollToBottomSkipping(animated: Bool) {
     let lastSectionIndex = max(0, numberOfSections - 1)
     let lastItemIndex = max(0, numberOfItems(inSection: lastSectionIndex) - 1)
     
@@ -28,6 +28,6 @@ public extension UICollectionView {
       scrollToItem(at: indexPath1, at: .bottom, animated: false)
     }
     
-    scrollToItem(at: indexPath, at: .bottom, animated: true)
+    scrollToItem(at: indexPath, at: .bottom, animated: animated)
   }
 }

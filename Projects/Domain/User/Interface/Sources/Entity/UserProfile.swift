@@ -8,21 +8,24 @@
 import Foundation
 
 public struct UserProfile {
+  public let userId: Int
   public var nickname: String?
-  public var mobileNumber: String
   public var birth: String?
   public var gender: Gender?
   public var mbti: String?
-  public var authority: Authority
   public var address: String?
   public var imageUrl: String?
   public var interests: [Interest]
   public var job: String?
   public var introduce: String?
   public var school: String?
-  public var blueCheck: Bool
   
-  public init(nickname: String?, mobileNumber: String, birth: String? = nil, gender: Gender? = nil, mbti: String? = nil, authority: Authority, address: String? = nil, imageUrl: String? = nil, imageData: Data? = nil, interests: [Interest] = [], job: String? = nil, introduce: String? = nil, school: String? = nil, blueCheck: Bool) {
+  public var mobileNumber: String
+  public var blueCheck: Bool
+  public var authority: Authority
+  
+  public init(userId: Int, nickname: String?, mobileNumber: String, birth: String? = nil, gender: Gender? = nil, mbti: String? = nil, authority: Authority, address: String? = nil, imageUrl: String? = nil, imageData: Data? = nil, interests: [Interest] = [], job: String? = nil, introduce: String? = nil, school: String? = nil, blueCheck: Bool) {
+    self.userId = userId
     self.nickname = nickname
     self.mobileNumber = mobileNumber
     self.birth = birth

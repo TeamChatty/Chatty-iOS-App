@@ -25,7 +25,7 @@ final class ProfileMainReactor: Reactor {
   }
   
   struct State {
-    var profileData: UserProfile = UserProfile(nickname: "jiho", mobileNumber: "01077777777", birth: "2000-11-14", gender: .male, mbti: "INTP", authority: .user, address: nil, imageData: nil, interests: [], job: nil, introduce: nil, blueCheck: false)
+    var profileData: UserProfile = UserProfile(userId: 0, nickname: "jiho", mobileNumber: "01077777777", birth: "2000-11-14", gender: .male, mbti: "INTP", authority: .user, address: nil, imageData: nil, interests: [], job: nil, introduce: nil, blueCheck: false)
     var candyCount: Int = 10
     var ticketCount: Int = 10
     
@@ -72,7 +72,7 @@ extension ProfileMainReactor {
       return .concat([
         .just(.setLoading(true)),
         getUserDataUseCase.executeSingle().asObservable()
-          .map { userData in .setProfileData(userData as! UserProfile) }
+          .map { userData in .setProfileData(userData ) }
           .catch { error -> Observable<Mutation> in
             return error.toMutation()
           },

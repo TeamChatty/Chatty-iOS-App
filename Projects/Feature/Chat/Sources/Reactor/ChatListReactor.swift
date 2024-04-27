@@ -10,6 +10,7 @@ import RxSwift
 import ReactorKit
 import DomainChatInterface
 import DomainChat
+import FeatureChatInterface
 
 public final class ChatListReactor: Reactor {
   private let chatServerConnectUseCase: DefaultChatSTOMPConnectUseCase
@@ -35,7 +36,6 @@ public final class ChatListReactor: Reactor {
   public struct State {
     var chatRooms: [ChatRoomViewData]? = nil
     var socketState: SocketState? = nil
-    var chatMessages: [Int: ChatMessageViewData]? = nil
   }
   
   public let initialState: State = .init()
@@ -58,8 +58,9 @@ extension ChatListReactor {
           let _ = rooms.map { room in
             self.chatRoomSubscribeUseCase.execute(roomId: "\(room.roomId)")
           }
-          let roomViewData = rooms.map {
-            ChatRoomViewData(roomId: $0.roomId, recieverProfile: .init(userId: $0.senderId, name: $0.senderNickname, profileImageURL: $0.senderImageURL), lastMessage: .init(roomId: $0.roomId, content: .text($0.lastMessage ?? ""), senderType: .participant($0.senderNickname), sendTime: $0.createdAt))
+          let roomViewData = rooms.map { room in
+            let chatRoomActiveStatus = self.computeChatRoomActivationStatus(room: room)
+            return ChatRoomViewData(roomId: room.roomId, recieverProfile: .init(userId: room.partnerId, name: room.partnerNickname, profileImageURL: room.partnerImageURL), lastMessage: .init(roomId: room.roomId, content: room.lastMessage?.content ?? .text(""), senderType: .currentUser, sendTime: room.lastMessage?.sendTime), chatRoomActiveStatus: chatRoomActiveStatus, createdTime: room.chatRoomCreatedTime)
           }
           return .just(.setChatRooms(roomViewData))
         }
@@ -67,7 +68,8 @@ extension ChatListReactor {
       return getChatMessageStreamUseCase.execute()
         .asObservable()
         .flatMap { message -> Observable<Mutation> in
-          let messageViewData = ChatMessageViewData(roomId: message.roomId, content: .text(message.content.textValue), senderType: .participant(""), sendTime: message.sendTime)
+          let messageViewData = ChatMessageViewData(roomId: message.roomId, content: .text(message.content.textValue), senderType: .participant(.init(name: "")), sendTime: message.sendTime)
+          print("\(message.content.textValue) 메시지 옴~")
           return .just(.setChatMessage(messageViewData))
         }
     case .connectSocketServer:
@@ -80,6 +82,8 @@ extension ChatListReactor {
             return .just(.setSocketState(.socketConnected))
           case .stompConnected:
             return .just(.setSocketState(.stompConnected))
+          case .stompDisconnected:
+            return .just(.setSocketState(.stompDisconnected))
           }
         }
     case .subscribeChatRoom:
@@ -101,9 +105,27 @@ extension ChatListReactor {
       newSate.socketState = status
     case .setChatRooms(let array):
       newSate.chatRooms = array
-    case .setChatMessage(let messages):
-      break
+    case .setChatMessage(let message):
+      var chatRooms = currentState.chatRooms
+      if let index = chatRooms?.firstIndex(where: { $0.roomId == message.roomId }) {
+        chatRooms?[index].lastMessage = message
+        
+        if let movedItem = chatRooms?.remove(at: index) {
+          chatRooms?.insert(movedItem, at: 0)
+        }
+      }
+      newSate.chatRooms = chatRooms
     }
     return newSate
+  }
+}
+
+extension ChatListReactor {
+  private func computeChatRoomActivationStatus(room: ChatRoom) -> ChatRoomType {
+    if room.extend {
+      return .unlimited
+    } else {
+      return .temporary(creationTime: room.chatRoomCreatedTime)
+    }
   }
 }

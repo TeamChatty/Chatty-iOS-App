@@ -15,7 +15,7 @@ public struct MatchSocketRequestDTO: Codable {
   let gender: String
   let mbti: String
   let address: String?
-  let imageUrl: String
+  let imageUrl: String?
   let age: Int
   let blueCheck: Bool
   let requestMinAge: Int
@@ -26,7 +26,7 @@ public struct MatchSocketRequestDTO: Codable {
   let requestBlueCheck: Bool
   let success: Bool
   
-  public init(id: Int, userId: Int, nickname: String, gender: String, mbti: String, address: String, imageUrl: String, age: Int, blueCheck: Bool, requestMinAge: Int, requestMaxAge: Int, requestCategory: String, requestScope: Int, requestGender: String, requestBlueCheck: Bool, success: Bool) {
+  public init(id: Int, userId: Int, nickname: String, gender: String, mbti: String, address: String, imageUrl: String?, age: Int, blueCheck: Bool, requestMinAge: Int, requestMaxAge: Int, requestCategory: String, requestScope: Int, requestGender: String, requestBlueCheck: Bool, success: Bool) {
     self.id = id
     self.userId = userId
     self.nickname = nickname

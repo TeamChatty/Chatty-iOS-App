@@ -9,10 +9,14 @@ import UIKit
 import RxSwift
 import ReactorKit
 import SharedDesignSystem
+import DomainAuth
 
 public final class AccountSecurityQuestionReactor: Reactor {
+  private let getAuthCheckProblemUseCase: DefaultGetAuthCheckQuestionUseCase
+  
   public enum Action {
-    case getQuestion(AccountSecurityQuestionType)
+    case getQuestionNickname
+    case getQuestionBirth
     case answerSelected(AccountSecurityAnswerType)
     case answerEntered
   }
@@ -25,8 +29,7 @@ public final class AccountSecurityQuestionReactor: Reactor {
   }
   
   public struct State {
-    var nickname: [RadioSegmentItem] = []
-    var birth: [RadioSegmentItem] = []
+    var questions: AccountSecurityQuestionType?
     var answer: AccountSecurityAnswerType?
     var isCorrect: AnswerStatus? = nil
     var isContinueButtonEnabled: Bool = false
@@ -34,7 +37,9 @@ public final class AccountSecurityQuestionReactor: Reactor {
   
   public let initialState: State = State()
   
-  public init() { }
+  public init(getAuthCheckProblemUseCase: DefaultGetAuthCheckQuestionUseCase) {
+    self.getAuthCheckProblemUseCase = getAuthCheckProblemUseCase
+  }
 }
 
 extension AccountSecurityQuestionReactor {
@@ -49,8 +54,24 @@ extension AccountSecurityQuestionReactor {
           .setAnswer(answer)
         ]
       )
-    case .getQuestion(let type):
-      return .just(.setQuestion(type))
+    case .getQuestionBirth:
+      return getAuthCheckProblemUseCase.executeForBirth()
+        .asObservable()
+        .flatMap { question -> Observable<Mutation> in
+          let questionItem = question.enumerated().map { index, item in
+            AuthCheckQuestionItem(id: index, title: item)
+          }
+          return .just(.setQuestion(.birth(questionItem)))
+        }
+    case .getQuestionNickname:
+      return getAuthCheckProblemUseCase.executeForNickname()
+        .asObservable()
+        .flatMap { question -> Observable<Mutation> in
+          let questionItem = question.enumerated().map { index, item in
+            AuthCheckQuestionItem(id: index, title: item)
+          }
+          return .just(.setQuestion(.nickname(questionItem)))
+        }
     }
   }
   
@@ -69,22 +90,10 @@ extension AccountSecurityQuestionReactor {
       newState.answer = answer
     case .setQuestion(let type):
       switch type {
-      case .nickname:
-        newState.nickname = [
-          RadioSegmentItem(id: 0, title: "시락이"),
-          RadioSegmentItem(id: 1, title: "옴팡이지롱"),
-          RadioSegmentItem(id: 2, title: "윤둥똥차"),
-          RadioSegmentItem(id: 3, title: "오엔제이"),
-          RadioSegmentItem(id: 4, title: "감쇠진동"),
-        ]
-      case .birth:
-        newState.birth = [
-          RadioSegmentItem(id: 0, title: "1987"),
-          RadioSegmentItem(id: 1, title: "1992"),
-          RadioSegmentItem(id: 2, title: "1997"),
-          RadioSegmentItem(id: 3, title: "1995"),
-          RadioSegmentItem(id: 4, title: "1998"),
-        ]
+      case .nickname(let items):
+        newState.questions = .nickname(items)
+      case .birth(let items):
+        newState.questions = .birth(items)
       }
     }
     return newState

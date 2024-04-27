@@ -10,6 +10,7 @@ import RxSwift
 import ReactorKit
 import DomainChatInterface
 import DomainChat
+import FeatureChatInterface
 
 public final class ChatReactor: Reactor {
   private let chatServerConnectUseCase: DefaultChatSTOMPConnectUseCase
@@ -26,18 +27,18 @@ public final class ChatReactor: Reactor {
     case loadMessages
     case sendMessage(MessageContentType)
     case observeChatMessage
-    case scrollToUnreadMessaged
+    case scrollToUnreadMessage
   }
   
   public enum Mutation {
     case setSocketState(SocketState)
-    case setMessages([ChatMessageViewData])
+    case setMessages([ChatMessageViewData], Bool)
     case setUnreadMessageIndexPath(IndexPath?)
   }
   
   public struct State {
     var chatRooms: ChatRoomViewData
-    var messages: [ChatMessageViewData] = []
+    var messages: ([ChatMessageViewData], Bool) = ([], false)
     var socketState: SocketState? = nil
     var unreadMessageIndexPath: IndexPath?
   }
@@ -58,21 +59,23 @@ extension ChatReactor {
   public func mutate(action: Action) -> Observable<Mutation> {
     switch action {
     case .sendMessage(let message):
+      print("메시지 보낸다~")
       chatSendMessageUseCase.execute(roomId: roomViewData.roomId, content: message.textValue, senderId: 6)
       let message: ChatMessageViewData = .init(roomId: roomViewData.roomId, content: .text(message.textValue), senderType: .currentUser, sendTime: Date())
       var messages = currentState.messages
-      messages.append(message)
-      return .just(.setMessages(messages))
+      messages.0 = messageAccessoryCaculated(messages: messages.0, newMessage: message)
+      return .just(.setMessages(messages.0, true))
     case .loadMessages:
       return getChatMessagesUseCase.exectue(roomId: roomViewData.roomId)
         .asObservable()
         .flatMap { messages -> Observable<Mutation> in
           let partnerId = self.roomViewData.recieverProfile.userId
           let reversed = messages.reversed()
-          let messagesViewData = reversed.map { ChatMessageViewData(roomId: $0.roomId, content: $0.content, senderType: $0.senderId == partnerId ? .participant(self.roomViewData.recieverProfile.name) : .currentUser, sendTime: $0.sendTime)}
-          return .just(.setMessages(messagesViewData))
+          let messagesViewData = reversed.map { ChatMessageViewData(roomId: $0.roomId, content: $0.content, senderType: $0.senderId == partnerId ? .participant(.init(name: self.roomViewData.recieverProfile.name, imageURL: self.roomViewData.recieverProfile.profileImageURL)) : .currentUser, sendTime: $0.sendTime) }
+          let filteredMessages = self.messageAccessoryFiltered(messages: messagesViewData)
+          return .just(.setMessages(filteredMessages, false))
         }
-    case .scrollToUnreadMessaged:
+    case .scrollToUnreadMessage:
       return .concat([
         .just(.setUnreadMessageIndexPath(nil)),
         .just(.setUnreadMessageIndexPath(nil))
@@ -80,28 +83,25 @@ extension ChatReactor {
     case .connectChatServer:
       return chatServerConnectUseCase.connectSocket()
         .asObservable()
-        .flatMap { [weak self] _ -> Observable<Mutation> in
-          self?.chatServerConnectUseCase.connectSTOMP()
-          return .just(.setSocketState(.stompConnected))
+        .flatMap { state -> Observable<Mutation> in
+          return .just(.setSocketState(state))
         }
     case .subscribeToChatRoom(let roomId):
+      print("STOMP 스톰프 구독 시도")
       chatRoomSubscribeUseCase.execute(roomId: "\(roomId)")
-      return .just(.setSocketState(.stompSubscribed))
+      return .empty()
     case .observeChatMessage:
       return getChatMessageStreamUseCase.execute()
         .asObservable()
         .flatMap { message -> Observable<Mutation> in
-          let senderType: ChatParticipantType = message.senderId == self.roomViewData.recieverProfile.userId ? .participant(self.roomViewData.recieverProfile.name) : .currentUser
+          print("메시지 옴?")
+          let senderType: ChatParticipantType = message.senderId == self.roomViewData.recieverProfile.userId ? .participant(.init(name: self.roomViewData.recieverProfile.name, imageURL: self.roomViewData.recieverProfile.profileImageURL)) : .currentUser
           var messages = self.currentState.messages
-          
-          print("받은 메시지 아이디: \(message.senderId)")
-          print("상대방 메시지 아이디: \(self.roomViewData.recieverProfile.userId)")
-          if case .participant(let name) = senderType {
+          if case .participant(_) = senderType {
             let messageViewData = ChatMessageViewData(roomId: message.roomId, content: .text(message.content.textValue), senderType: senderType, sendTime: message.sendTime)
-            messages.append(messageViewData)
+            messages.0 = self.messageAccessoryCaculated(messages: messages.0, newMessage: messageViewData)
           }
-          
-          return .just(.setMessages(messages))
+          return .just(.setMessages(messages.0, true))
         }
     }
   }
@@ -109,8 +109,8 @@ extension ChatReactor {
   public func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     switch mutation {
-    case .setMessages(let messages):
-      newState.messages = messages
+    case .setMessages(let messages, let animated):
+      newState.messages = (messages, animated)
     case .setUnreadMessageIndexPath(let indexPath):
       newState.unreadMessageIndexPath = indexPath
     case .setSocketState(let state):
@@ -119,12 +119,58 @@ extension ChatReactor {
     
     return newState
   }
-}
+  
+  private func messageAccessoryCaculated(messages: [ChatMessageViewData], newMessage: ChatMessageViewData) -> [ChatMessageViewData] {
+    var messages = messages
+    var newMessage = newMessage
+    if let last = messages.last {
+      let previousComponents = last.sendTime?.toMinuteComponents()
+      let currentComponents = newMessage.sendTime?.toMinuteComponents()
+      // 이전 메시지와 비교하여 설정 변경
+      if newMessage.senderType != last.senderType {
+        newMessage.accessoryConfig.nicknameAndProfileVisible = true
+      } else if previousComponents?.minute != currentComponents?.minute {
+        messages[messages.count - 1].accessoryConfig.timeLabelVisible = true
+        newMessage.accessoryConfig.nicknameAndProfileVisible = true
+        newMessage.accessoryConfig.timeLabelVisible = true
+      } else {
+        messages[messages.count - 1].accessoryConfig.timeLabelVisible = false
+        newMessage.accessoryConfig.timeLabelVisible = true
+        newMessage.accessoryConfig.nicknameAndProfileVisible = false
+      }
+    }
+    messages.append(newMessage)
+    return messages
+  }
+  
+  private func messageAccessoryFiltered(messages: [ChatMessageViewData]) -> [ChatMessageViewData] {
+    var newMessages = messages
 
-public enum SocketState {
-  case socketConnected
-  case socketDisConnected
-  case stompConnected
-  case stompDisConnected
-  case stompSubscribed
+    // 초기 설정은 첫 번째 메시지의 설정을 기준으로 함
+    guard !newMessages.isEmpty else {
+        return newMessages
+    }
+  
+    // 첫 번째 메시지의 설정은 항상 false로 설정
+    newMessages[0].accessoryConfig = .init(timeLabelVisible: true, nicknameAndProfileVisible: true)
+    
+    // 이후 메시지들에 대해 설정 조정
+    for i in 1..<newMessages.count {
+      let previousComponents = newMessages[i - 1].sendTime?.toMinuteComponents()
+      let currentComponents = newMessages[i].sendTime?.toMinuteComponents()
+      // 이전 메시지와 비교하여 설정 변경
+      if newMessages[i].senderType != newMessages[i - 1].senderType {
+        newMessages[i].accessoryConfig.nicknameAndProfileVisible = true
+      } else if previousComponents?.minute != currentComponents?.minute {
+        newMessages[i - 1].accessoryConfig.timeLabelVisible = true
+        newMessages[i].accessoryConfig.timeLabelVisible = true
+      } else {
+        newMessages[i-1].accessoryConfig.timeLabelVisible = false
+        newMessages[i].accessoryConfig.timeLabelVisible = true
+        newMessages[i].accessoryConfig.nicknameAndProfileVisible = false
+        }
+    }
+    
+    return newMessages
+  }
 }

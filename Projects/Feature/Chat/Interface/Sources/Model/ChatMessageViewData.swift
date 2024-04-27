@@ -13,12 +13,14 @@ public struct ChatMessageViewData: Hashable {
   public let content: MessageContentType
   public let senderType: ChatParticipantType
   public let sendTime: Date?
+  public var accessoryConfig: ChatMessageViewConfiguration = .init(timeLabelVisible: true, nicknameAndProfileVisible: true)
   
   public func hash(into hasher: inout Hasher) {
     hasher.combine(roomId)
     hasher.combine(content)
     hasher.combine(senderType)
     hasher.combine(sendTime)
+    hasher.combine(accessoryConfig)
   }
   
   public static func == (lhs: ChatMessageViewData, rhs: ChatMessageViewData) -> Bool {
@@ -26,6 +28,7 @@ public struct ChatMessageViewData: Hashable {
     && lhs.content == rhs.content
     && lhs.senderType == rhs.senderType
     && lhs.sendTime == rhs.sendTime
+    && lhs.accessoryConfig == rhs.accessoryConfig
   }
   
   public init(roomId: Int, content: MessageContentType, senderType: ChatParticipantType, sendTime: Date?) {
@@ -33,5 +36,15 @@ public struct ChatMessageViewData: Hashable {
     self.content = content
     self.senderType = senderType
     self.sendTime = sendTime
+  }
+}
+
+public struct ChatMessageViewConfiguration: Hashable {
+  public var timeLabelVisible: Bool
+  public var nicknameAndProfileVisible: Bool
+  
+  public init(timeLabelVisible: Bool, nicknameAndProfileVisible: Bool) {
+    self.timeLabelVisible = timeLabelVisible
+    self.nicknameAndProfileVisible = nicknameAndProfileVisible
   }
 }

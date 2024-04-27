@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import ReactorKit
 import SharedDesignSystem
 
 public final class OnboardingAccountOwnerCheckController: BaseController {
@@ -14,6 +15,14 @@ public final class OnboardingAccountOwnerCheckController: BaseController {
   private let mainView = OnboardingAccountOwnerCheckView()
   
   weak var delegate: AccountOwnerCheckDelegate?
+  
+  // MARK: - Initialize Method
+  public required init(reactor: Reactor) {
+    defer {
+      self.reactor = reactor
+    }
+    super.init()
+  }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -27,15 +36,19 @@ public final class OnboardingAccountOwnerCheckController: BaseController {
       $0.horizontalEdges.bottom.equalToSuperview()
     }
   }
+}
+
+extension OnboardingAccountOwnerCheckController: ReactorKit.View {
+  public typealias Reactor = AccountSecurityQuestionReactor
   
-  public override func bind() {
+  public func bind(reactor: Reactor) {
     mainView.touchEventRelay
-      .subscribe(with: self) { owner, touch in
-        switch touch {
+      .bind(with: self) { owner, touchType in
+        switch touchType {
         case .ownedAccount:
-          owner.delegate?.pushToQuestion(step: .nickname)
+          reactor.action.onNext(.getQuestionNickname)
         case .createAccount:
-          print("새 계정 만들기~")
+          break
         }
       }
       .disposed(by: disposeBag)

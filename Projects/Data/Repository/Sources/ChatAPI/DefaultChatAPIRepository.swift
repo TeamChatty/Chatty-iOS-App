@@ -17,18 +17,23 @@ public struct DefaultChatAPIRepository: ChatAPIRepositoryProtocol {
     self.chatAPIService = chatAPIService
   }
   
-  public func fetchChatMessages(roomId: Int) -> Single<[ChatMessageProtocol]> {
+  public func fetchChatMessages(roomId: Int) -> Single<[ChatMessage]> {
     let request = ChatMessagesRequestDTO(roomId: roomId)
     return chatAPIService.request(endPoint: .messages(request), responseDTO: ChatMessagesResponseDTO.self)
       .map { $0.toDomain() }
   }
   
-  public func saveChatMessage(with message: ChatMessageProtocol) -> Single<Void> {
+  public func saveChatMessage(with message: ChatMessage) -> Single<Void> {
     return .just(())
   }
   
-  public func fetchChatRooms() -> Single<[ChatRoomProtocol]> {
+  public func fetchChatRooms() -> Single<[ChatRoom]> {
     return chatAPIService.request(endPoint: .getChatRooms, responseDTO: ChatRoomListResponseDTO.self)
+      .map { $0.toDomain() }
+  }
+  
+  public func fetchChatRoom(roomId: Int) -> Single<ChatRoom> {
+    return chatAPIService.request(endPoint: .getChatRoom(roomId: roomId), responseDTO: ChatRoomResponseDTO.self)
       .map { $0.toDomain() }
   }
 }

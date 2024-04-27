@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import DomainCommon
 
 public protocol SaveProfileDataUseCase {
   func executeObs(

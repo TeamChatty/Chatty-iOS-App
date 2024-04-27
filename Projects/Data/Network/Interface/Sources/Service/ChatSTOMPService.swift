@@ -7,12 +7,11 @@
 
 import Foundation
 import RxSwift
-import DataStorageInterface
 import DomainChatInterface
 
 public protocol ChatSTOMPService {
-  func connectSocket() -> PublishSubject<SocketState>
-  func socketObserver() -> PublishSubject<ChatMessageProtocol>
+  func connectSocket(token: String) -> PublishSubject<SocketState>
+  func socketObserver() -> PublishSubject<ChatMessage>
   func send(_ router: ChatSTOMPRouter)
   func subscribe(to: String)
 }

@@ -12,6 +12,8 @@ public enum AuthAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case mobile(MobileRequestDTO)
   case refresh(RefreshRequestDTO)
   case token
+  case problem(QuestionRequestDTO)
+  case check(CheckRequestDTO)
 }
 
 public extension AuthAPIRouter {
@@ -20,7 +22,12 @@ public extension AuthAPIRouter {
   }
   
   var basePath: String {
-    return "/auth"
+    switch self {
+    case .mobile, .refresh, .token:
+      return "/auth"
+    case .problem, .check:
+      return "/check"
+    }
   }
   
   var path: String {
@@ -31,12 +38,30 @@ public extension AuthAPIRouter {
       return "/refresh"
     case .token:
       return "/token"
+    case .problem(let dto):
+      switch dto.checkType {
+      case .birth:
+        return "/problem/birth"
+      case .nickname:
+        return "/problem/nickname"
+      }
+    case .check(let dto):
+      switch dto.checkType {
+      case .birth:
+        return "/nickname"
+      case .nickname:
+        return "/birth"
+      }
     }
   }
   
   var method: Moya.Method {
     switch self {
     case .mobile, .refresh, .token:
+      return .post
+    case .problem:
+      return .get
+    case .check:
       return .post
     }
   }
@@ -49,12 +74,16 @@ public extension AuthAPIRouter {
       return .requestJSONEncodable(refreshRequestDTO)
     case .token:
       return .requestPlain
+    case .problem(let problemRequestDTO):
+      return .requestJSONEncodable(problemRequestDTO.body)
+    case .check(let checkRequestDTO):
+      return .requestJSONEncodable(checkRequestDTO.body)
     }
   }
   
   var headers: [String : String]? {
     switch self {
-    case .mobile, .refresh, .token:
+    case .mobile, .refresh, .token, .problem, .check:
       return ["Content-Type": "application/json"]
     }
   }

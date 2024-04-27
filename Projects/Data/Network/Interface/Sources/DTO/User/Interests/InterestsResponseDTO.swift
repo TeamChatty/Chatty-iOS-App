@@ -14,8 +14,6 @@ public struct InterestsResponseDTO: CommonResponseDTO {
   public var message: String
   public var data: [InterestsDTO]
   
-  
-  
   public func toDomain() -> Interests {
     return Interests(interests: data.map { $0.toDomain() })
   }

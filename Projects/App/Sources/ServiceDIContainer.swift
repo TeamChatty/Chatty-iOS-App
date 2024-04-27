@@ -19,9 +19,14 @@ public protocol ServiceDIContainer {
   func makeInterestAPIService() -> InterestAPIServiceImpl
   func makeUserDefaultsService() -> UserDefaultsService
   func makeCommunityAPIService() -> CommunityAPIServiceImpl
+  func makeChatSTOMPService() -> ChatSTOMPServiceImpl
 }
 
 extension ServiceDIContainer {
+  func makeChatSTOMPService() -> ChatSTOMPServiceImpl {
+    return ChatSTOMPServiceImpl.shared
+  }
+  
   func makeChatAPIService() -> ChatAPIServiceImpl {
     return ChatAPIServiceImpl(
       authAPIService: makeAuthAPIService(),

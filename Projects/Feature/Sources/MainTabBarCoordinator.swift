@@ -9,7 +9,6 @@ import UIKit
 import Shared
 import SharedDesignSystem
 import FeatureLive
-import FeatureLiveInterface
 import FeatureChat
 import FeatureChatInterface
 import FeatureProfile
@@ -29,7 +28,8 @@ final class MainTabBarCoordinator: BaseCoordinator {
   }
   
   override func start() {
-    let liveTabCoordinator = LiveMainCoordinator(navigationController: CustomNavigationController(), featureLiveDependencyProvider: appDependencyProvider.makeFeatureLiveDependencyProvider())
+    let featureLiveDependencyProvider = appDependencyProvider.makeFeatureLiveDependencyProvider()
+    let liveTabCoordinator = LiveMainCoordinator(navigationController: featureLiveDependencyProvider.navigationController, featureLiveDependencyProvider: featureLiveDependencyProvider)
     liveTabCoordinator.start()
     
     let chatTabCoordinator = ChatCoordinator(navigationController: CustomNavigationController(), dependencyProvider: appDependencyProvider.makeFeatureChatDependencyProvider())

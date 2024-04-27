@@ -11,6 +11,13 @@ import DomainUser
 import FeatureOnboardingInterface
 
 final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardingDependencyProvider {
+  func makeGetAuthCheckQuestionUseCase() -> DomainAuth.DefaultGetAuthCheckQuestionUseCase {
+    return DefaultGetAuthCheckQuestionUseCase(
+      authAPIRepository: makeAuthAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
   func makeSignUseCase() -> DefaultSignUseCase {
     return DefaultSignUseCase(
       userAPIRepository: makeUserAPIRepository(),
@@ -21,9 +28,9 @@ final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardi
   
   func makeSendVerificationCodeUseCase() -> DefaultSendVerificationCodeUseCase {
     return DefaultSendVerificationCodeUseCase(
-      authAPIRepository: makeAuthAPIRepository(), 
-      keychainRepository: makeKeychainRepository()
-    )
+      authAPIRepository: makeAuthAPIRepository(),
+      keychainRepository: makeKeychainRepository(),
+      userProfileRepository: makeUserProfileRepository())
   }
   
   func makeGetDeviceIdUseCase() -> DefaultGetDeviceIdUseCase {
@@ -35,28 +42,28 @@ final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardi
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userDataRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveProfileDataUseCase() -> DefaultSaveProfileDataUseCase {
     return DefaultSaveProfileDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userDataRepository: makeUserProfileRepository()
     )
   }
   
   func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
     return DefaultGetUserDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userDataRepository: makeUserProfileRepository()
     )
   }
   
   func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase {
     return DefaultGetAllInterestsUseCase(
       userAPIRepository: makeUserAPIRepository(), 
-      userDataRepository: makeUserDataRepository()
+      userDataRepository: makeUserProfileRepository()
     )
   }
 }

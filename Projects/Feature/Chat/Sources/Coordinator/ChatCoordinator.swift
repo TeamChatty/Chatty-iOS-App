@@ -9,10 +9,9 @@ import Foundation
 import Shared
 import SharedDesignSystem
 import FeatureChatInterface
+import DomainLiveInterface
+import DomainChatInterface
 
-public protocol ChatCoordinatorDelegate: AnyObject {
-  func pushToChatRoom(roomViewData: ChatRoomViewData)
-}
 
 public final class ChatCoordinator: BaseCoordinator, ChatCoordinatorDelegate {
   public override var type: CoordinatorType {
@@ -40,5 +39,12 @@ public final class ChatCoordinator: BaseCoordinator, ChatCoordinatorDelegate {
     let chatRoomController = ChatRoomController(reactor: ChatReactor(chatServerConnectUseCase: dependencyProvider.makeChatServerConnectUseCase(), chatSendMessageUseCase: dependencyProvider.makeChatSendMessageUseCase(), chatRoomSubscribeUseCase: dependencyProvider.makeChatRoomSubscribeUseCase(), getChatMessageStreamUseCase: dependencyProvider.makeGetChatMessageStreamUseCase(), getChatMessagesUseCase: dependencyProvider.makeGetChatMessagesUseCase(), roomViewData: roomViewData))
     chatRoomController.hidesBottomBarWhenPushed = true
     navigationController.pushViewController(chatRoomController, animated: true)
+  }
+  
+  public func pushToTemporaryChatRoom(roomData: ChatRoom) {
+    let roomViewData = ChatRoomViewData(roomId: roomData.roomId, recieverProfile: .init(userId: roomData.partnerId, name: roomData.partnerNickname, profileImageURL: roomData.partnerImageURL), chatRoomActiveStatus: .temporary(creationTime: roomData.chatRoomCreatedTime), createdTime: roomData.chatRoomCreatedTime)
+    let temporaryChatRoomController = TemporaryChatRoomController(reactor: ChatReactor(chatServerConnectUseCase: dependencyProvider.makeChatServerConnectUseCase(), chatSendMessageUseCase: dependencyProvider.makeChatSendMessageUseCase(), chatRoomSubscribeUseCase: dependencyProvider.makeChatRoomSubscribeUseCase(), getChatMessageStreamUseCase: dependencyProvider.makeGetChatMessageStreamUseCase(), getChatMessagesUseCase: dependencyProvider.makeGetChatMessagesUseCase(), roomViewData: roomViewData), temporaryChatReactor: TemporaryChatReactor())
+    temporaryChatRoomController.hidesBottomBarWhenPushed = true
+    navigationController.pushViewController(temporaryChatRoomController, animated: true)
   }
 }

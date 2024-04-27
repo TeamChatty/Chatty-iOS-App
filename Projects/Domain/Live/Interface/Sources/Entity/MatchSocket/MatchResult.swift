@@ -14,7 +14,7 @@ public struct MatchResult {
   public let gender: String
   public let mbti: String
   public let address: String?
-  public let imageUrl: String
+  public let imageUrl: String?
   public let age: Int
   public let blueCheck: Bool
   public let requestMinAge: Int
@@ -25,7 +25,7 @@ public struct MatchResult {
   public let requestBlueCheck: Bool
   public let success: Bool
   
-  public init(id: Int, userId: Int, nickname: String, gender: String, mbti: String, address: String?, imageUrl: String, age: Int, blueCheck: Bool, requestMinAge: Int, requestMaxAge: Int, requestCategory: String, requestScope: Int?, requestGender: String, requestBlueCheck: Bool, success: Bool) {
+  public init(id: Int, userId: Int, nickname: String, gender: String, mbti: String, address: String?, imageUrl: String?, age: Int, blueCheck: Bool, requestMinAge: Int, requestMaxAge: Int, requestCategory: String, requestScope: Int?, requestGender: String, requestBlueCheck: Bool, success: Bool) {
     self.id = id
     self.userId = userId
     self.nickname = nickname

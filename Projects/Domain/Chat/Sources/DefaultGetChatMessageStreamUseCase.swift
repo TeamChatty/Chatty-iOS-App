@@ -16,7 +16,7 @@ public struct DefaultGetChatMessageStreamUseCase {
     self.chatSTOMPRepository = chatSTOMPRepository
   }
   
-  public func execute() -> PublishSubject<ChatMessageProtocol> {
+  public func execute() -> PublishSubject<ChatMessage> {
     return chatSTOMPRepository.socketObserver()
   }
 }

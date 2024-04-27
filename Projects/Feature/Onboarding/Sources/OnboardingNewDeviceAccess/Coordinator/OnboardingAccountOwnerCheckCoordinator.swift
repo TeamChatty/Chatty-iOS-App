@@ -1,5 +1,5 @@
 //
-//  AccountOwnerCheckCoordinator.swift
+//  OnboardingAccountOwnerCheckCoordinator.swift
 //  FeatureOnboardingInterface
 //
 //  Created by HUNHIE LEE on 1/30/24.
@@ -8,6 +8,7 @@
 import UIKit
 import Shared
 import SharedDesignSystem
+import FeatureOnboardingInterface
 
 public protocol AccountOwnerCheckDelegate: AnyObject {
   func pushToQuestion(step: AccountSecurityQuestionType)
@@ -16,21 +17,28 @@ public protocol AccountOwnerCheckDelegate: AnyObject {
   func pushToCreateAccount()
 }
 
-public final class AccountOwnerCheckCoordinator: BaseCoordinator {
+public final class OnboardingAccountOwnerCheckCoordinator: BaseCoordinator {
   public override var type: CoordinatorType {
    return .onboarding(.newDeviceAccess(.accountOwnerCheck))
   }
   
+  private let dependencyProvider: FeatureOnboardingDependencyProvider
+  
+  public init(navigationController: CustomNavigationController, dependencyProvider: FeatureOnboardingDependencyProvider) {
+    self.dependencyProvider = dependencyProvider
+    super.init(navigationController: navigationController)
+  }
+  
   public override func start() {
-    let onboardingAccountOwnerCheckController = OnboardingAccountOwnerCheckController()
+    let onboardingAccountOwnerCheckController = OnboardingAccountOwnerCheckController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase()))
     onboardingAccountOwnerCheckController.delegate = self
     navigationController.pushViewController(onboardingAccountOwnerCheckController, animated: true)
   }
 }
 
-extension AccountOwnerCheckCoordinator: AccountOwnerCheckDelegate {
+extension OnboardingAccountOwnerCheckCoordinator: AccountOwnerCheckDelegate {
   public func pushToQuestion(step: AccountSecurityQuestionType) {
-    let accountSecurityQuestionController = AccountSecurityQuestionController(reactor: .init(), step: step)
+    let accountSecurityQuestionController = AccountSecurityQuestionController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase()), step: step)
     accountSecurityQuestionController.delegate = self
     navigationController.pushViewController(accountSecurityQuestionController, animated: true)
   }

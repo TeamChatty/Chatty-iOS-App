@@ -107,13 +107,14 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
           print("인증번호 발송에 실패하였습니다.")
         case .mismatchedDeviceId:
           print("기기 번호가 다릅니다. 계정 확인 화면으로~")
+          owner.delegate?.pushToAccountAccess()
         case .unknownError:
           print("알 수 없는 에러입니다.")
         case .alreadyExistUser:
           print("이미 가입한 유저입니다.")
           switch reactor.type {
           case .signIn:
-            print("메인으로 보내기")
+            AppFlowControl.shared.delegete?.showMainFlow()
           case .signUp:
             owner.showErrorAlert(title: "계정 확인", subTitle: "이미 가입된 계정이 있어요.", positiveLabel: "로그인", negativeLabel: "취소")
           }

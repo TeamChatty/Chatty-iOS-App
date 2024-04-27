@@ -31,4 +31,10 @@ public extension String {
     dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
     return dateFormatter.date(from: self)
   }
+  
+  func toDate() -> Date? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    return dateFormatter.date(from: self)
+  }
 }

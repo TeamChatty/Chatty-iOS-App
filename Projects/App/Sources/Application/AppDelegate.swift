@@ -14,12 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // 앱 커스텀 폰트 등록
     SharedDesignSystemFontFamily.registerAllCustomFonts()
-
+    
     // Firebase info.plist 설정
     if let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") {
       AppFirebase.Firebase.configure(with: filePath)
     }
-
+    
     // 푸쉬 알림 설정
     UNUserNotificationCenter.current().delegate = self
     let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound] // 필요한 알림 권한을 설정
@@ -33,15 +33,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // 기기 식별 번호 생성 ( 앱 최초 설치 시 )
     let getDeviceIdUseCase = AppDIContainer.shared.makeDefaultGetDeviceIdUseCase()
     getDeviceIdUseCase.execute()
-      .filter { deviceId in
-        return deviceId.isEmpty
-      }
-      .subscribe(with: self) { owner, _ in
+      .asObservable()
+      .subscribe(onError: { _ in
         let saveDeviceIdUseCase = AppDIContainer.shared.makeDefaultSaveDeviceIdUseCase()
         let _ = saveDeviceIdUseCase.execute()
-      }
+      })
       .dispose()
-
     
     return true
   }
@@ -69,10 +66,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     Messaging.messaging().apnsToken = deviceToken
   }
   
-//  // Foreground(앱 켜진 상태)에서도 알림 오는 설정
-//  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-//    completionHandler([.list, .banner])
-//  }
+  //  // Foreground(앱 켜진 상태)에서도 알림 오는 설정
+  //  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+  //    completionHandler([.list, .banner])
+  //  }
 }
 
 extension AppDelegate: MessagingDelegate {

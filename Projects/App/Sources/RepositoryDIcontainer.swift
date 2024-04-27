@@ -20,7 +20,7 @@ public protocol RepositoryDIcontainer: ServiceDIContainer {
   func makeUserAPIRepository() -> DefaultUserAPIRepository
   func makeAuthAPIRepository() -> DefaultAuthAPIRepository
   func makeKeychainRepository() -> DefaultKeychainReposotory
-  func makeUserDataRepository() -> DefaultUserDataRepository
+  func makeUserProfileRepository() -> DefaultUserProfileRepository
   func makeLiveAPIRepository() -> DefaultLiveAPIRepository
   func makeLiveSocketRepository() -> DefaultLiveSocketRepository
   func makeUserDefaultsRepository() -> DefaultUserDefaultsRepository
@@ -50,9 +50,9 @@ extension RepositoryDIcontainer {
     )
   }
   
-  func makeUserDataRepository() -> DefaultUserDataRepository {
-    return DefaultUserDataRepository(
-      userDataService: UserProfileService.shared
+  func makeUserProfileRepository() -> DefaultUserProfileRepository {
+    return DefaultUserProfileRepository(
+      userProfileService: UserProfileService.shared
     )
   }
   
@@ -75,7 +75,7 @@ extension RepositoryDIcontainer {
   }
   
   func makeChatSTOMPRepository() -> DefaultChatSTOMPRepository {
-    return DefaultChatSTOMPRepository(chatSTOMPService: ChatSTOMPServiceImpl.shared)
+    return DefaultChatSTOMPRepository(chatSTOMPService: makeChatSTOMPService(), keychainService: KeychainService.shared)
   }
   
   func makeChatAPIRepository() -> DefaultChatAPIRepository {

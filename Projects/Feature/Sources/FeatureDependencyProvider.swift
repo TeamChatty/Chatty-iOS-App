@@ -7,14 +7,14 @@
 
 import Foundation
 import FeatureOnboardingInterface
-import FeatureLiveInterface
+import FeatureLive
 import FeatureChatInterface
 import FeatureProfileInterface
 import FeatureFeedInterface
 
 public protocol FeatureDependencyProvider {
   func makeFeatureOnboardingDependencyProvider() -> FeatureOnboardingDependencyProvider
-  func makeFeatureLiveDependencyProvider() -> FeatureLiveDependencyProvider
+  func makeFeatureLiveDependencyProvider() -> any FeatureLiveDependencyProvider
   func makeFeatureProfileDependencyProvider() -> FeatureProfileDependencyProvider
   func makeFeatureChatDependencyProvider() -> FeatureChatDependecyProvider
   func makeFeatureFeedDependencyProvider() -> FeatureFeedDependencyProvider

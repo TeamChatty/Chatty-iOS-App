@@ -16,7 +16,7 @@ public struct DefaultGetChatMessgesUseCase {
     self.chatAPIRepository = chatAPIRepository
   }
   
-  public func exectue(roomId: Int) -> Single<[ChatMessageProtocol]> {
+  public func exectue(roomId: Int) -> Single<[ChatMessage]> {
     return chatAPIRepository.fetchChatMessages(roomId: roomId)
   }
 }

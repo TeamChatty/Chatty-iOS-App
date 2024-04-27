@@ -7,12 +7,15 @@
 
 import UIKit
 import SharedDesignSystem
+import Kingfisher
+import FeatureChatInterface
 
 public class ChatMessageCell: UICollectionViewCell {
   private lazy var profileImageView: UIImageView = UIImageView().then {
-    $0.backgroundColor = SystemColor.gray400.uiColor
+    $0.contentMode = .scaleAspectFit
+    $0.layer.masksToBounds = true
   }
-
+  
   private lazy var nicknameLabel: UILabel = UILabel().then {
     $0.font = SystemFont.caption02.font
     $0.textColor = SystemColor.basicBlack.uiColor
@@ -26,19 +29,28 @@ public class ChatMessageCell: UICollectionViewCell {
   public let messageView: UIView = UIView()
   
   private var message: ChatMessageViewData?
-
-  public func configureCell(with message: ChatMessageViewData) {
-    self.message = message
-    setupMessageView(with: message)
+  private var profileImageURL: String?
+  public var chatRoomType: ChatRoomType = .unlimited
   
-    timeLabel.text = message.sendTime?.toCustomString(format: .ahhmm)
+  public func configureCell(with message: ChatMessageViewData, chatRoomType: ChatRoomType) {
+    self.message = message
+    self.chatRoomType = chatRoomType
+    
+    setupMessageView(with: message)
+    if message.accessoryConfig.timeLabelVisible {
+      timeLabel.text = message.sendTime?.toCustomString(format: .ahhmm)
+    }
   }
   
   public override func prepareForReuse() {
     super.prepareForReuse()
-
+    
     contentView.removeAllSubviews()
     contentView.layoutIfNeeded()
+    
+    nicknameLabel.text = nil
+    timeLabel.text = nil
+    profileImageView.backgroundColor = nil
   }
   
   private func setupMessageView(with message: ChatMessageViewData) {
@@ -57,16 +69,32 @@ public class ChatMessageCell: UICollectionViewCell {
         $0.trailing.equalTo(messageView.snp.leading).offset(-8)
         $0.bottom.equalTo(messageView)
       }
-    case .participant(let name):
-      setupProfileImageView()
-      setupNicknameLabel()
-      nicknameLabel.text = name
+    case .participant(let profile):
+      setupNicknameLabel(profile: profile)
+      setupProfileImageView(profile: profile)
       
       messageView.snp.makeConstraints {
-        $0.leading.equalTo(profileImageView.snp.trailing).offset(10)
-        $0.top.equalTo(nicknameLabel.snp.bottom).offset(8)
         $0.bottom.equalToSuperview().offset(-8)
         $0.width.lessThanOrEqualToSuperview().multipliedBy(0.55)
+        
+        switch chatRoomType {
+        case .temporary:
+          $0.leading.equalToSuperview().offset(20)
+        case .unlimited:
+          if message.accessoryConfig.nicknameAndProfileVisible {
+            $0.leading.equalTo(profileImageView.snp.trailing).offset(10)
+            $0.top.equalTo(nicknameLabel.snp.bottom).offset(8)
+          } else {
+            $0.leading.equalToSuperview().offset(74)
+            $0.top.equalToSuperview().offset(8)
+          }
+        }
+        
+        if message.accessoryConfig.nicknameAndProfileVisible {
+          $0.top.equalTo(nicknameLabel.snp.bottom).offset(8)
+        } else {
+          $0.top.equalToSuperview().offset(8)
+        }
       }
       
       timeLabel.snp.makeConstraints {
@@ -76,21 +104,39 @@ public class ChatMessageCell: UICollectionViewCell {
     }
   }
   
-  private func setupProfileImageView() {
-    contentView.addSubview(profileImageView)
-    profileImageView.snp.makeConstraints {
-      $0.leading.equalToSuperview().inset(20)
-      $0.top.equalToSuperview().offset(8)
-      $0.size.equalTo(44)
+  private func setupProfileImageView(profile: ChatParticipantType.ParticipantProfile) {
+    if case .unlimited = chatRoomType,
+       let message,
+       message.accessoryConfig.nicknameAndProfileVisible {
+      contentView.addSubview(profileImageView)
+      profileImageView.snp.makeConstraints {
+        $0.leading.equalToSuperview().inset(20)
+        $0.top.equalToSuperview().offset(8)
+        $0.size.equalTo(44)
+      }
+      profileImageView.makeCircle(with: 44)
+      if let url = profile.imageURL {
+        profileImageView.kf.setImage(with: URL(string: url))
+      } else {
+        profileImageView.backgroundColor = SystemColor.gray400.uiColor
+      }
     }
-    profileImageView.makeCircle(with: 44)
   }
   
-  private func setupNicknameLabel() {
+  private func setupNicknameLabel(profile: ChatParticipantType.ParticipantProfile) {
     contentView.addSubview(nicknameLabel)
     nicknameLabel.snp.makeConstraints {
-      $0.leading.equalTo(profileImageView.snp.trailing).offset(10)
+      if case .unlimited = chatRoomType {
+        $0.leading.equalToSuperview().offset(74)
+      } else {
+        $0.leading.equalToSuperview().offset(20)
+      }
       $0.top.equalToSuperview().offset(8)
+    }
+    
+    if let message,
+       message.accessoryConfig.nicknameAndProfileVisible {
+      nicknameLabel.text = profile.name
     }
   }
 }

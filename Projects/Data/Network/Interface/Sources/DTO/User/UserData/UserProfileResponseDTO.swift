@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import DomainUserInterface
 import DomainUser
+import DomainUserInterface
 
 public struct UserProfileResponseDTO: CommonResponseDTO {
   public let code: Int
@@ -35,6 +35,7 @@ public struct UserProfileResponseDTO: CommonResponseDTO {
   public func toDomain() -> SomeoneProfile {
     return SomeoneProfile(
       profile: .init(
+        userId: data.id, 
         nickname: data.nickname,
         mobileNumber: data.mobileNumber,
         birth: data.birth,

@@ -7,9 +7,10 @@
 
 import Foundation
 import RxSwift
+import DomainCommon
 
-public protocol UserDataRepositoryProtocol {
-  func saveUserData(userData: UserProfile)
-  func getUserData() -> UserProfile
+public protocol UserProfileRepositoryProtocol {
+  func saveUserProfile(userProfile: UserProfile)
+  func getUserProfile() -> UserProfile
   func saveAllInterests(interests: Interests)
 }

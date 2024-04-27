@@ -17,7 +17,8 @@ let project = Project.makeModule(
             implements: .Live,
             factory: .init(
                 dependencies: [
-                    .feature(interface: .Live)
+                    .feature(interface: .Live),
+                    .feature(interface: .Chat)
                 ]
             )
         ),

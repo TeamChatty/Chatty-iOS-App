@@ -10,6 +10,7 @@ import Feature
 import FeatureOnboardingInterface
 import FeatureLiveInterface
 import FeatureFeedInterface
+import FeatureLive
 import FeatureProfileInterface
 import FeatureChatInterface
 import DomainCommon
@@ -28,7 +29,7 @@ final class AppDIContainer: RepositoryDIcontainer, AppDependencyProvider {
     return FeatureOnboardingDIContainer()
   }
   
-  func makeFeatureLiveDependencyProvider() -> FeatureLiveDependencyProvider {
+  func makeFeatureLiveDependencyProvider() -> any FeatureLiveDependencyProvider {
     return FeatureLiveDIcontainer()
   }
   
@@ -65,6 +66,6 @@ final class AppDIContainer: RepositoryDIcontainer, AppDependencyProvider {
   }
   
   func makeGetProfileUseCase() -> DomainUser.DefaultGetUserDataUseCase {
-    return DefaultGetUserDataUseCase(userAPIRepository: makeUserAPIRepository(), userDataRepository: makeUserDataRepository())
+    return DefaultGetUserDataUseCase(userAPIRepository: makeUserAPIRepository(), userDataRepository: makeUserProfileRepository())
   }
 }

@@ -7,6 +7,7 @@
 
 import UIKit
 import SharedDesignSystem
+import FeatureChatInterface
 
 public final class ChatTextMessageCell: ChatMessageCell {
   private let bubbleView: UIView = UIView()
@@ -17,8 +18,8 @@ public final class ChatTextMessageCell: ChatMessageCell {
     $0.numberOfLines = 0
   }
   
-  public override func configureCell(with message: ChatMessageViewData) {
-    super.configureCell(with: message)
+  public override func configureCell(with message: ChatMessageViewData, chatRoomType: ChatRoomType) {
+    super.configureCell(with: message, chatRoomType: chatRoomType)
     setText(with: message)
     setTextLabelColor(with: message)
     setBubbleView(with: message)
@@ -29,6 +30,7 @@ public final class ChatTextMessageCell: ChatMessageCell {
   private func setupTextLabel() {
     bubbleView.addSubview(textLabel)
     textLabel.snp.makeConstraints {
+      $0.height.greaterThanOrEqualTo(20).priority(800)
       $0.verticalEdges.equalToSuperview().inset(8)
       $0.horizontalEdges.equalToSuperview().inset(12)
     }
@@ -55,8 +57,13 @@ public final class ChatTextMessageCell: ChatMessageCell {
       bubbleView.backgroundColor = SystemColor.primaryNormal.uiColor
       bubbleView.roundCorners(cornerRadius: 12, maskedCorners: [.layerMinXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner])
     case .participant:
-      bubbleView.backgroundColor = SystemColor.gray100.uiColor
+      bubbleView.backgroundColor = chatRoomType == .unlimited ? SystemColor.gray100.uiColor : SystemColor.basicWhite.uiColor
       bubbleView.roundCorners(cornerRadius: 12, maskedCorners: [.layerMaxXMaxYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner])
+      
+      if case .temporary = chatRoomType {
+        bubbleView.layer.borderColor = SystemColor.gray200.uiColor.cgColor
+        bubbleView.layer.borderWidth = 1
+      }
     }
   }
   

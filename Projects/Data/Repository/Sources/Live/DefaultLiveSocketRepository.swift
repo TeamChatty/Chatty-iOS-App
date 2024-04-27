@@ -36,6 +36,4 @@ public final class DefaultLiveSocketRepository: LiveSocketRepository {
   public func disconnectSocket() {
     liveWebSocketService.disconnectSocket()
   }
-  
-  
 }

@@ -11,23 +11,26 @@ import RxCocoa
 import SharedDesignSystem
 import DomainChatInterface
 
-public final class ChatInputBar: BaseView, InputReceivable {
+public final class ChatInputBar: BaseView, InputReceivable, Touchable {
   private let dividerView: BackgroundView = BackgroundView().then {
     $0.backgroundColor = SystemColor.gray200.uiColor
   }
   
-  public let textView: UITextView = UITextView().then {
+  public lazy var textView: UITextView = UITextView().then {
     $0.showsVerticalScrollIndicator = false
     $0.font = SystemFont.body03.font
-    $0.textColor = SystemColor.basicBlack.uiColor
+    $0.text = "메시지를 입력해 주세요"
+    $0.textColor = SystemColor.gray500.uiColor
     $0.isScrollEnabled = false
     $0.textContainerInset = .init(top: 2, left: 0, bottom: 0, right: 0)
+    $0.backgroundColor = SystemColor.gray100.uiColor
   }
   
   private let inputBar: UIView = UIView().then {
     $0.layer.cornerRadius = 12
     $0.layer.borderColor = SystemColor.gray200.uiColor.cgColor
     $0.layer.borderWidth = 1
+    $0.backgroundColor = SystemColor.gray100.uiColor
   }
   
   private let sendButton: ChangeableImageButton = ChangeableImageButton().then {
@@ -41,10 +44,11 @@ public final class ChatInputBar: BaseView, InputReceivable {
   }
   
   public var inputEventRelay: PublishRelay<MessageContentType> = .init()
-  
+  public var touchEventRelay: PublishRelay<Void> = .init()
   private let disposeBag: DisposeBag = DisposeBag()
   
   public override func configureUI() {
+    self.backgroundColor = SystemColor.basicWhite.uiColor
     setupDividerView()
     setupInputBar()
     setupSendButton()
@@ -53,6 +57,16 @@ public final class ChatInputBar: BaseView, InputReceivable {
   
   public override func bind() {
     super.bind()
+    self.rx.tapGesture(configuration: { [weak self] gestureRecognizer, delegate in
+      guard let self else { return }
+      gestureRecognizer.delegate = self
+      delegate.simultaneousRecognitionPolicy = .always
+    })
+    .when(.recognized)
+    .map { _ in () }
+    .bind(to: touchEventRelay)
+    .disposed(by: disposeBag)
+    
     sendButton.touchEventRelay
       .withUnretained(self)
       .map { _ in .text(self.textView.text) }
@@ -98,5 +112,12 @@ public final class ChatInputBar: BaseView, InputReceivable {
   
   public func updateSendButtonIsEnabled(_ isEnabled: Bool) {
     sendButton.currentState = isEnabled ? .enabled : .disabled
+  }
+}
+
+extension ChatInputBar: UIGestureRecognizerDelegate {
+  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    guard touch.view?.isDescendant(of: self.sendButton) == false else { return false }
+    return true
   }
 }

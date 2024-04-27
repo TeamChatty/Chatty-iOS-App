@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import Then
 import SharedDesignSystem
+import DomainAuth
 
 public enum AccountSecurityAnswerType: Int, IntCaseIterable {
   case answer1
@@ -19,9 +20,9 @@ public enum AccountSecurityAnswerType: Int, IntCaseIterable {
   case answer5
 }
 
-public enum AccountSecurityQuestionType: Int, CaseIterable {
-  case nickname
-  case birth
+public enum AccountSecurityQuestionType {
+  case nickname([AuthCheckQuestionItem])
+  case birth([AuthCheckQuestionItem])
   
   var questionTitle: String {
     switch self {
@@ -39,7 +40,12 @@ public enum AccountSecurityQuestionType: Int, CaseIterable {
   }
   
   var stepValue: String {
-    return "\(self.rawValue + 1)/\(Self.allCases.count)단계"
+    switch self {
+    case .nickname:
+      return "1단계"
+    case .birth:
+      return "2단계"
+    }
   }
 }
 

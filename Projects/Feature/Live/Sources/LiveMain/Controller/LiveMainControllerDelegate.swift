@@ -7,6 +7,7 @@
 
 import Foundation
 import DomainLiveInterface
+import FeatureChatInterface
 
 protocol LiveMainControllerDelegate: AnyObject {
   func pushToMatchingView()

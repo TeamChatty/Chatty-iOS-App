@@ -6,10 +6,23 @@
 //
 
 import Foundation
-import FeatureLiveInterface
+import FeatureLive
+import FeatureChatInterface
 import DomainLive
+import DomainChat
+import FeatureChat
+import SharedDesignSystem
 
 final class FeatureLiveDIcontainer: RepositoryDIcontainer, FeatureLiveDependencyProvider {
+  var navigationController: CustomNavigationController = CustomNavigationController()
+  
+  func getChatCoordinatorDelegate() -> ChatCoordinatorDelegate {
+    return ChatCoordinator(
+      navigationController: navigationController,
+      dependencyProvider: AppDIContainer.shared.makeFeatureChatDependencyProvider()
+    )
+  }
+  
   func makeConnectMatchUseCase() -> DefaultConnectMatchUseCase {
     return DefaultConnectMatchUseCase(
       liveAPIRepository: makeLiveAPIRepository(),
@@ -20,6 +33,12 @@ final class FeatureLiveDIcontainer: RepositoryDIcontainer, FeatureLiveDependency
   func makeMatchConditionUseCase() -> DefaultMatchConditionUseCase {
     return DefaultMatchConditionUseCase(
       userDefaultsRepository: makeUserDefaultsRepository()
+    )
+  }
+  
+  func makeGetChatRoomUseCase() -> DefaultGetChatRoomUseCase {
+    return DefaultGetChatRoomUseCase(
+      chatAPIRepository: makeChatAPIRepository()
     )
   }
 }

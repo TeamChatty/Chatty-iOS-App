@@ -15,7 +15,7 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
   func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
     return DefaultGetUserDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userDataRepository: makeUserProfileRepository()
     )
   }
   

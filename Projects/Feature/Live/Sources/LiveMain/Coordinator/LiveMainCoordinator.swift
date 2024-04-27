@@ -9,17 +9,18 @@ import UIKit
 import Shared
 import SharedDesignSystem
 
-import FeatureLiveInterface
 import DomainLiveInterface
+import FeatureChatInterface
+import DomainChatInterface
 
 public final class LiveMainCoordinator: BaseCoordinator {
   public override var type: CoordinatorType {
     .live(.main)
   }
   
-  private let featureLiveDependencyProvider: FeatureLiveDependencyProvider
-  
-  public init(navigationController: CustomNavigationController, featureLiveDependencyProvider: FeatureLiveDependencyProvider
+  private let featureLiveDependencyProvider: any FeatureLiveDependencyProvider
+
+  public init(navigationController: CustomNavigationController, featureLiveDependencyProvider: any FeatureLiveDependencyProvider
   ) {
     self.featureLiveDependencyProvider = featureLiveDependencyProvider
     super.init(navigationController: navigationController)
@@ -56,7 +57,8 @@ extension LiveMainCoordinator: LiveMainControllerDelegate {
     let liveMatchingReactor = LiveEditConditionModalReactor(
       matchState: matchState, 
       matchConditionUseCase: self.featureLiveDependencyProvider.makeMatchConditionUseCase(),
-      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase()
+      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase(), 
+      getChatRoomUseCase: self.featureLiveDependencyProvider.makeGetChatRoomUseCase()
     )
     let editGenderConditionModal = LiveEditGenderConditionModal(reactor: liveMatchingReactor)
     editGenderConditionModal.modalPresentationStyle = .pageSheet
@@ -68,7 +70,8 @@ extension LiveMainCoordinator: LiveMainControllerDelegate {
     let liveMatchingReactor = LiveEditConditionModalReactor(
       matchState: matchState,
       matchConditionUseCase: self.featureLiveDependencyProvider.makeMatchConditionUseCase(),
-      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase()
+      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase(), 
+      getChatRoomUseCase: self.featureLiveDependencyProvider.makeGetChatRoomUseCase()
     )
     let editAgeConditionModal = LiveEditAgeConditionModal(reactor: liveMatchingReactor)
     editAgeConditionModal.modalPresentationStyle = .pageSheet
@@ -80,7 +83,8 @@ extension LiveMainCoordinator: LiveMainControllerDelegate {
     let liveMatchingReactor = LiveEditConditionModalReactor(
       matchState: matchState,
       matchConditionUseCase: self.featureLiveDependencyProvider.makeMatchConditionUseCase(),
-      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase()
+      connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase(), 
+      getChatRoomUseCase: self.featureLiveDependencyProvider.makeGetChatRoomUseCase()
     )
     let matchModeModal = LiveMatchModeModal(reactor: liveMatchingReactor)
     matchModeModal.modalPresentationStyle = .pageSheet
@@ -114,7 +118,8 @@ extension LiveMainCoordinator: LiveMatchModeModalDelegate {
       let liveMatchingReactor = LiveEditConditionModalReactor(
         matchState: matchState,
         matchConditionUseCase: self.featureLiveDependencyProvider.makeMatchConditionUseCase(),
-        connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase()
+        connectMatchUserCase: self.featureLiveDependencyProvider.makeConnectMatchUseCase(),
+        getChatRoomUseCase: self.featureLiveDependencyProvider.makeGetChatRoomUseCase()
       )
       let liveMatchingController = LiveMatchingController(reactor: liveMatchingReactor)
       liveMatchingController.modalPresentationStyle = .overFullScreen
@@ -125,10 +130,12 @@ extension LiveMainCoordinator: LiveMatchModeModalDelegate {
 }
 
 extension LiveMainCoordinator: LiveMatchingDelegate {
-  func successMatching() {
+  func successMatching(room: ChatRoom) {
     print("successMatching - Matching")
+    let chatCoordinatorDelegate = featureLiveDependencyProvider.getChatCoordinatorDelegate()
     DispatchQueue.main.async {
-      self.navigationController.dismiss(animated: true)
+      self.navigationController.dismiss(animated: false)
+      (chatCoordinatorDelegate as? ChatCoordinatorDelegate)?.pushToTemporaryChatRoom(roomData: room)
     }
   }
 }

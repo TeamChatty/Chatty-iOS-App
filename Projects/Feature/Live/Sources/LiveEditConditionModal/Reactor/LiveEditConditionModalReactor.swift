@@ -12,6 +12,7 @@ import ReactorKit
 
 import DomainCommon
 import DomainLiveInterface
+import DomainChat
 
 public final class LiveEditConditionModalReactor: Reactor {
   private let matchConditionUseCase: MatchConditionUseCase
@@ -19,6 +20,7 @@ public final class LiveEditConditionModalReactor: Reactor {
   private let connectMatchUserCase: ConnectMatchUseCase
   private var socketResultSubject: PublishSubject<MatchSocketResult> = .init()
   private var isSocketOpenedSubject: PublishSubject<Void> = .init()
+  private let getChatRoomUseCase: DefaultGetChatRoomUseCase
   
   private let disposeBag = DisposeBag()
   
@@ -38,8 +40,9 @@ public final class LiveEditConditionModalReactor: Reactor {
     // LiveMatchingController
     case matchingStart
     case matchSocketOpened
-    case matchingSuccess
+    case matchingSuccess(MatchSocketResult)
     case getError(Error)
+    case matchingExit
   }
   
   public enum Mutation {
@@ -48,7 +51,6 @@ public final class LiveEditConditionModalReactor: Reactor {
     case setAgeCondition(MatchAgeRange)
     case toggleProfileAuthenticationConnection(Bool)
     case startMatching(MatchMode)
-
     case setMathcingState(MatchingState)
     case setError(ErrorType?)
   }
@@ -66,10 +68,11 @@ public final class LiveEditConditionModalReactor: Reactor {
   
   public var initialState: State
   
-  init(matchState: MatchConditionState, matchConditionUseCase: MatchConditionUseCase, connectMatchUserCase: ConnectMatchUseCase) {
+  public init(matchState: MatchConditionState, matchConditionUseCase: MatchConditionUseCase, connectMatchUserCase: ConnectMatchUseCase, getChatRoomUseCase: DefaultGetChatRoomUseCase) {
     self.initialState = State(matchConditionState: matchState)
     self.matchConditionUseCase = matchConditionUseCase
     self.connectMatchUserCase = connectMatchUserCase
+    self.getChatRoomUseCase = getChatRoomUseCase
   }
 }
 
@@ -118,10 +121,17 @@ extension LiveEditConditionModalReactor {
       .catch { error -> Observable<Mutation> in
         return error.toMutation()
       }
-    case .matchingSuccess:
-      return .just(.setMathcingState(.successMatching))
+    case .matchingSuccess(let result):
+      return getChatRoomUseCase.exectue(roomId: result.roomId)
+        .asObservable()
+        .flatMap { room -> Observable<Mutation> in
+          return .just(.setMathcingState(.successMatching(room)))
+        }
     case .getError(let error):
       return error.toMutation()
+    case .matchingExit:
+      connectMatchUserCase.disconnectSocket()
+      return .never()
     }
   }
   
@@ -142,15 +152,13 @@ extension LiveEditConditionModalReactor {
     socketResultSubject.subscribe(
         with: self,
         onNext: { reactor, matchRes in
-          reactor.action.onNext(.matchingSuccess)
+          reactor.action.onNext(.matchingSuccess(matchRes))
         },
         onError: { reactor, error in
           reactor.action.onNext(.getError(error))
         })
     .disposed(by: disposeBag)
   }
-  
-  
   
   public func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
@@ -167,7 +175,6 @@ extension LiveEditConditionModalReactor {
     case .startMatching(let matchMode):
       newState.matchMode = matchMode
       newState.isMatchStarted = true
-      
     case .setMathcingState(let matchingState):
       newState.matchingState = matchingState
     case .setError(let error):

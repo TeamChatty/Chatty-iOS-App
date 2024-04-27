@@ -40,6 +40,13 @@ public final class OnboardingPhoneAuthenticationCoordinator: BaseCoordinator {
 }
 
 extension OnboardingPhoneAuthenticationCoordinator: OnboardingPhoneAuthenticationDelegate {
+  public func pushToAccountAccess() {
+    let onboardingAccountOwnerCheckCoordinator = OnboardingAccountOwnerCheckCoordinator(navigationController: navigationController, dependencyProvider: dependencyProvider)
+    onboardingAccountOwnerCheckCoordinator.start()
+    
+    childCoordinators.append(onboardingAccountOwnerCheckCoordinator)
+  }
+  
   public func pushToVerificationCodeEntryView(_ reactor: OnboardingPhoneAuthenticationReactor?) {
     guard let reactor else { return }
     let onboardingVerificationCodeEntryController = OnboardingVerificationCodeEntryController(reactor: reactor)

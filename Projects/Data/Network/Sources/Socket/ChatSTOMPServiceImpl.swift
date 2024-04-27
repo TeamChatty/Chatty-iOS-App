@@ -16,84 +16,90 @@ import SharedUtil
 import SwiftStomp
 
 public class ChatSTOMPServiceImpl: ChatSTOMPService, SwiftStompDelegate {
-  public static let shared = ChatSTOMPServiceImpl()
-  
   let url = URL(string: "wss://dev.api.chattylab.org/ws")!
   
+  public static let shared = ChatSTOMPServiceImpl()
   private let socketStateSubject = PublishSubject<SocketState>()
-  private let socketResultSubject = PublishSubject<ChatMessageProtocol>()
+  private let socketResultSubject = PublishSubject<ChatMessage>()
   
-  lazy var swiftStomp = SwiftStomp(host: url)
+  private var swiftStomp: SwiftStomp?
   
   private init() {
-    swiftStomp.delegate = self
-    swiftStomp.autoReconnect = true
+    
   }
   
-  public func connectSocket() -> PublishSubject<SocketState> {
-    swiftStomp.connect(acceptVersion: "1.1, 1.2")
+  public func connectSocket(token: String) -> PublishSubject<SocketState> {
+    print("STOMP 스톰프 연결 시도")
+    swiftStomp = SwiftStomp(host: url, headers: ["Authorization": "Bearer \(token)"])
+    swiftStomp!.delegate = self
+    swiftStomp!.connect(acceptVersion: "1.1, 1.2")
     return socketStateSubject
   }
   
-  public func socketObserver() -> PublishSubject<ChatMessageProtocol> {
+  public func socketObserver() -> PublishSubject<ChatMessage> {
     return socketResultSubject
   }
   
   public func send(_ router: ChatSTOMPRouter) {
-    
-    if swiftStomp.isConnected {
-      if let message = router.body as? ChatMessageRequestDTO {
-        swiftStomp.send(body: message, to: router.destination, receiptId: router.id, headers: router.headers, jsonDateEncodingStrategy: .iso8601)
-      }
-    } else {
-      swiftStomp.connect()
+    guard let swiftStomp else { return }
+    print("STOMP 메시지 전송 시도 \(router.command)")
+    switch router {
+    case .sendMessage(let chatMessageRequestDTO):
+      swiftStomp.send(body: chatMessageRequestDTO, to: router.destination, receiptId: router.id, headers: router.headers, jsonDateEncodingStrategy: .iso8601)
+    default:
+      break
     }
   }
   
   public func subscribe(to: String) {
-    if swiftStomp.isConnected {
-      swiftStomp.subscribe(to:"/sub/chat/\(to)")
-    } else {
-      swiftStomp.connect()
-    }
+    guard let swiftStomp else { return }
+    print("구독! \(to)")
+    swiftStomp.subscribe(to:"/sub/chat/\(to)", mode: .auto)
+  }
+  
+  public func unsubsribe(to: String) {
+    guard let swiftStomp else { return }
+    swiftStomp.unsubscribe(from: "/sub/chat/\(to)", mode: .auto)
   }
   
   public func onConnect(swiftStomp: SwiftStomp, connectType: StompConnectType) {
     switch connectType {
     case .toSocketEndpoint:
+      print("STOMP 소켓 연결됨")
       socketStateSubject.onNext(.socketConnected)
     case .toStomp:
+      print("STOMP 스톰프 연결됨")
       socketStateSubject.onNext(.stompConnected)
     }
   }
   
   public func onDisconnect(swiftStomp: SwiftStomp, disconnectType: StompDisconnectType) {
-    
+    socketStateSubject.onNext(.stompDisconnected)
   }
   
   public func onMessageReceived(swiftStomp: SwiftStomp, message: Any?, messageId: String, destination: String, headers: [String : String]) {
     guard let messageString = message as? String else { return }
-    print(messageString)
     if let messageData = messageString.data(using: .utf8) {
       do {
         let decodeMessage = try JSONDecoder().decode(ChatMessageResponseDTO.self, from: messageData)
         let chatMessage = ChatMessage(content: .text(decodeMessage.data.content), senderId: decodeMessage.data.senderID, sendTime: Date(), roomId: decodeMessage.data.roomID)
+        print("STOMP 메시지 받았다~")
         socketResultSubject.onNext(chatMessage)
       } catch {
-        print("Error decoding message: \(error)")
+        print("STOMP Error decoding message: \(error)")
       }
     }
   }
   
   public func onReceipt(swiftStomp: SwiftStomp, receiptId: String) {
-    print(receiptId)
+    print("STOMP Receipt \(receiptId)")
   }
   
   public func onError(swiftStomp: SwiftStomp, briefDescription: String, fullDescription: String?, receiptId: String?, type: StompErrorType) {
-    print(fullDescription)
+    print("STOMP 에러 발생: \(fullDescription ?? "STOMP 에러 없음")")
   }
   
   public func onSocketEvent(eventName: String, description: String) {
-    print(eventName)
+    print("STOMP 소켓 이벤트 발생 \(eventName)")
   }
 }

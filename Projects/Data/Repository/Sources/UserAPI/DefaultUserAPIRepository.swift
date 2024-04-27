@@ -25,7 +25,6 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
   }
   
   // user
-  
   public func saveNickname(nickname: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.nickname(nickname: nickname)
     return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)

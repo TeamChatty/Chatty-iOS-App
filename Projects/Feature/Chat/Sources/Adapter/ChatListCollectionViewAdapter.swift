@@ -7,6 +7,7 @@
 
 import UIKit
 import SharedDesignSystem
+import FeatureChatInterface
 
 protocol ChatListCollectionViewAdapterDelegate: AnyObject {
   func chatListCollectionViewAdapter(_ adapter: ChatListCollectionViewAdapter, didSelectChatRoom room: ChatRoomViewData)

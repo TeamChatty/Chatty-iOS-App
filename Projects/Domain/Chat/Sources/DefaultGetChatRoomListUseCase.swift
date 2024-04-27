@@ -16,7 +16,7 @@ public struct DefaultGetChatRoomListUseCase {
     self.chatAPIRepository = chatAPIRepository
   }
   
-  public func execute() -> Single<[ChatRoomProtocol]> {
+  public func execute() -> Single<[ChatRoom]> {
     return chatAPIRepository.fetchChatRooms()
   }
 }

@@ -31,8 +31,20 @@ public struct DefaultAuthAPIRepository: AuthAPIRepository {
       .map { $0.toDomain() }
   }
   
-  public func tokenValidation() -> RxSwift.Single<Bool> {
+  public func tokenValidation() -> Single<Bool> {
     return authAPIService.request(endPoint: .token, responseDTO: EmptyResponseDTO.self)
       .map { _ in true }
+  }
+  
+  public func getAuthCheckQuestion(forNickname mobileNumber: String) -> Single<[String]> {
+    return authAPIService.request(endPoint: .problem(.init(checkType: .nickname, body: .init(mobileNumber: mobileNumber))), responseDTO: QuestionResponseDTO.self).map {
+      $0.toDomain()
+    }
+  }
+  
+  public func getAuthCheckQuestion(forBirth mobileNumber: String) -> Single<[String]> {
+    return authAPIService.request(endPoint: .problem(.init(checkType: .birth, body: .init(mobileNumber: mobileNumber))), responseDTO: QuestionResponseDTO.self).map {
+      $0.toDomain()
+    }
   }
 }
