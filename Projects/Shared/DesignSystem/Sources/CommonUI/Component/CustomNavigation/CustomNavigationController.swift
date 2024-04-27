@@ -97,14 +97,6 @@ public final class CustomNavigationController: UINavigationController, Bindable,
     super.setViewControllers(viewControllers, animated: animated)
     setBackButton(viewControllers)
   }
-  
-  public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
-    if let config = customNavigationBarConfigStack.last {
-      print("붸에에~ \(config)")
-      self.customNavigationBar.backgroundColor = config.backgroundColor
-      self.customNavigationBar.alpha = config.backgroundAlpha
-    }
-  }
 }
 
 extension CustomNavigationController {
@@ -198,7 +190,6 @@ extension CustomNavigationController {
   }
   
   private func disableDefaultNavigationBar() {
-    navigationBar.barStyle = .black
     setNavigationBarHidden(true, animated: false)
   }
 }

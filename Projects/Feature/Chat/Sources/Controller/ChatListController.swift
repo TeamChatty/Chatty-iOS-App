@@ -18,10 +18,6 @@ public final class ChatListController: BaseController {
   public weak var delegate: (any ChatCoordinatorDelegate)?
   public typealias Reactor = ChatListReactor
   
-  public override func loadView() {
-    view = mainView
-  }
-  
   required init(reactor: Reactor) {
     defer {
       self.reactor = reactor
@@ -35,7 +31,12 @@ public final class ChatListController: BaseController {
   }
   
   public override func configureUI() {
-    
+    view.addSubview(mainView)
+    mainView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(52)
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(view.safeAreaLayoutGuide)
+    }
   }
   
   private func setupCollectionView() {

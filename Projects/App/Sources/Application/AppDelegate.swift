@@ -12,6 +12,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
     
+    // 상태 표시줄 배경색 변경
+//    UIView.appearance().backgroundColor = .red  // 원하는 배경색으로 변경
+    
+    // Navigation Bar 숨기기
+    UINavigationBar.appearance().isHidden = true
+    
     // 앱 커스텀 폰트 등록
     SharedDesignSystemFontFamily.registerAllCustomFonts()
     
