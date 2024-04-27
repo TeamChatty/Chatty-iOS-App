@@ -22,7 +22,7 @@ protocol FeedMainControllerDelegate: AnyObject {
 final class FeedMainController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: FeedMainSegmentView = FeedMainSegmentView()
-  private let mainView = FeedMainPageViewController()
+  private let mainView: FeedMainPageViewController
   private let writeFeedButton: WriteFeedButton = WriteFeedButton().then {
     $0.backgroundColor = SystemColor.primaryNormal.uiColor
     $0.layer.cornerRadius = 43 / 2
@@ -45,10 +45,11 @@ final class FeedMainController: BaseController {
   }
   
   // MARK: - Initialize Method
-  required init(reactor: Reactor) {
+  required init(reactor: Reactor, FeedMainPageViewController: FeedMainPageViewController) {
     defer {
       self.reactor = reactor
     }
+    self.mainView = FeedMainPageViewController
     super.init()
   }
   

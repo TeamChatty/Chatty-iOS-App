@@ -10,7 +10,8 @@ import Moya
 
 public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case writePost(WriteFeedRequestDTO)
-  case getPosts
+  case getPosts(GetFeedPageRequestDTO)
+  
   case getPost(PostRequestId)
   
   case writeComment(requestIds: PostRequestId, requestDTO: WriteCommonCommentReqeustDTO)
@@ -25,15 +26,20 @@ public extension CommunityAPIRouter {
   }
   
   var basePath: String {
-    return "/v1/post"
+    switch self {
+    case .getPosts(let requestDTO):
+      return "/v2/posts?lastPostId=\(requestDTO.lastPostId)&size=\(requestDTO.size)"
+    default:
+      return "/v1/post"
+    }
   }
   
   var path: String {
     switch self {
     case .writePost:
       return ""
-    case .getPosts:
-      return "s"
+    case .getPosts(let requestDTO):
+      return ""
     case .getPost(let requestId):
       return "/\(requestId.postId)"
       
@@ -59,9 +65,13 @@ public extension CommunityAPIRouter {
   
   var task: Moya.Task {
     switch self {
-    case .getPost, .getPosts, .getComment, .getCommentReplies:
+    case .getPost, .getComment, .getCommentReplies:
       return .requestPlain
-    case .writePost(let requestDTO):  
+
+    case .getPosts:
+      return .requestPlain
+
+    case .writePost(let requestDTO):
       
       if requestDTO.images.isEmpty {
         let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
@@ -107,7 +117,7 @@ public extension CommunityAPIRouter {
     switch self {
     case .writePost:
       return RequestHeader.getHeader([.binary])
-    case .writeComment, .writeCommentReply:
+    case .getPosts, .writeComment, .writeCommentReply:
       return RequestHeader.getHeader([.json])
     default:
       return nil

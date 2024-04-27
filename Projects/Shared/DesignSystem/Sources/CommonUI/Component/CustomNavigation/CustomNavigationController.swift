@@ -108,6 +108,7 @@ extension CustomNavigationController {
           owner.customDelegate?.popViewController()
         case .rightButtons(let button):
           owner.navigationBarRightButtonsRelay.accept(button.rawValue)
+          print("aaaa ==>")
         }
       }
       .disposed(by: disposeBag)

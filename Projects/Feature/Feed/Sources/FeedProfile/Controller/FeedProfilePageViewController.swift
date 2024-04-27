@@ -15,29 +15,23 @@ import DomainCommunityInterface
 
 
 final class FeedProfilePageViewController: UIPageViewController {
-  private let dataViewControllers: [UIViewController] = {
-    let writedFeedVC = FeedTypeTableView(reactor: FeedTypeTableReactor(feedType: .wirtedFeed))
-    let myCommentVC = UIViewController()
-    myCommentVC.view.backgroundColor = .brown
-    let savedFeedVC = FeedTypeTableView(reactor: FeedTypeTableReactor(feedType: .savedFeed))
-    
-    return [writedFeedVC, myCommentVC, savedFeedVC]
-  }()
+  private let dataViewControllers: [UIViewController] 
+
   
   private var nowPageIndex: Int = 0
   
-  override init(transitionStyle style: UIPageViewController.TransitionStyle,
-                navigationOrientation: UIPageViewController.NavigationOrientation,
-                options: [UIPageViewController.OptionsKey: Any]? = nil) {
+  required init(dataViewControllers: [UIViewController]) {
+    self.dataViewControllers = dataViewControllers
     super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    self.dataViewControllers = []
+    super.init(coder: coder)
   }
   
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   private let disposeBag = DisposeBag()
-  
-  required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -130,7 +124,7 @@ extension FeedProfilePageViewController: UIPageViewControllerDelegate {
     }
     nowPageIndex = index
   }
-  
+   
   private func reloadPageView() {
       delegate = nil
       dataSource = nil

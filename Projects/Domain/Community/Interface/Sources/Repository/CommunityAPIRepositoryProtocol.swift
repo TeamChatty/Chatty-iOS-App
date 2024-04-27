@@ -9,5 +9,6 @@ import Foundation
 import RxSwift
 
 public protocol CommunityAPIRepositoryProtocol: AnyObject {
+  func getPosts(lastPostId: Int, size: Int) -> Observable<[Feed]>
   func writeFeed(title: String, content: String, images: [Data]) -> Observable<WritedFeed>
 }

@@ -21,6 +21,14 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
     self.communityAPIService = communityAPIService
   }
   
+  public func getPosts(lastPostId: Int, size: Int) -> Observable<[Feed]> {
+    let requestDTO = GetFeedPageRequestDTO(lastPostId: lastPostId, size: size)
+    
+    return communityAPIService.request(endPoint: .getPosts(requestDTO), responseDTO: GetFeedsResponseDTO.self)
+      .asObservable()
+      .map { $0.toDomain() }
+  }
+  
   public func writeFeed(title: String, content: String, images: [Data]) -> Observable<WritedFeed> {
     let requestDTO = WriteFeedRequestDTO(title: title, content: content, images: images)
     

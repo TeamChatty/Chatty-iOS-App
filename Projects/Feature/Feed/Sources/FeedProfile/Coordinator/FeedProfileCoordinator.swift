@@ -36,7 +36,17 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
   
   public override func start() {
     let reactor = FeedProfileReactor()
-    let feedProfileController = FeedProfileController(reactor: reactor)
+    let myCommentVC = UIViewController()
+    myCommentVC.view.backgroundColor = .brown
+    let dataViewControllers: [UIViewController] = [
+      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .wirtedFeed)),
+      myCommentVC,
+      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .savedFeed)),
+    ]
+    let feedProfilePageViewController = FeedProfilePageViewController(dataViewControllers: dataViewControllers)
+    
+    let feedProfileController = FeedProfileController(reactor: reactor, feedProfilePageViewController: feedProfilePageViewController)
+    
     feedProfileController.delegate = self
     navigationController.pushViewController(feedProfileController, animated: true)
   }

@@ -26,7 +26,7 @@ public struct WritedFeedResponseDTO: Decodable {
   public let content: String
   public let userId: Int
   public let nickname:String
-  public let profileImage: String
+  public let profileImage: String?
   public let postImages: [String]
   public let viewCount: Int
   

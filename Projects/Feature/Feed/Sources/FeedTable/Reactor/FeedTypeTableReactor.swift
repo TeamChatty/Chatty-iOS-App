@@ -11,6 +11,8 @@ import DomainCommunityInterface
 import DomainCommon
 
 final class FeedTypeTableReactor: Reactor {
+  private let getFeedsPageUseCase: GetFeedsPageUseCase
+
   enum Action {
     case viewDidLoad
     case refresh
@@ -27,6 +29,7 @@ final class FeedTypeTableReactor: Reactor {
     case setListRefresh([Feed])
     case setNextPage(feeds: [Feed])
     
+    case setIsFetchingPage(Bool)
     case isReloading(Bool)
     case setIsLoading(Bool)
     case setError(ErrorType?)
@@ -38,15 +41,19 @@ final class FeedTypeTableReactor: Reactor {
     var feeds: [Feed] = []
     var newPageItemCount: Int? = nil
     
+    var isLastPage: Bool = false
+    var isFetchingPage: Bool = false
     var isReloading: Bool = false
     var isLoading: Bool = false
     var errorState: ErrorType? = nil
   }
   
   var newPageIndexPath: [IndexPath] {
-    guard let newPageItemCount = currentState.newPageItemCount else { return [] }
+    guard let newPageItemCount = currentState.newPageItemCount else {
+      return []
+    }
     var indexPaths: [IndexPath] = []
-    let lastRowIndex: Int = currentState.feeds.count
+    let lastRowIndex: Int = currentState.feeds.count - newPageItemCount
     for count in 0..<newPageItemCount {
       indexPaths.append(IndexPath(row: lastRowIndex + count, section: 0))
     }
@@ -56,7 +63,8 @@ final class FeedTypeTableReactor: Reactor {
   
   var initialState: State
   
-  init(feedType: FeedListType) {
+  init(getFeedsPageUseCase: GetFeedsPageUseCase, feedType: FeedListType) {
+    self.getFeedsPageUseCase = getFeedsPageUseCase
     self.initialState = State(
       feedType: feedType
     )
@@ -80,35 +88,39 @@ extension FeedTypeTableReactor {
     case .viewDidLoad:
       return .concat([
         .just(.setIsLoading(true)),
-        .just(.setList([
-//          Feed(postId: 0, title: "무우무우", content: "성시경 콘서트 다녀왔어요", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "무우무우", imageUrl: "2323"),
-//          Feed(postId: 1, title: "메인", content: "축구 이야기 하실분~", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "메인", imageUrl: "2323"),
-//          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-        ])),
+        getFeedsPageUseCase.execute(lastPostId: Int.max, size: 10)
+          .map { .setList($0) }
+          .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
+            return error.toMutation()
+          },
         .just(.setIsLoading(false))
       ])
     case .refresh:
       return .concat([
         .just(.isReloading(true)),
-        .just(.setListRefresh([
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-          Feed(postId: 0, title: "0", content: "11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "0", imageUrl: "2323"),
-          Feed(postId: 1, title: "1", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "1", imageUrl: "2323"),
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-        ])),
+        getFeedsPageUseCase.execute(lastPostId: Int.max, size: 10)
+          .map { .setListRefresh($0) }
+          .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
+            return error.toMutation()
+          },
         .just(.isReloading(false))
       ])
     case .scrollToNextPage:
-      return .concat([
-        .just(.setListRefresh([
-          Feed(postId: 0, title: "0", content: "11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa11adadawdwa", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "0", imageUrl: "2323"),
-          Feed(postId: 1, title: "1", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "1", imageUrl: "2323"),
-          Feed(postId: 2, title: "2", content: "1egaewgewgeg1", viewCount: 2, createdAt: "2024-04-17T00:08:31.268Z", userId: 29, nickname: "2", imageUrl: "2323"),
-        ]))
-      ])
+      if currentState.isFetchingPage {
+        return .just(.setIsLoading(false))
+      } else {
+        let lastPostId = currentState.feeds.last?.postId ?? Int.max
+        return .concat([
+          .just(.setIsFetchingPage(true)),
+          getFeedsPageUseCase.execute(lastPostId: lastPostId, size: 10)
+            .map { .setNextPage(feeds: $0) }
+            .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
+              return error.toMutation()
+            },
+          .just(.setIsFetchingPage(false))
+        ])
+      }
+
 
     case .showDetail(postId: let postId):
       return .concat([])
@@ -130,17 +142,26 @@ extension FeedTypeTableReactor {
     case .setList(let feeds):
       newState.feeds = feeds
       newState.newPageItemCount = 0
+      newState.isLastPage = false
 
     case .setListRefresh(let feeds):
       newState.feeds = feeds
       newState.newPageItemCount = -1
+      newState.isLastPage = false
 
       print("refresh")
     case .setNextPage(feeds: let feeds):
+      print("1. newState.feeds => \(newState.feeds.count)")
       newState.feeds += feeds
       newState.newPageItemCount = feeds.count
-      print("nextPage")
-      
+      if feeds.isEmpty {
+        newState.isLastPage = true
+        print("isLastPage")
+      }
+
+    case .setIsFetchingPage(let bool):
+      newState.isFetchingPage = bool
+      newState.newPageItemCount = nil
     case .setIsLoading(let bool):
       newState.isLoading = bool
     case .setError(let errorType):
@@ -148,6 +169,7 @@ extension FeedTypeTableReactor {
     case .isReloading(let bool):
       newState.isReloading = bool
    
+    
     }
     return newState
   }

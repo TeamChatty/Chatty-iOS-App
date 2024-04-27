@@ -17,20 +17,22 @@ import SharedDesignSystem
 import DomainCommunityInterface
 
 
-final class FeedTypeTableView: BaseController {
+final class FeedTypeTableView: UIViewController {
   // MARK: - View Property
   private var tableView: UITableView = UITableView()
   private let refreshControl: UIRefreshControl = UIRefreshControl()
   private lazy var emptyFeedView: EmptyFeedView = EmptyFeedView()
-  
+  private let footerView: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: CGRect.appFrame.width, height: 100))
+
   // MARK: - Reactor Property
   typealias Reactor = FeedTypeTableReactor
     
   // MARK: - Life Method
   override func viewDidLoad() {
     super.viewDidLoad()
-    reactor?.action.onNext(.viewDidLoad)
   }
+  
+  var disposeBag = DisposeBag()
   
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
@@ -43,13 +45,19 @@ final class FeedTypeTableView: BaseController {
   required init(reactor: Reactor) {
     defer {
       self.reactor = reactor
+      reactor.action.onNext(.viewDidLoad)
     }
-    super.init()
+    super.init(nibName: nil, bundle: nil)
+    configureUI()
   }
-
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   
   // MARK: - UIConfigurable
-  override func configureUI() {
+  private func configureUI() {
     setTableView()
     setupRefreshControl()
   }
@@ -57,6 +65,7 @@ final class FeedTypeTableView: BaseController {
   deinit {
     print("해제됨: FeedTypeTableView")
   }
+  
 }
 
 extension FeedTypeTableView: ReactorKit.View {
@@ -90,7 +99,7 @@ extension FeedTypeTableView: ReactorKit.View {
           let isShowing = reactor.currentState.feeds.isEmpty
           owner.setupEmptyView(feedListType: feedType, isShowing: isShowing)
         default:
-          print("")
+          print("newPageItemCount")
         }
         
         guard let pageItemCount else { return }
@@ -98,7 +107,7 @@ extension FeedTypeTableView: ReactorKit.View {
         case 0, -1:
           owner.tableView.reloadData()
         default:
-          owner.tableView.reloadRows(at: reactor.newPageIndexPath, with: .automatic)
+          owner.tableView.insertRows(at: owner.reactor?.newPageIndexPath ?? [], with: .automatic)
         }
       }
       .disposed(by: disposeBag)
@@ -116,37 +125,34 @@ extension FeedTypeTableView: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map(\.isLoading)
+      .map(\.isLastPage)
       .distinctUntilChanged()
-      .bind(with: self) { owner, isLoading in
-        if isLoading {
-          owner.showLoadingIndicactor()
+      .bind(with: self) { owner, isLastPage in
+        if isLastPage {
+          owner.tableView.tableFooterView = UIView(frame: .zero)
         } else {
-          owner.hideLoadingIndicator()
+          owner.tableView.tableFooterView = owner.footerView
         }
       }
       .disposed(by: disposeBag)
   }
+
   
  
 }
 
 extension FeedTypeTableView: UITableViewDataSource {
   
-//  func numberOfSections(in tableView: UITableView) -> Int {
-//    return/* dataSource.count*/
-//  }
-  
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return reactor?.currentState.feeds.count ?? 0
+    guard let reactor else { return 0 }
+    return reactor.currentState.feeds.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    guard let cell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.cellId, for: indexPath) as? FeedTableViewCell else { return UITableViewCell() }
-    if let reactor {
-      let feedData = reactor.currentState.feeds[indexPath.row]
-      cell.setData(feedData: feedData)
-    }
+    guard let reactor,
+          let cell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.cellId, for: indexPath) as? FeedTableViewCell else { return UITableViewCell() }
+    let feedData = reactor.currentState.feeds[indexPath.row]
+    cell.setData(feedData: feedData)
     
     cell.touchEventRelay
       .bind(with: self) { owner, event in
@@ -166,8 +172,6 @@ extension FeedTypeTableView: UITableViewDataSource {
         }
       }
       .disposed(by: cell.disposeBag)
-      
-    
     return cell
   }
 }
@@ -175,6 +179,17 @@ extension FeedTypeTableView: UITableViewDataSource {
 extension FeedTypeTableView: UITableViewDelegate {
   public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
       return false
+  }
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    let height: CGFloat = scrollView.frame.size.height
+    let contentYOffset: CGFloat = scrollView.contentOffset.y
+    let scrollViewHeight: CGFloat = scrollView.contentSize.height
+    let distanceFromBottom: CGFloat = scrollViewHeight - contentYOffset
+
+    if distanceFromBottom < height && reactor?.currentState.isFetchingPage == false && reactor?.currentState.isLastPage == false {
+      self.reactor?.action.onNext(.scrollToNextPage)
+    }
   }
 }
 
@@ -192,6 +207,8 @@ extension FeedTypeTableView {
     tableView.snp.makeConstraints {
       $0.horizontalEdges.verticalEdges.equalToSuperview()
     }
+    footerView.startAnimating()
+    tableView.tableFooterView = footerView
   }
   
   private func registerCell() {

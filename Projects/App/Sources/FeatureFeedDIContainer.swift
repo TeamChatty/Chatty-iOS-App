@@ -10,6 +10,12 @@ import FeatureFeedInterface
 import DomainCommunity
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
+  
+  func makeGetFeedsPageUseCase() -> DefaultGetFeedsPageUseCase {
+    return DefaultGetFeedsPageUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
   func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase {
     return DefaultWriteFeedUseCase(
       communityAPIRepository: makeCommunityAPIRepository()

@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct GetFeedRequestDTO: CommonResponseDTO {
-  typealias Data = FeedResponseDTO
-  var code: Int
-  var status: String
-  var message: String
-  var data: Data
+public struct GetFeedResponseDTO: CommonResponseDTO {
+  public typealias Data = FeedResponseDTO
+  public var code: Int
+  public var status: String
+  public var message: String
+  public var data: Data
 }

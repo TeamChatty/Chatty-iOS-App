@@ -12,11 +12,11 @@ public struct WritedFeed {
   public let content: String
   public let userId: Int
   public let nickname:String
-  public let profileImage: String
+  public let profileImage: String?
   public let postImages: [String]
   public let viewCount: Int
   
-  public init(postId: Int, content: String, userId: Int, nickname: String, profileImage: String, postImages: [String], viewCount: Int) {
+  public init(postId: Int, content: String, userId: Int, nickname: String, profileImage: String?, postImages: [String], viewCount: Int) {
     self.postId = postId
     self.content = content
     self.userId = userId

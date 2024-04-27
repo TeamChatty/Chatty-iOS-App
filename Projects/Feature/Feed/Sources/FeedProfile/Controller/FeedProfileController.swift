@@ -21,7 +21,7 @@ protocol FeedProfileControllerDelegate: AnyObject {
 final class FeedProfileController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: FeedProfileSegmentView = FeedProfileSegmentView()
-  private let mainView = FeedProfilePageViewController()
+  private let mainView: FeedProfilePageViewController
     
   // MARK: - Reactor Property
   typealias Reactor = FeedProfileReactor
@@ -39,10 +39,11 @@ final class FeedProfileController: BaseController {
   }
   
   // MARK: - Initialize Method
-  required init(reactor: Reactor) {
+  required init(reactor: Reactor, feedProfilePageViewController: FeedProfilePageViewController) {
     defer {
       self.reactor = reactor
     }
+    self.mainView = feedProfilePageViewController
     super.init()
   }
   
@@ -54,7 +55,7 @@ final class FeedProfileController: BaseController {
   override func configureUI() {
     setView()
   }
-  
+   
   override func setNavigationBar() {
     customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
       titleView: .init(title: "내 활동"),

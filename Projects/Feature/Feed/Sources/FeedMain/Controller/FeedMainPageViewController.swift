@@ -15,27 +15,22 @@ import DomainCommunityInterface
 
 
 final class FeedMainPageViewController: UIPageViewController {
-  private let dataViewControllers: [UIViewController] = {
-    let lastestVC = FeedTypeTableView(reactor: FeedTypeTableReactor(feedType: .lastest))
-    let recommendVC = FeedTypeTableView(reactor: FeedTypeTableReactor(feedType: .recommend))
-    
-    return [lastestVC, recommendVC]
-  }()
+  private let dataViewControllers: [UIViewController]
   
   private var nowPageIndex: Int = 0
   
-  override init(transitionStyle style: UIPageViewController.TransitionStyle,
-                navigationOrientation: UIPageViewController.NavigationOrientation,
-                options: [UIPageViewController.OptionsKey: Any]? = nil) {
+  required init(dataViewControllers: [UIViewController]) {
+    self.dataViewControllers = dataViewControllers
     super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    self.dataViewControllers = []
+    super.init(coder: coder)
   }
   
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   private let disposeBag = DisposeBag()
-  
-  required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
   
   override func viewDidLoad() {
     super.viewDidLoad()

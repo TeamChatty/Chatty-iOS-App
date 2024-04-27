@@ -34,7 +34,13 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   let disposeBag = DisposeBag()
   public override func start() {
     let reactor = FeedMainReactor()
-    let feedMainController = FeedMainController(reactor: reactor)
+    let dataViewControllers: [UIViewController] = [
+      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .lastest)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .recommend)),
+    ]
+    let feedMainPageViewController = FeedMainPageViewController(dataViewControllers: dataViewControllers)
+    
+    let feedMainController = FeedMainController(reactor: reactor, FeedMainPageViewController: feedMainPageViewController)
     feedMainController.delegate = self
     navigationController.pushViewController(feedMainController, animated: true)
   }
