@@ -12,13 +12,14 @@ import DomainAuth
 import DomainUser
 import FeatureLiveInterface
 import FeatureProfileInterface
+import FeatureFeedInterface
 
 public protocol AppDependencyProvider {
   func makeFeatureOnboardingDependencyProvider() -> FeatureOnboardingDependencyProvider
   func makeFeatureLiveDependencyProvider() -> FeatureLiveDependencyProvider
   func makeFeatureProfileDependencyProvider() -> FeatureProfileDependencyProvider
   func makeFeatureChatDependencyProvider() -> FeatureChatDependecyProvider
-  
+  func makeFeatureFeedDependencyProvider() -> FeatureFeedDependencyProvider
   
   func makeValiateAccessTokenUseCase() -> DefaultValidateAccessTokenUseCase
   func makeGetAccessTokenUseCase() -> DefaultGetAccessTokenUseCase

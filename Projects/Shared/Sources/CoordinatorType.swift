@@ -9,11 +9,12 @@ import UIKit
 
 public enum CoordinatorType {
   case app, tab
-  case chat, feed, myChatty
+  case chat, myChatty
   case live(LiveType)
   case onboarding(OnboardingType)
   case profile(ProfileType)
   case setting(SettingType)
+  case feed(FeedType)
 }
 
 public enum LiveType {
@@ -47,6 +48,11 @@ public enum ProfileType {
   case main
   case editMain
   case editType
+}
+
+public enum FeedType {
+  case main
+  case profile
 }
 
 public enum SettingType {

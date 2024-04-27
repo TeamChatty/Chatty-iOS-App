@@ -29,6 +29,7 @@ public extension ModulePath {
 // MARK: FeatureModule
 public extension ModulePath {
   enum Feature: String, CaseIterable {
+    case Feed
     case Profile
     case Chat
     case Live
@@ -42,6 +43,7 @@ public extension ModulePath {
 
 public extension ModulePath {
   enum Domain: String, CaseIterable {
+    case Community
     case Live
     case Chat
     case Common

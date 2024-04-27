@@ -16,7 +16,8 @@ let targets: [Target] = [
         .domain(implements: .Auth),
         .domain(implements: .User),
         .domain(implements: .Live),
-        .domain(implements: .Chat)
+        .domain(implements: .Chat),
+        .domain(implements: .Community)
       ]
     )
   )

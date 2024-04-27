@@ -18,6 +18,7 @@ public protocol ServiceDIContainer {
   func makeProfileAPIService() -> ProfileAPIServiceImpl
   func makeInterestAPIService() -> InterestAPIServiceImpl
   func makeUserDefaultsService() -> UserDefaultsService
+  func makeCommunityAPIService() -> CommunityAPIServiceImpl
 }
 
 extension ServiceDIContainer {
@@ -70,5 +71,12 @@ extension ServiceDIContainer {
   
   func makeUserDefaultsService() -> UserDefaultsService {
     return UserDefaultsService()
+  }
+  
+  func makeCommunityAPIService() -> CommunityAPIServiceImpl {
+    return CommunityAPIServiceImpl(
+      authAPIService: makeAuthAPIService(),
+      keychainService: KeychainService.shared
+    )
   }
 }

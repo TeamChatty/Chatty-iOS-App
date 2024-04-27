@@ -21,15 +21,14 @@ let project = Project.makeModule(
         ]
       )
     ),
-    
-      .feature(
-        testing: .Chat,
-        factory: .init(
-          dependencies: [
-            .feature(interface: .Chat)
-          ]
-        )
-      ),
+    .feature(
+      testing: .Chat,
+      factory: .init(
+        dependencies: [
+          .feature(interface: .Chat)
+        ]
+      )
+    ),
     .feature(
       tests: .Chat,
       factory: .init(
@@ -38,16 +37,14 @@ let project = Project.makeModule(
         ]
       )
     ),
-    
-      .feature(
-        example: .Chat,
-        factory: .init(
-          dependencies: [
-            .feature(implements: .Chat),
-            .feature(interface: .Chat)
-          ]
-        )
+    .feature(
+      example: .Chat,
+      factory: .init(
+        dependencies: [
+          .feature(implements: .Chat),
+          .feature(interface: .Chat)
+        ]
       )
-    
+    )
   ]
 )

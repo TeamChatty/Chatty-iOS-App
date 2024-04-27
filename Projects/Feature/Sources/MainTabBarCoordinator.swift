@@ -13,6 +13,8 @@ import FeatureLiveInterface
 import FeatureChat
 import FeatureChatInterface
 import FeatureProfile
+import FeatureFeed
+import FeatureFeedInterface
 
 final class MainTabBarCoordinator: BaseCoordinator {
   override var type: CoordinatorType {
@@ -33,17 +35,26 @@ final class MainTabBarCoordinator: BaseCoordinator {
     let chatTabCoordinator = ChatCoordinator(navigationController: CustomNavigationController(), dependencyProvider: appDependencyProvider.makeFeatureChatDependencyProvider())
     chatTabCoordinator.start()
     
+    let feedTabCoordinator = FeedMainCoordinator(
+      navigationController: CustomNavigationController(),
+      featureProfileDependencyProvider: appDependencyProvider.makeFeatureFeedDependencyProvider()
+    )
+    feedTabCoordinator.start()
+    
     let profileTabCoordinator = ProfileMainCoordinator(navigationController: CustomNavigationController(), featureProfileDependencyProvider: appDependencyProvider.makeFeatureProfileDependencyProvider())
     profileTabCoordinator.start()
+    
     
     let tabBarController = MainTabBarController(tabNavigationControllers: [
       .live: liveTabCoordinator.navigationController,
       .chat: chatTabCoordinator.navigationController,
+      .feed: feedTabCoordinator.navigationController,
       .myChatty: profileTabCoordinator.navigationController
     ])
     
     childCoordinators.append(liveTabCoordinator)
     childCoordinators.append(chatTabCoordinator)
+    childCoordinators.append(feedTabCoordinator)
     childCoordinators.append(profileTabCoordinator)
     
     navigationController.setViewControllers([tabBarController], animated: false)

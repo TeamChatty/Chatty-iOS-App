@@ -96,9 +96,14 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
     rightButton.enumerated().forEach { [weak self] index, item in
       guard let self else { return }
       self.rightButtonStackView.addArrangedSubview(item)
+      
       item.touchEventRelay
         .withUnretained(self)
-        .map { _ in .rightButtons(.allCases[index]) }
+        .map { _ in
+          print("dddd ==>")
+
+            return .rightButtons(.allCases[index])
+        }
         .bind(to: self.touchEventRelay)
         .disposed(by: disposeBag)
     }

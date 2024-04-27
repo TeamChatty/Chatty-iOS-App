@@ -42,6 +42,11 @@ public final class TitleImageLabel: UIView {
       self.imageView.image = image
     }
   }
+  public var imageViewTintColor: UIColor? {
+    didSet {
+      self.imageView.tintColor = imageViewTintColor
+    }
+  }
   
   // MARK: - Initialize Method
 
@@ -77,6 +82,9 @@ public final class TitleImageLabel: UIView {
         $0.trailing.equalToSuperview()
       }
     }
+  
+    titleLabel.isUserInteractionEnabled = true
+    imageView.isUserInteractionEnabled = true
   }
   
   required init?(coder: NSCoder) {
