@@ -18,7 +18,7 @@ final class LiveMainController: BaseController {
   private let backgroundImageView: UIImageView = UIImageView().then {
     $0.image = Images.matchHomeImage.image
     $0.backgroundColor = .white
-    $0.contentMode = .scaleAspectFit
+    $0.contentMode = .scaleAspectFill
   }
   private let mainView = LiveMainView()
     

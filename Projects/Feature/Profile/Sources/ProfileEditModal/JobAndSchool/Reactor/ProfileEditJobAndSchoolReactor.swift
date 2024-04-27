@@ -11,7 +11,7 @@ import DomainUserInterface
 import DomainCommon
 
 final class ProfileEditJobAndSchoolReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   private let saveSchoolUserCase: SaveSchoolUseCase
   private let saveJobUseCase: SaveJobUseCase
   
@@ -43,7 +43,7 @@ final class ProfileEditJobAndSchoolReactor: Reactor {
   
   var initialState: State
   
-  init(editType: ProfileEditType, getUserDataUseCase: GetUserDataUseCase,
+  init(editType: ProfileEditType, getUserDataUseCase: GetUserProfileUseCase,
        saveSchoolUserCase: SaveSchoolUseCase,
        saveJobUseCase: SaveJobUseCase) {
     self.getUserDataUseCase = getUserDataUseCase

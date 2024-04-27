@@ -12,7 +12,7 @@ import DomainUserInterface
 import DomainCommon
 
 final class ProfileEditAddressReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   private let saveSaveAddressUseCase: SaveAddressUseCase
   
   enum Action {
@@ -42,7 +42,7 @@ final class ProfileEditAddressReactor: Reactor {
   
   var initialState: State
   
-  public init(saveSaveAddressUseCase: SaveAddressUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  public init(saveSaveAddressUseCase: SaveAddressUseCase, getUserDataUseCase: GetUserProfileUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
     self.saveSaveAddressUseCase = saveSaveAddressUseCase
     

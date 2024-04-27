@@ -16,9 +16,9 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
   private let userProfileRepository: any UserProfileRepositoryProtocol
   
-  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserProfileRepositoryProtocol) {
+  public init(userAPIRepository: any UserAPIRepositoryProtocol, userProfileRepository: any UserProfileRepositoryProtocol) {
     self.userAPIRepository = userAPIRepository
-    self.userProfileRepository = userDataRepository
+    self.userProfileRepository = userProfileRepository
   }
   
   public func executeObs(gender: String, birth: String, imageData: Data?, interests: [Interest], mbti: String) -> Observable<UserProfile> {
@@ -44,10 +44,10 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
           return saveImage
         }
         .flatMap { _ -> Observable<UserProfile> in
-          return saveMbti.map { userData in
+          return saveMbti.map { userProfile in
             /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
-            self.userProfileRepository.saveUserProfile(userProfile: userData)
-            return userData
+            self.userProfileRepository.saveUserProfile(userProfile: userProfile)
+            return userProfile
           }
         }
     } else {
@@ -62,10 +62,10 @@ public final class DefaultSaveProfileDataUseCase: SaveProfileDataUseCase {
           return saveInterests
         }
         .flatMap { _ -> Observable<UserProfile> in
-          return saveMbti.map { userData in
+          return saveMbti.map { userProfile in
             /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
-            self.userProfileRepository.saveUserProfile(userProfile: userData)
-            return userData
+            self.userProfileRepository.saveUserProfile(userProfile: userProfile)
+            return userProfile
           }
         }
     }

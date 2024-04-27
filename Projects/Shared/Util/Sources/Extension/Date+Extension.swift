@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import Then
 
 extension Date {
-  private static let dateFormatter = DateFormatter()
+  private static let dateFormatter = DateFormatter().then {
+    $0.timeZone = .autoupdatingCurrent
+  }
   
   public enum DateFormatType {
     case ahhmm

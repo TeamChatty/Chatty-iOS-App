@@ -12,17 +12,17 @@ import RxSwift
 
 public final class DefaultGetAllInterestsUseCase: GetAllInterestsUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
-  private let userDataRepository: any UserProfileRepositoryProtocol
+  private let userProfileRepository: any UserProfileRepositoryProtocol
   
-  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserProfileRepositoryProtocol) {
+  public init(userAPIRepository: any UserAPIRepositoryProtocol, userProfileRepository: any UserProfileRepositoryProtocol) {
     self.userAPIRepository = userAPIRepository
-    self.userDataRepository = userDataRepository
+    self.userProfileRepository = userProfileRepository
   }
   
   public func execute() -> Single<Interests> {
     return userAPIRepository.getInterests()
       .map { interests in
-        self.userDataRepository.saveAllInterests(interests: interests)
+        self.userProfileRepository.saveAllInterests(interests: interests)
         return interests
       }
   }

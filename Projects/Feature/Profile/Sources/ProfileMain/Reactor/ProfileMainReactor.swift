@@ -12,7 +12,7 @@ import DomainUserInterface
 import DomainCommon
 
 final class ProfileMainReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   
   enum Action {
     case viewWillAppear
@@ -60,7 +60,7 @@ final class ProfileMainReactor: Reactor {
   
   var initialState: State = State()
   
-  public init(getUserDataUseCase: GetUserDataUseCase) {
+  public init(getUserDataUseCase: GetUserProfileUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
   }
 }

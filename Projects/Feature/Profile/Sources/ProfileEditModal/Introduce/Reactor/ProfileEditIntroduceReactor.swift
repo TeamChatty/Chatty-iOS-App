@@ -11,7 +11,7 @@ import DomainUserInterface
 import DomainCommon
 
 final class ProfileEditIntroduceReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   private let saveIntroduceUseCase: SaveIntroduceUseCase
   
   enum Action {
@@ -41,7 +41,7 @@ final class ProfileEditIntroduceReactor: Reactor {
   
   var initialState: State
   
-  public init(saveIntroduceUseCase: SaveIntroduceUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  public init(saveIntroduceUseCase: SaveIntroduceUseCase, getUserDataUseCase: GetUserProfileUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
     self.saveIntroduceUseCase = saveIntroduceUseCase
     self.initialState = State(profileData: getUserDataUseCase.execute())

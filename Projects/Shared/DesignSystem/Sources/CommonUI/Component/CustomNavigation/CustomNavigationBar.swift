@@ -52,7 +52,7 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
   public var touchEventRelay: PublishRelay<TouchEventType> = .init()
   
   // MARK: - Rx Property
-  private let disposeBag = DisposeBag()
+  private var disposeBag = DisposeBag()
   
   open override func configureUI() {
     setRightButtonStackView()
@@ -60,6 +60,7 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
   
   private func setBackButton(_ backButton: CustomNavigationBarButton?) {
     guard let backButton else { return }
+    disposeBag = DisposeBag()
     addSubview(backButton)
     backButton.snp.makeConstraints {
       $0.leading.equalToSuperview().offset(16)
@@ -92,6 +93,7 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
   }
   
   private func setRightButtons(_ rightButton: [CustomNavigationBarButton]) {
+
     rightButtonStackView.removeAllArrangedSubViews()
     rightButton.enumerated().forEach { [weak self] index, item in
       guard let self else { return }
@@ -153,7 +155,5 @@ extension CustomNavigationBar {
     self.titleAlignment = config.titleAlignment
     self.titleView = config.titleView
     self.rightButtons = config.rightButtons
-    self.backgroundColor = config.backgroundColor
-    self.alpha = config.backgroundAlpha
   }
 }

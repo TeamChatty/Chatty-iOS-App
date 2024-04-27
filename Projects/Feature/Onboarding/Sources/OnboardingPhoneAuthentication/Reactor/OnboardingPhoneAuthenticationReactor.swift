@@ -19,7 +19,7 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
   private let sendVerificationCodeUseCase: SendVerificationCodeUseCase
   private let getDeviceIdUseCase: GetDeviceIdUseCase
   private let signUseCase: SignUseCase
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserProfileUseCase: GetUserProfileUseCase
   
   public enum Action {
     case phoneNumberEntered(String)
@@ -48,12 +48,12 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
   
   public let initialState: State = State()
   
-  public init(type: OnboardingAuthType, sendVerificationCodeUseCase: SendVerificationCodeUseCase, getDeviceIdUseCase: GetDeviceIdUseCase, signUseCase: SignUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  public init(type: OnboardingAuthType, sendVerificationCodeUseCase: SendVerificationCodeUseCase, getDeviceIdUseCase: GetDeviceIdUseCase, signUseCase: SignUseCase, getUserProfileUseCase: GetUserProfileUseCase) {
     self.type = type
     self.sendVerificationCodeUseCase = sendVerificationCodeUseCase
     self.getDeviceIdUseCase = getDeviceIdUseCase
     self.signUseCase = signUseCase
-    self.getUserDataUseCase = getUserDataUseCase
+    self.getUserProfileUseCase = getUserProfileUseCase
   }
 }
 
@@ -125,7 +125,7 @@ extension OnboardingPhoneAuthenticationReactor {
       signUseCase.requestLogin(mobileNumber: mobileNumber, authenticationNumber: authenticationNumber)
         .asObservable()
         .flatMap { loginResponse -> Observable<Mutation> in
-          self.getUserDataUseCase.executeSingle()
+          self.getUserProfileUseCase.executeSingle()
             .asObservable()
             .flatMap { userData -> Observable<Mutation> in
               if userData.authority == .user {

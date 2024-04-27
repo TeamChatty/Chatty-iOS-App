@@ -29,7 +29,7 @@ public final class OnboardingNickNameCoordinator: BaseCoordinator, OnboardingNic
   public override func start() {
     let onboardingNickNameReactor = OnboardingNickNameReactor(
       saveProfileNicknameUseCase: dependencyProvider.makeSaveProfileNicknameUseCase(),
-      getUserDataUseCase: dependencyProvider.makeGetProfileDataUseCase()
+      getUserProfileUseCase: dependencyProvider.makeGetProfileDataUseCase()
     )
     let onboardingNickNameController = OnboardingNickNameController(
       reactor: onboardingNickNameReactor

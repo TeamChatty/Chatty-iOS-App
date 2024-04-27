@@ -42,28 +42,28 @@ final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardi
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserProfileRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveProfileDataUseCase() -> DefaultSaveProfileDataUseCase {
     return DefaultSaveProfileDataUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserProfileRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
-  func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
-    return DefaultGetUserDataUseCase(
+  func makeGetProfileDataUseCase() -> DefaultGetUserProfileUseCase {
+    return DefaultGetUserProfileUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserProfileRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase {
     return DefaultGetAllInterestsUseCase(
       userAPIRepository: makeUserAPIRepository(), 
-      userDataRepository: makeUserProfileRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
 }

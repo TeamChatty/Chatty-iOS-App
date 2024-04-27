@@ -24,5 +24,5 @@ public protocol AppDependencyProvider {
   
   func makeValiateAccessTokenUseCase() -> DefaultValidateAccessTokenUseCase
   func makeGetAccessTokenUseCase() -> DefaultGetAccessTokenUseCase
-  func makeGetProfileUseCase() -> DefaultGetUserDataUseCase
+  func makeGetProfileUseCase() -> DefaultGetUserProfileUseCase
 }

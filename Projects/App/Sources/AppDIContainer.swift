@@ -65,7 +65,7 @@ final class AppDIContainer: RepositoryDIcontainer, AppDependencyProvider {
     return DefaultGetAccessTokenUseCase(keychainRepository: makeKeychainRepository())
   }
   
-  func makeGetProfileUseCase() -> DomainUser.DefaultGetUserDataUseCase {
-    return DefaultGetUserDataUseCase(userAPIRepository: makeUserAPIRepository(), userDataRepository: makeUserProfileRepository())
+  func makeGetProfileUseCase() -> DomainUser.DefaultGetUserProfileUseCase {
+    return DefaultGetUserProfileUseCase(userAPIRepository: makeUserAPIRepository(), userProfileRepository: makeUserProfileRepository())
   }
 }

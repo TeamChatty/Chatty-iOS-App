@@ -3,7 +3,7 @@
 import DomainUser
 
 public protocol FeatureProfileDependencyProvider {
-  func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase
+  func makeGetProfileDataUseCase() -> DefaultGetUserProfileUseCase
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase
   func makeSaveAddressUseCase() -> DefaultSaveAddressUseCase
   func makeSaveJobUseCase() -> DefaultSaveJobUseCase

@@ -1,5 +1,5 @@
 //
-//  UserDataServiceProtocol.swift
+//  UserProfileServiceProtocol.swift
 //  DataStorageInterface
 //
 //  Created by HUNHIE LEE on 2/1/24.

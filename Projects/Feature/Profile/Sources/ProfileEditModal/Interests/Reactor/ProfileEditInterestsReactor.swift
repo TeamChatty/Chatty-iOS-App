@@ -12,7 +12,7 @@ import DomainCommon
 
 
 final class ProfileEditInterestsReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   private let getAllInterestsUseCase: GetAllInterestsUseCase
   private let saveInterestsUseCase: SaveInterestsUseCase
   
@@ -44,7 +44,7 @@ final class ProfileEditInterestsReactor: Reactor {
   
   var initialState: State
   
-  public init(getAllInterestsUseCase: GetAllInterestsUseCase, saveInterestsUseCase: SaveInterestsUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  public init(getAllInterestsUseCase: GetAllInterestsUseCase, saveInterestsUseCase: SaveInterestsUseCase, getUserDataUseCase: GetUserProfileUseCase) {
     self.getAllInterestsUseCase = getAllInterestsUseCase
     self.getUserDataUseCase = getUserDataUseCase
     self.saveInterestsUseCase = saveInterestsUseCase

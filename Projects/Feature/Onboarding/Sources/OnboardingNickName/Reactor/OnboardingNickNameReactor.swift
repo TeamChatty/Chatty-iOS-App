@@ -14,7 +14,7 @@ import DomainCommon
 
 public final class OnboardingNickNameReactor: Reactor {
   private let saveProfileNicknameUseCase: SaveProfileNicknameUseCase
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserProfileUseCase: GetUserProfileUseCase
   
   /// 뷰에서 수행할 수 있는 사용자의 액션
   public enum Action {
@@ -49,9 +49,9 @@ public final class OnboardingNickNameReactor: Reactor {
   
   public var initialState: State = State()
   
-  init(saveProfileNicknameUseCase: SaveProfileNicknameUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  init(saveProfileNicknameUseCase: SaveProfileNicknameUseCase, getUserProfileUseCase: GetUserProfileUseCase) {
     self.saveProfileNicknameUseCase = saveProfileNicknameUseCase
-    self.getUserDataUseCase = getUserDataUseCase
+    self.getUserProfileUseCase = getUserProfileUseCase
   }
 }
 
@@ -66,7 +66,7 @@ extension OnboardingNickNameReactor {
       ])
     case .tabContinueButton:
       /// 닉네임
-      if currentState.nickNameText == getUserDataUseCase.execute().nickname {
+      if currentState.nickNameText == getUserProfileUseCase.execute().nickname {
         return .just(.isSavedSuccess)
       } else {
         return .concat([

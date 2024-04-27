@@ -12,7 +12,7 @@ import DomainUserInterface
 import DomainCommon
 
 final class ProfileEditMainReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   
   enum Action {
     case changePage(Int)
@@ -39,7 +39,7 @@ final class ProfileEditMainReactor: Reactor {
   
   var initialState: State
   
-  public init(getUserDataUseCase: GetUserDataUseCase) {
+  public init(getUserDataUseCase: GetUserProfileUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
     self.initialState = State(profileData: getUserDataUseCase.execute())
   }

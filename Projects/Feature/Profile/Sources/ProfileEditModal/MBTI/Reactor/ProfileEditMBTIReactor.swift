@@ -12,7 +12,7 @@ import DomainCommon
 
 
 final class ProfileEditMBTIReactor: Reactor {
-  private let getUserDataUseCase: GetUserDataUseCase
+  private let getUserDataUseCase: GetUserProfileUseCase
   private let saveMBTIUseCase: SaveMBTIUseCase
   
   enum Action {
@@ -40,7 +40,7 @@ final class ProfileEditMBTIReactor: Reactor {
   
   var initialState: State = .init()
   
-  public init(saveMBTIUseCase: SaveMBTIUseCase, getUserDataUseCase: GetUserDataUseCase) {
+  public init(saveMBTIUseCase: SaveMBTIUseCase, getUserDataUseCase: GetUserProfileUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
     self.saveMBTIUseCase = saveMBTIUseCase
     if let mbti: String = getUserDataUseCase.execute().mbti {

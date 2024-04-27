@@ -10,24 +10,24 @@ import DomainUserInterface
 import DomainCommon
 import RxSwift
 
-public final class DefaultGetUserDataUseCase: GetUserDataUseCase {
+public final class DefaultGetUserProfileUseCase: GetUserProfileUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
-  private let userDataRepository: any UserProfileRepositoryProtocol
+  private let userProfileRepository: any UserProfileRepositoryProtocol
 
-  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserProfileRepositoryProtocol) {
+  public init(userAPIRepository: any UserAPIRepositoryProtocol, userProfileRepository: any UserProfileRepositoryProtocol) {
     self.userAPIRepository = userAPIRepository
-    self.userDataRepository = userDataRepository
+    self.userProfileRepository = userProfileRepository
   }
   
   public func executeSingle() -> Single<UserProfile> {
     return userAPIRepository.getProfile()
-      .flatMap { userData in
-        self.userDataRepository.saveUserProfile(userProfile: userData)
-        return .just(self.userDataRepository.getUserProfile())
+      .flatMap { userProfile in
+        self.userProfileRepository.saveUserProfile(userProfile: userProfile)
+        return .just(self.userProfileRepository.getUserProfile())
       }
   }
   
   public func execute() -> UserProfile {
-    return userDataRepository.getUserProfile()
+    return userProfileRepository.getUserProfile()
   }
 }

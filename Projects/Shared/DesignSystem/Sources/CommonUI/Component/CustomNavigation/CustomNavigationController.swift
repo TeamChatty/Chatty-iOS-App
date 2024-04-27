@@ -15,7 +15,7 @@ import RxCocoa
 /// - `configureUI`: UI과 관련된 설정을 적용하는 메소드에요.
 ///   이 메소드는 컨트롤러의 UI를 설정하는데 사용되고, viewDidLoad 시점에 실행돼요.
 ///
-public final class CustomNavigationController: UINavigationController, Bindable {
+public final class CustomNavigationController: UINavigationController, Bindable, UINavigationControllerDelegate {
   // MARK: - View Property
   private var customNavigationBarConfigStack: [any CustomNavigationBarConfigurable] = []
   
@@ -62,6 +62,7 @@ public final class CustomNavigationController: UINavigationController, Bindable 
   // MARK: - Initialize Method
   public init() {
     super.init(nibName: nil, bundle: nil)
+    delegate = self
     bind()
   }
   
@@ -95,6 +96,14 @@ public final class CustomNavigationController: UINavigationController, Bindable 
   public override func setViewControllers(_ viewControllers: [UIViewController], animated: Bool) {
     super.setViewControllers(viewControllers, animated: animated)
     setBackButton(viewControllers)
+  }
+  
+  public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+    if let config = customNavigationBarConfigStack.last {
+      print("붸에에~ \(config)")
+      self.customNavigationBar.backgroundColor = config.backgroundColor
+      self.customNavigationBar.alpha = config.backgroundAlpha
+    }
   }
 }
 
@@ -145,19 +154,18 @@ extension CustomNavigationController {
   }
   
   private func setupCustomNavigationBar() {
-    if customNavigationBarBackgroundView.superview == nil,
-       customNavigationBar.superview == nil {
-      view.addSubview(customNavigationBarBackgroundView)
+    if customNavigationBar.superview == nil {
+//      view.addSubview(customNavigationBarBackgroundView)
       view.addSubview(customNavigationBar)
       
-      customNavigationBarBackgroundView.snp.makeConstraints {
-        $0.top.equalToSuperview()
-        $0.horizontalEdges.equalToSuperview()
-        $0.height.equalTo(50)
-      }
+//      customNavigationBarBackgroundView.snp.makeConstraints {
+//        $0.top.equalToSuperview()
+//        $0.horizontalEdges.equalToSuperview()
+//        $0.height.equalTo(50)
+//      }
       
       customNavigationBar.snp.makeConstraints {
-        $0.top.equalTo(customNavigationBarBackgroundView.snp.bottom)
+        $0.top.equalTo(self.view.safeAreaLayoutGuide)
         $0.leading.trailing.equalToSuperview()
         $0.height.equalTo(52)
       }
@@ -167,8 +175,6 @@ extension CustomNavigationController {
   private func setCustomNavigationBar(_ config: any CustomNavigationBarConfigurable) {
     setupCustomNavigationBar()
     customNavigationBar.setNavigationBar(with: config)
-    customNavigationBarBackgroundView.backgroundColor = config.backgroundColor
-    customNavigationBarBackgroundView.alpha = config.backgroundAlpha
   }
   
   private func setBackButton(_ viewControllers: [UIViewController]) {
@@ -192,6 +198,7 @@ extension CustomNavigationController {
   }
   
   private func disableDefaultNavigationBar() {
+    navigationBar.barStyle = .black
     setNavigationBarHidden(true, animated: false)
   }
 }

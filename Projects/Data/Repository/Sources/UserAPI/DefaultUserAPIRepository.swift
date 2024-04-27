@@ -27,31 +27,31 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
   // user
   public func saveNickname(nickname: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.nickname(nickname: nickname)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveMBTI(mbti: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.mbti(mbti: mbti)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveImage(imageData: Data) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.image(imageData: imageData)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveGender(gender: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.gender(gender: gender)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveBirth(birth: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.birth(birth: birth)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
@@ -64,38 +64,38 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
   
   public func saveSchool(school: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.school(school: school)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveJob(job: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.job(job: job)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveIntroduce(introduce: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.introduce(introduce: introduce)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveInterests(interest: [Interest]) -> Single<UserProfile> {
     let interestIds = interest.map { $0.id }
     let endPoint = UserAPIRouter.interests(interests: interestIds)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func saveAddress(address: String) -> Single<UserProfile> {
     let endPoint = UserAPIRouter.address(address: address)
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
   public func getProfile() -> Single<UserProfile> {
     let endPoint = UserAPIRouter.profile
-    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserDataResponseDTO.self)
+    return userAPIService.request(endPoint: endPoint, responseDTO: SaveUserProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   
@@ -127,7 +127,7 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
   
   // prodile
   public func myProfile() -> Single<UserProfile> {
-    return userAPIService.request(endPoint: .profile, responseDTO: UserDataReponseDTO.self)
+    return userAPIService.request(endPoint: .profile, responseDTO: UserProfileReponseDTO.self)
       .map { $0.toDomain() }
   }
   

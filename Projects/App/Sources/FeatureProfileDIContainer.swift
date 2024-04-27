@@ -12,66 +12,66 @@ import DomainUser
 
 final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDependencyProvider {
   
-  func makeGetProfileDataUseCase() -> DefaultGetUserDataUseCase {
-    return DefaultGetUserDataUseCase(
+  func makeGetProfileDataUseCase() -> DefaultGetUserProfileUseCase {
+    return DefaultGetUserProfileUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserProfileRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveAddressUseCase() -> DefaultSaveAddressUseCase {
     return DefaultSaveAddressUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveJobUseCase() -> DefaultSaveJobUseCase {
     return DefaultSaveJobUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveSchoolUseCase() -> DefaultSaveSchoolUseCase {
     return DefaultSaveSchoolUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveIntroduceUseCase() -> DefaultSaveIntroduceUseCase {
     return DefaultSaveIntroduceUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveMBTIUseCase() -> DefaultSaveMBTIUseCase {
     return DefaultSaveMBTIUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeSaveInterestsUseCase() -> DefaultSaveInterestsUseCase {
     return DefaultSaveInterestsUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
   
   func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase {
     return DefaultGetAllInterestsUseCase(
       userAPIRepository: makeUserAPIRepository(),
-      userDataRepository: makeUserDataRepository()
+      userProfileRepository: makeUserProfileRepository()
     )
   }
 }

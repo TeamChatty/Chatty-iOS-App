@@ -1,5 +1,5 @@
 //
-//  UserDataResponseDTO.swift
+//  UserProfileReponseDTO.swift
 //  DataNetworkInterface
 //
 //  Created by 윤지호 on 1/25/24.
@@ -9,7 +9,7 @@ import Foundation
 import DomainUser
 import DomainUserInterface
 
-public struct UserDataReponseDTO: Decodable {
+public struct UserProfileReponseDTO: Decodable {
   public let id: Int
   public let mobileNumber: String
   public let nickname: String

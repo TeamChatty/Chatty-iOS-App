@@ -11,20 +11,20 @@ import DomainUserInterface
 
 public final class DefaultSaveIntroduceUseCase: SaveIntroduceUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
-  private let userDataRepository: any UserDataRepositoryProtocol
+  private let userProfileRepository: any UserProfileRepositoryProtocol
   
-  public init(userAPIRepository: any UserAPIRepositoryProtocol, userDataRepository: any UserDataRepositoryProtocol) {
+  public init(userAPIRepository: any UserAPIRepositoryProtocol, userProfileRepository: any UserProfileRepositoryProtocol) {
     self.userAPIRepository = userAPIRepository
-    self.userDataRepository = userDataRepository
+    self.userProfileRepository = userProfileRepository
   }
   
   public func execute(introduce: String) -> Single<Bool> {
     return userAPIRepository.saveIntroduce(introduce: introduce)
-      .flatMap { userData -> Single<Bool> in
+      .flatMap { userProfile -> Single<Bool> in
         /// 최종적으로 저장된 데이터를 UserService에 저장해 둡니다.
         /// Single로 데이터를 전달받으니 weak self  사용시 self를 찾지 못했습니다.
         /// 추후 원인을 찾아보고 해결하겠습니다.
-        self.userDataRepository.saveUserData(userData: userData)
+        self.userProfileRepository.saveUserProfile(userProfile: userProfile)
         return .just(true)
       }
   }
