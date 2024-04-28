@@ -90,7 +90,7 @@ final class EditAdditionalInfoSectionView: BaseView, Touchable {
 }
 
 extension EditAdditionalInfoSectionView {
-  func updateView(userProfile: UserProfile) {
+  public func updateView(userProfile: UserProfile) {
     self.introduceButton.setIntroduceText(introduce: userProfile.introduce)
     self.mbtiButton.title = userProfile.mbti
     let joinedInterests: String = userProfile.interests.map { $0.name }.joined(separator: ",")

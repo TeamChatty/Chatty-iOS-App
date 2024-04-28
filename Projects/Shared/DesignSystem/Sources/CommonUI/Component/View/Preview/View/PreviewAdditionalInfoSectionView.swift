@@ -11,10 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-import SharedDesignSystem
-import DomainUserInterface
-
-final class PreviewAdditionalInfoSectionView: UITableViewCell {
+public final class PreviewAdditionalInfoSectionView: UITableViewCell {
 
   // MARK: - View Property
   private let introduceHeaderTitle: UILabel = UILabel().then {
@@ -113,16 +110,16 @@ final class PreviewAdditionalInfoSectionView: UITableViewCell {
 }
 
 extension PreviewAdditionalInfoSectionView {
-  func updateView(userProfile: UserProfile) {
-    let introduce = userProfile.introduce == nil ? "자기소개를 입력해주세요." : userProfile.introduce
+  public func updateView(introduce: String?, mbti: String?, interests: [String]) {
+    let introduce = introduce == nil ? "자기소개를 입력해주세요." : introduce
     introduceLabel.setIntroduceText(introduce: introduce)
-    mbtiLabel.title = userProfile.mbti == nil ? "MBTI를 입력해주세요." : userProfile.mbti
+    mbtiLabel.title = mbti == nil ? "MBTI를 입력해주세요." : mbti
     
     interestsStackView.removeAllArrangedSubViews()
-    if userProfile.interests.isEmpty == false {
-      for interest in userProfile.interests {
+    if interests.isEmpty == false {
+      for interest in interests {
         let label = BasePaddingLabel(padding: .init(top: 8, left: 12, bottom: 8, right: 12))
-        label.text = interest.name
+        label.text = interest
         label.textColor = SystemColor.basicBlack.uiColor
         label.font = SystemFont.body02.font
         label.backgroundColor = SystemColor.gray100.uiColor

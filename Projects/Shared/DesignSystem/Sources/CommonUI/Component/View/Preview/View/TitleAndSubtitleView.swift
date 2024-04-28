@@ -8,9 +8,8 @@
 import UIKit
 import SnapKit
 import Then
-import SharedDesignSystem
 
-final class TitleContentView: BaseView {
+public final class TitleContentView: BaseView {
   // MARK: - View Property
   private let titleLabel: UILabel = UILabel().then {
     $0.numberOfLines = 0
@@ -22,26 +21,26 @@ final class TitleContentView: BaseView {
   }
   
   // MARK: - Stored Property
-  var title: String? {
+  public var title: String? {
     didSet {
       self.titleLabel.text = title
     }
   }
   
-  var contentText: String? {
+  public var contentText: String? {
     didSet {
       self.contentLabel.text = contentText
     }
   }
   
-  var font: UIFont? {
+  public var font: UIFont? {
     didSet {
       self.titleLabel.font = font
       self.contentLabel.font = font
     }
   }
   
-  var textColor: UIColor? {
+  public var textColor: UIColor? {
     didSet {
       self.titleLabel.textColor = textColor
       self.contentLabel.textColor = textColor
@@ -49,7 +48,7 @@ final class TitleContentView: BaseView {
   }
   
   // MARK: - UIConfigurable
-  override func configureUI() {
+  public override func configureUI() {
     addSubview(titleLabel)
     addSubview(contentLabel)
     

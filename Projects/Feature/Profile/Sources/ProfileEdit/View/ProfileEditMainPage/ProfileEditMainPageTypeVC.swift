@@ -138,7 +138,7 @@ extension ProfileEditMainPageTypeViewController {
     case .edit:
         editPageView?.updateUserProfile(userProfile)
     case .preview:
-        previewPageView?.updateUserProfile(userProfile)
+      previewPageView?.updateUserProfile(profileImage: userProfile.imageUrl, nickname: userProfile.nickname ?? "", americanAge: userProfile.americanAge, gender: userProfile.genderStringKR, blueCheck: userProfile.blueCheck, address: userProfile.address, job: userProfile.job, school: userProfile.school, introduce: userProfile.introduce, mbti: userProfile.mbti, interests: userProfile.interests.map { $0.name })
     }
   }
 }

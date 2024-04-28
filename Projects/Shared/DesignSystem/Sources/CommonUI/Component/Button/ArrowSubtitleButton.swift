@@ -10,9 +10,8 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import Then
-import SharedDesignSystem
 
-final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transformable {
+public final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transformable {
   // MARK: - View Property
   private let titleLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicBlack.uiColor
@@ -29,13 +28,13 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   }
   
   // MARK: - Stored Property
-  var title: String? {
+  public var title: String? {
     didSet {
       self.titleLabel.text = title
     }
   }
   
-  var contentText: String? {
+  public var contentText: String? {
     didSet {
       setStateForContentText()
     }
@@ -50,10 +49,10 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   }
   
   // MARK: - Touchable Property
-  var touchEventRelay: PublishRelay<Void> = .init()
+  public var touchEventRelay: PublishRelay<Void> = .init()
 
   // MARK: - UIConfigurable
-  override func configureUI() {
+  public override func configureUI() {
     self.layer.cornerRadius = 8
     self.layer.borderWidth = 1
     self.layer.borderColor = SystemColor.gray200.uiColor.cgColor
@@ -82,7 +81,7 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   }
   
   // MARK: - UIBindable
-  override func bind() {
+  public override func bind() {
     self.rx.controlEvent(.touchDown)
       .bind(with: self) { [weak self] owner, _ in
         guard let self else { return }
@@ -114,12 +113,12 @@ final class ArrowSubtitleButton: BaseControl, Touchable, Highlightable, Transfor
   }
 }
 extension ArrowSubtitleButton: StateConfigurable {
-  enum State {
+  public enum State {
     case validData
     case emptyData
   }
   
-  struct Configuration {
+  public struct Configuration {
     var contentText: String
     let font: UIFont
     let textColor: UIColor
@@ -131,7 +130,7 @@ extension ArrowSubtitleButton: StateConfigurable {
     }
   }
   
-  func updateForCurrentState() {
+  public func updateForCurrentState() {
     guard let currentState,
           let config = configurations[currentState] else { return }
     

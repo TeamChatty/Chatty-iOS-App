@@ -56,7 +56,7 @@ final class EditImageSectionView: BaseView, Touchable {
     $0.layer.borderColor = SystemColor.gray200.uiColor.cgColor
     $0.clipsToBounds = true
   }
-  private let profileImageOpacuityLabel: UILabel = UILabel().then {
+  private let profileImageOpacityLabel: UILabel = UILabel().then {
     $0.textAlignment = .center
     $0.font = SystemFont.body01.font
     $0.textColor = SystemColor.basicWhite.uiColor
@@ -83,7 +83,6 @@ final class EditImageSectionView: BaseView, Touchable {
     imagePosition: .left,
     space: 1
   ).then {
-    $0.image = Images.smallShieldGray.image
     $0.font = SystemFont.body01.font
     $0.textColor = SystemColor.gray600.uiColor
   }
@@ -129,14 +128,17 @@ extension EditImageSectionView {
   func updateView(userProfile: UserProfile) {
     profileImageView.setImageKF(urlString: userProfile.imageUrl)
     if userProfile.blueCheck {
-      profileImageOpacuityLabel.text = ""
-      profileImageOpacuityLabel.backgroundColor = .clear
+      profileImageOpacityLabel.text = ""
+      profileImageOpacityLabel.backgroundColor = .clear
+      
       certifiedLabel.title = "인증 완료"
+      certifiedLabel.image = Images.smallShieldPrimary.image
     } else {
-      profileImageOpacuityLabel.text = "요청 중"
-      profileImageOpacuityLabel.backgroundColor = .black.withAlphaComponent(0.5)
+      profileImageOpacityLabel.text = "요청 중"
+      profileImageOpacityLabel.backgroundColor = .black.withAlphaComponent(0.5)
 
       certifiedLabel.title = "사진 미인증"
+      certifiedLabel.image = Images.smallShieldGray.image
     }
   }
 }
@@ -168,7 +170,7 @@ extension EditImageSectionView {
   
   private func setupImage() {
     addSubview(profileImageView)
-    profileImageView.addSubview(profileImageOpacuityLabel)
+    profileImageView.addSubview(profileImageOpacityLabel)
     addSubview(cameraButton)
     addSubview(certifiedLabel)
     
@@ -178,7 +180,7 @@ extension EditImageSectionView {
       $0.centerX.equalToSuperview()
     }
     
-    profileImageOpacuityLabel.snp.makeConstraints {
+    profileImageOpacityLabel.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
     

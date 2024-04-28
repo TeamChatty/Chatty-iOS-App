@@ -11,10 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-import SharedDesignSystem
-import DomainUserInterface
-
-final class PreviewBasicInfoSectionView: BaseView {
+public final class PreviewBasicInfoSectionView: BaseView {
 
   private let basicInfoHeaderTitle: UILabel = UILabel().then {
     $0.text = "기본 정보"
@@ -46,7 +43,7 @@ final class PreviewBasicInfoSectionView: BaseView {
   }
 
   // MARK: - UIConfigurable
-  override func configureUI() {
+  public override func configureUI() {
     addSubview(basicInfoHeaderTitle)
     addSubview(stackView)
     
@@ -84,22 +81,22 @@ final class PreviewBasicInfoSectionView: BaseView {
 }
 
 extension PreviewBasicInfoSectionView {
-  func updateView(userProfile: UserProfile) {
-    if let address = userProfile.address {
+  public func updateView(address: String?, job: String?, school: String?) {
+    if let address {
       addressLabel.title = address
       addressLabel.textColor = SystemColor.basicBlack.uiColor
     } else {
       addressLabel.title = "미입력"
       addressLabel.textColor = SystemColor.gray600.uiColor
     }
-    if let job = userProfile.job {
+    if let job {
       jobLabel.title = job
       jobLabel.textColor = SystemColor.basicBlack.uiColor
     } else {
       jobLabel.title = "미입력"
       jobLabel.textColor = SystemColor.gray600.uiColor
     }
-    if let school = userProfile.school {
+    if let school {
       schoolLabel.title = school
       schoolLabel.textColor = SystemColor.basicBlack.uiColor
     } else {
