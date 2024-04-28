@@ -1,8 +1,8 @@
 //
-//  EditImageTableViewCell.swift
-//  FeatureProfileInterface
+//  EditImageSectionView.swift
+//  FeatureProfile
 //
-//  Created by 윤지호 on 3/24/24.
+//  Created by 윤지호 on 4/28/24.
 //
 
 import UIKit
@@ -14,9 +14,8 @@ import Then
 import SharedDesignSystem
 import DomainUserInterface
 
-final class EditImageTableViewCell: UITableViewCell, Touchable {
-  static let cellId = "EditImageTableViewCell"
-
+final class EditImageSectionView: BaseView, Touchable {
+  
   // MARK: - View Property
   private let headerTitle: UILabel = UILabel().then {
     $0.text = "프로필 사진"
@@ -34,8 +33,8 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
     $0.setState(commonState, for: .customImage)
     $0.currentState = .customImage
   }
-  private let certifiedGuideButton: FillButton = FillButton().then {
-    typealias Configuration = FillButton.Configuration
+  private let certifiedGuideButton: FillButtonTemp = FillButtonTemp(horizontalInset: 12).then {
+    typealias Configuration = FillButtonTemp.Configuration
     let enabled = Configuration(
       backgroundColor: SystemColor.primaryLight.uiColor,
       textColor: SystemColor.primaryNormal.uiColor,
@@ -47,7 +46,7 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
     $0.currentState = .enabled
 
     $0.title = "인증가이드"
-    $0.cornerRadius = 28 / 2
+    $0.layer.cornerRadius = 28 / 2
   }
   
   private let profileImageView: UIImageView = UIImageView().then {
@@ -100,26 +99,15 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
     case selectImage
   }
   
-  // MARK: - Initialize Method
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    configureUI()
-    bind()
-  }
-  
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
   // MARK: - UIConfigurable
-  private func configureUI() {
+  override func configureUI() {
     setupTitle()
     setupImage()
   }
   
   
   // MARK: - UIBindable
-  private func bind() {
+  override func bind() {
     headerButton.touchEventRelay
       .map { TouchEventType.chatImageGuide }
       .bind(to: touchEventRelay)
@@ -137,10 +125,10 @@ final class EditImageTableViewCell: UITableViewCell, Touchable {
   }
 }
 
-extension EditImageTableViewCell {
-  func updateCell(userData: UserProfile) {
-    profileImageView.setImageKF(urlString: userData.imageUrl)
-    if userData.blueCheck {
+extension EditImageSectionView {
+  func updateView(userProfile: UserProfile) {
+    profileImageView.setImageKF(urlString: userProfile.imageUrl)
+    if userProfile.blueCheck {
       profileImageOpacuityLabel.text = ""
       profileImageOpacuityLabel.backgroundColor = .clear
       certifiedLabel.title = "인증 완료"
@@ -153,11 +141,11 @@ extension EditImageTableViewCell {
   }
 }
 
-extension EditImageTableViewCell {
+extension EditImageSectionView {
   private func setupTitle() {
-    contentView.addSubview(headerTitle)
-    contentView.addSubview(headerButton)
-    contentView.addSubview(certifiedGuideButton)
+    addSubview(headerTitle)
+    addSubview(headerButton)
+    addSubview(certifiedGuideButton)
     
     headerTitle.snp.makeConstraints {
       $0.top.equalToSuperview().inset(30)
@@ -170,7 +158,7 @@ extension EditImageTableViewCell {
       $0.centerY.equalTo(headerTitle.snp.centerY)
       $0.leading.equalTo(headerTitle.snp.trailing).offset(4)
     }
-    
+
     certifiedGuideButton.snp.makeConstraints {
       $0.top.equalToSuperview().inset(30)
       $0.height.equalTo(28)
@@ -179,10 +167,10 @@ extension EditImageTableViewCell {
   }
   
   private func setupImage() {
-    contentView.addSubview(profileImageView)
+    addSubview(profileImageView)
     profileImageView.addSubview(profileImageOpacuityLabel)
-    contentView.addSubview(cameraButton)
-    contentView.addSubview(certifiedLabel)
+    addSubview(cameraButton)
+    addSubview(certifiedLabel)
     
     profileImageView.snp.makeConstraints {
       $0.top.equalToSuperview().inset(85)

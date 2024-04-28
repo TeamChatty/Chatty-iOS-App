@@ -1,9 +1,10 @@
 //
-//  EditAdditionalInfoTableViewCell.swift
-//  FeatureProfileInterface
+//  EditAdditionalInfoSectionView.swift
+//  FeatureProfile
 //
-//  Created by 윤지호 on 3/24/24.
+//  Created by 윤지호 on 4/28/24.
 //
+
 
 import UIKit
 import RxSwift
@@ -14,8 +15,7 @@ import Then
 import SharedDesignSystem
 import DomainUserInterface
 
-final class EditAdditionalInfoTableViewCell: UITableViewCell {
-  static let cellId = "EditAdditionalInfoTableViewCell"
+final class EditAdditionalInfoSectionView: BaseView, Touchable {
   
   // MARK: - View Property
   private let introduceHeaderTitle: UILabel = UILabel().then {
@@ -64,25 +64,14 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
     case interests
   }
   
-  // MARK: - Initialize Method
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    configureUI()
-    bind()
-  }
-  
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
   // MARK: - UIConfigurable
-  private func configureUI() {
+  override func configureUI() {
     setupIntroduce()
     setupMBTI()
     setupInterests()
   }
   // MARK: - UIBindable
-  private func bind() {
+  override func bind() {
     introduceButton.touchEventRelay
       .map { TouchEventType.introduce }
       .bind(to: touchEventRelay)
@@ -100,19 +89,19 @@ final class EditAdditionalInfoTableViewCell: UITableViewCell {
   }
 }
 
-extension EditAdditionalInfoTableViewCell {
-  func updateCell(userData: UserProfile) {
-    self.introduceButton.setIntroduceText(introduce: userData.introduce)
-    self.mbtiButton.title = userData.mbti
-    let joinedInterests: String = userData.interests.map { $0.name }.joined(separator: ",")
+extension EditAdditionalInfoSectionView {
+  func updateView(userProfile: UserProfile) {
+    self.introduceButton.setIntroduceText(introduce: userProfile.introduce)
+    self.mbtiButton.title = userProfile.mbti
+    let joinedInterests: String = userProfile.interests.map { $0.name }.joined(separator: ",")
     self.interestsButton.title = joinedInterests
   }
 }
 
-extension EditAdditionalInfoTableViewCell {
+extension EditAdditionalInfoSectionView {
   private func setupIntroduce() {
-    contentView.addSubview(introduceHeaderTitle)
-    contentView.addSubview(introduceButton)
+    addSubview(introduceHeaderTitle)
+    addSubview(introduceButton)
     
     introduceHeaderTitle.snp.makeConstraints {
       $0.top.equalToSuperview()
@@ -127,8 +116,8 @@ extension EditAdditionalInfoTableViewCell {
   }
   
   private func setupMBTI() {
-    contentView.addSubview(mbtiHeaderTitle)
-    contentView.addSubview(mbtiButton)
+    addSubview(mbtiHeaderTitle)
+    addSubview(mbtiButton)
     
     mbtiHeaderTitle.snp.makeConstraints {
       $0.top.equalTo(introduceButton.snp.bottom).offset(48)
@@ -139,13 +128,13 @@ extension EditAdditionalInfoTableViewCell {
     mbtiButton.snp.makeConstraints {
       $0.top.equalTo(mbtiHeaderTitle.snp.bottom).offset(34)
       $0.height.equalTo(48)
-      $0.horizontalEdges.equalToSuperview().inset(12)
+      $0.horizontalEdges.equalToSuperview().inset(20)
     }
   }
   
   private func setupInterests() {
-    contentView.addSubview(interestsHeaderTitle)
-    contentView.addSubview(interestsButton)
+    addSubview(interestsHeaderTitle)
+    addSubview(interestsButton)
     
     interestsHeaderTitle.snp.makeConstraints {
       $0.top.equalTo(mbtiButton.snp.bottom).offset(48)
@@ -155,13 +144,13 @@ extension EditAdditionalInfoTableViewCell {
     interestsButton.snp.makeConstraints {
       $0.top.equalTo(interestsHeaderTitle.snp.bottom).offset(34)
       $0.height.equalTo(48)
-      $0.horizontalEdges.equalToSuperview().inset(12)
+      $0.horizontalEdges.equalToSuperview().inset(20)
       $0.bottom.equalToSuperview().inset(97)
     }
   }
 }
 
-extension EditAdditionalInfoTableViewCell {
+extension EditAdditionalInfoSectionView {
   func setdata() {
     
   }

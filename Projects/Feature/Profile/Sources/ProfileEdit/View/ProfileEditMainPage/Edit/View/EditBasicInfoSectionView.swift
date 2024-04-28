@@ -1,8 +1,8 @@
 //
-//  EditBasicInfomationTableViewCell.swift
-//  FeatureProfileInterface
+//  EditBasicInfoSectionView.swift
+//  FeatureProfile
 //
-//  Created by 윤지호 on 3/24/24.
+//  Created by 윤지호 on 4/28/24.
 //
 
 import UIKit
@@ -13,8 +13,7 @@ import Then
 import SharedDesignSystem
 import DomainUserInterface
 
-final class EditBasicInfoTableViewCell: UITableViewCell {
-  static let cellId = "EditBasicInfoTableViewCell"
+final class EditBasicInfoSectionView: BaseView, Touchable {
   
   // MARK: - View Property
   private let headerTitle: UILabel = UILabel().then {
@@ -88,25 +87,14 @@ final class EditBasicInfoTableViewCell: UITableViewCell {
     case job
     case school
   }
-  
-  // MARK: - Initialize Method
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    configureUI()
-    bind()
-  }
-  
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
+
   // MARK: - UIConfigurable
-  private func configureUI() {
+  override func configureUI() {
     setupButtons()
   }
   
   // MARK: - UIBindable
-  private func bind() {
+  override func bind() {
     nicknameButton.touchEventRelay
       .map { TouchEventType.nickname }
       .bind(to: touchEventRelay)
@@ -129,26 +117,26 @@ final class EditBasicInfoTableViewCell: UITableViewCell {
   }
 }
 
-extension EditBasicInfoTableViewCell {
-  func updateCell(userData: UserProfile) {
-    genderView.contentText = userData.gender?.stringKR
-    ageView.contentText = "만 \(userData.americanAge)세"
-    nicknameButton.contentText = userData.nickname
-    addressButton.contentText = userData.address
-    jobButton.contentText = userData.job
-    schoolButton.contentText = userData.school
+extension EditBasicInfoSectionView {
+  func updateView(userProfile: UserProfile) {
+    genderView.contentText = userProfile.gender?.stringKR
+    ageView.contentText = "만 \(userProfile.americanAge)세"
+    nicknameButton.contentText = userProfile.nickname
+    addressButton.contentText = userProfile.address
+    jobButton.contentText = userProfile.job
+    schoolButton.contentText = userProfile.school
   }
 }
 
-extension EditBasicInfoTableViewCell {
+extension EditBasicInfoSectionView {
   private func setupButtons() {
-    contentView.addSubview(headerTitle)
-    contentView.addSubview(genderView)
-    contentView.addSubview(ageView)
-    contentView.addSubview(nicknameButton)
-    contentView.addSubview(addressButton)
-    contentView.addSubview(jobButton)
-    contentView.addSubview(schoolButton)
+    addSubview(headerTitle)
+    addSubview(genderView)
+    addSubview(ageView)
+    addSubview(nicknameButton)
+    addSubview(addressButton)
+    addSubview(jobButton)
+    addSubview(schoolButton)
 
     headerTitle.snp.makeConstraints {
       $0.top.equalToSuperview()
@@ -194,3 +182,4 @@ extension EditBasicInfoTableViewCell {
     }
   }
 }
+

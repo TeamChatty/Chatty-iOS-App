@@ -1,8 +1,8 @@
 //
-//  PreviewAdditionalInfoTableViewCell.swift
+//  PreviewAdditionalInfoSectionView.swift
 //  FeatureProfile
 //
-//  Created by 윤지호 on 3/24/24.
+//  Created by 윤지호 on 4/28/24.
 //
 
 import UIKit
@@ -14,8 +14,7 @@ import Then
 import SharedDesignSystem
 import DomainUserInterface
 
-final class PreviewAdditionalInfoTableViewCell: UITableViewCell {
-  static let cellId = "PreviewAdditionalInfoTableViewCell"
+final class PreviewAdditionalInfoSectionView: UITableViewCell {
 
   // MARK: - View Property
   private let introduceHeaderTitle: UILabel = UILabel().then {
@@ -113,15 +112,15 @@ final class PreviewAdditionalInfoTableViewCell: UITableViewCell {
   }
 }
 
-extension PreviewAdditionalInfoTableViewCell {
-  func updateCell(userData: UserProfile) {
-    let introduce = userData.introduce == nil ? "자기소개를 입력해주세요." : userData.introduce
+extension PreviewAdditionalInfoSectionView {
+  func updateView(userProfile: UserProfile) {
+    let introduce = userProfile.introduce == nil ? "자기소개를 입력해주세요." : userProfile.introduce
     introduceLabel.setIntroduceText(introduce: introduce)
-    mbtiLabel.title = userData.mbti == nil ? "MBTI를 입력해주세요." : userData.mbti
+    mbtiLabel.title = userProfile.mbti == nil ? "MBTI를 입력해주세요." : userProfile.mbti
     
     interestsStackView.removeAllArrangedSubViews()
-    if userData.interests.isEmpty == false {
-      for interest in userData.interests {
+    if userProfile.interests.isEmpty == false {
+      for interest in userProfile.interests {
         let label = BasePaddingLabel(padding: .init(top: 8, left: 12, bottom: 8, right: 12))
         label.text = interest.name
         label.textColor = SystemColor.basicBlack.uiColor
@@ -135,3 +134,4 @@ extension PreviewAdditionalInfoTableViewCell {
     }
   }
 }
+

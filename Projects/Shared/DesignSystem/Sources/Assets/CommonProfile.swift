@@ -30,13 +30,13 @@ public enum CommonProfileScale {
   }
 }
 public enum CommonProfile: String {
-  case Man
-  case Profile
+  case male
+  case female
   
   public func getProfileImage(scale: CommonProfileScale) -> UIImage {
 
     switch self {
-    case .Man:
+    case .male:
       switch scale {
       case .s36:
         return Images.manProfile36.image
@@ -49,7 +49,7 @@ public enum CommonProfile: String {
       case .s375:
         return Images.manProfile375.image
       }
-    case .Profile:
+    case .female:
       switch scale {
       case .s36:
         return Images.womanProfile36.image

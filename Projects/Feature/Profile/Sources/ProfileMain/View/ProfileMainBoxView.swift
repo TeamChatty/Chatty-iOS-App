@@ -25,7 +25,6 @@ final class ProfileMainBoxView: BaseView, Touchable {
     
     $0.layer.cornerRadius = 15
     $0.clipsToBounds = true
-    $0.text = "20% 완성"
   }
 //  private let percentProgress = CircularProgressBarView()
   private let percentProgress = UIView().then {
@@ -156,7 +155,10 @@ extension ProfileMainBoxView {
   }
   
   func setProfileData(_ data: UserProfile) {
-    self.profileImageView.setImageKF(urlString: data.imageUrl ?? nil)
+    self.profileImageView.setProfileImageKF(
+      urlString: data.imageUrl ?? nil,
+      gender: data.gender == .male ? .male : .female
+      , scale: .s140)
 
     self.nicknameLabel.text = data.nickname
     self.ageAndGenderLabel.text = "만 \(data.americanAge)세 ・ \(data.genderShortStringKR)"
