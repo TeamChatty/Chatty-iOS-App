@@ -144,6 +144,7 @@ extension ProfileMainBoxView {
       $0.top.equalTo(nicknameLabel.snp.bottom).offset(4)
       $0.height.equalTo(20)
       $0.centerX.equalToSuperview()
+      $0.bottom.equalToSuperview().inset(16)
     }
   }
 }
