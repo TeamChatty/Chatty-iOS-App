@@ -126,8 +126,17 @@ final class EditImageSectionView: BaseView, Touchable {
 
 extension EditImageSectionView {
   func updateView(userProfile: UserProfile) {
-    profileImageView.setImageKF(urlString: userProfile.imageUrl)
-    if userProfile.blueCheck {
+    profileImageView.setProfileImageKF(
+      urlString: userProfile.imageUrl,
+      gender: userProfile.gender == .male ? .male: .female,
+      scale: .s140)
+    if userProfile.imageUrl == nil {
+      profileImageOpacityLabel.text = ""
+      profileImageOpacityLabel.backgroundColor = .clear
+      
+      certifiedLabel.title = "사진 미입력"
+      certifiedLabel.image = Images.smallShieldGray.image
+    } else if userProfile.blueCheck {
       profileImageOpacityLabel.text = ""
       profileImageOpacityLabel.backgroundColor = .clear
       

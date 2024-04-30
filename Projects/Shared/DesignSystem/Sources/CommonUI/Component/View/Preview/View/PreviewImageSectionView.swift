@@ -158,10 +158,15 @@ extension PreviewImageSectionView {
   /// gender - "남자" /  "여자"
   public func updateMyPreviewView(profileImage: String?, nickname: String, americanAge: Int, gender: String, blueCheck: Bool) {
     profileImageView.setProfileImageKF(urlString: profileImage, gender: gender == "남자" ? .male : .female, scale: .s375)
+    if profileImage == nil {
+      updateBlueCheck(blueCheck: true)
+    } else {
+      updateBlueCheck(blueCheck: blueCheck)
+    }
+
     nicknameLabel.title = nickname
     ageAndGenderLabel.text = "만 \(americanAge)세 ・ \(gender)"
     
-    updateBlueCheck(blueCheck: blueCheck)
   }
   
   /// blueCheck 값으로 뷰를 업데이트 합니다.

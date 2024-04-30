@@ -23,13 +23,14 @@ extension UIImageView {
     self.kf.indicatorType = .activity
     guard let urlString,
           let url = URL(string: urlString) else {
+      self.image = gender.getProfileImage(scale: scale)
       return
     }
     
     self.kf.setImage(with: url, placeholder: nil, options: [.transition(.fade(0.7))], progressBlock: nil) { result in
       switch result {
       case .failure(_):
-        self.image = gender.getProfileImage(scale: scale).withRenderingMode(.alwaysTemplate)
+        self.image = gender.getProfileImage(scale: scale)
       case .success(let result):
         self.image = result.image
       }

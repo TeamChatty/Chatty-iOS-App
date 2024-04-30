@@ -156,7 +156,7 @@ extension ProfileMainBoxView {
   
   func setProfileData(_ data: UserProfile) {
     self.profileImageView.setProfileImageKF(
-      urlString: data.imageUrl ?? nil,
+      urlString: data.imageUrl,
       gender: data.gender == .male ? .male : .female
       , scale: .s140)
 
