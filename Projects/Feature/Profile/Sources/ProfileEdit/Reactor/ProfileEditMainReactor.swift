@@ -23,7 +23,7 @@ final class ProfileEditMainReactor: Reactor {
   enum Mutation {
     case setPage(Int)
     case setProfileData(UserProfile)
-    case setIsShowingToastView(Bool)
+    case setIsShowingToastView(ProfileEditType)
     case isLoading(Bool)
     case setError(ErrorType?)
   }
@@ -31,7 +31,7 @@ final class ProfileEditMainReactor: Reactor {
   struct State {
     var profileData: UserProfile
     var pageIndex: Int = 0
-    var isShowingToastView: Bool = false
+    var editedProfile: ProfileEditType? = nil
     
     var isLoading: Bool = false
     var errorState: ErrorType? = nil
@@ -47,6 +47,18 @@ final class ProfileEditMainReactor: Reactor {
   public enum ErrorType: Error {
     case unknownError
   }
+  
+  var editedProfileToastText: String {
+    guard let type = currentState.editedProfile else { return "" }
+    switch type {
+    case .image:
+      return "사진이 등록되어 인증 요청중이에요"
+    case .nickname:
+      return "닉네임이 변경되었어요"
+    default:
+      return "입력한 내용이 저장되었어요"
+    }
+  }
 }
 
 extension ProfileEditMainReactor {
@@ -54,11 +66,11 @@ extension ProfileEditMainReactor {
     switch action {
     case .changePage(let index):
       return .just(.setPage(index))
-    case .editSuccessed:
+    case .editSuccessed(let type):
       let userProfile = self.getUserDataUseCase.execute()
       return .concat([
         .just(.setProfileData(userProfile)),
-        .just(.setIsShowingToastView(true))
+        .just(.setIsShowingToastView(type))
       ])
     case .selectImage(let image):
       return .concat([
@@ -81,8 +93,8 @@ extension ProfileEditMainReactor {
       newState.pageIndex = index
     case .setProfileData(let profileData):
       newState.profileData = profileData
-    case .setIsShowingToastView(let bool):
-      newState.isShowingToastView = bool
+    case .setIsShowingToastView(let type):
+      newState.editedProfile = type
     case .isLoading(let bool):
       newState.isLoading = bool
     case .setError(let error):
