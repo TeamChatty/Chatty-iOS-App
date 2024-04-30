@@ -28,10 +28,6 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
     super.init(navigationController: navigationController)
   }
   
-  deinit {
-    print("해제됨: FeedProfileCoordinator")
-  }
-  
   let disposeBag = DisposeBag()
   
   public override func start() {

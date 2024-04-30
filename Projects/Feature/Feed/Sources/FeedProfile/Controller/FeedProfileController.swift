@@ -22,7 +22,7 @@ final class FeedProfileController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: FeedProfileSegmentView = FeedProfileSegmentView()
   private let mainView: FeedProfilePageViewController
-    
+  
   // MARK: - Reactor Property
   typealias Reactor = FeedProfileReactor
   

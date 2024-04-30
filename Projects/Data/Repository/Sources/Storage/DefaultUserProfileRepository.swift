@@ -27,6 +27,10 @@ public final class DefaultUserProfileRepository: UserProfileRepository {
     return userProfileService.getData()
   }
   
+  public func resetProfile() {
+    return userProfileService.resetProfile()
+  }
+  
   public func saveAllInterests(interests: Interests) {
     userProfileService.saveAllInterests(interests: interests)
   }

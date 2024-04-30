@@ -30,7 +30,16 @@ final class ProfileEditMainController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: ProfileEditSegmentView = ProfileEditSegmentView()
   private let mainView = ProfileEditMainPageViewController()
-    
+  private let toastMessageButton: ToastMessageView = ToastMessageView().then {
+    $0.layer.masksToBounds = false
+    $0.clipsToBounds = false
+  }
+  
+  private let toastMessageButton2: ToastMessageButton = ToastMessageButton().then {
+    $0.layer.masksToBounds = false
+    $0.clipsToBounds = false
+  }
+
   // MARK: - Reactor Property
   typealias Reactor = ProfileEditMainReactor
   
@@ -57,6 +66,13 @@ final class ProfileEditMainController: BaseController {
    // MARK: - UIConfigurable
   override func configureUI() {
     setView()
+    
+    self.view.addSubview(toastMessageButton2)
+    toastMessageButton2.snp.makeConstraints {
+      $0.height.equalTo(48)
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+    }
   }
   
   override func setNavigationBar() {
@@ -71,6 +87,13 @@ extension ProfileEditMainController: ReactorKit.View {
     segumentButtonView.touchEventRelay
       .bind(with: self) { owner, index in
         owner.reactor?.action.onNext(.changePage(index))
+        if index == 0 {
+          owner.toastMessageButton2.dismissToastMessage()
+          
+        } else {
+          owner.toastMessageButton2.showToastMessage(message: "hihihihihi")
+
+        }
       }
       .disposed(by: disposeBag)
     

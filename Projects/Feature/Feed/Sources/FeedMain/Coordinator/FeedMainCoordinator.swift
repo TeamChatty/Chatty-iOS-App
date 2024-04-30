@@ -28,7 +28,7 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   }
   
   deinit {
-    print("해제됨: FeedMainCoordinator")
+    self.deinitRootCoordinator()
   }
   
   let disposeBag = DisposeBag()

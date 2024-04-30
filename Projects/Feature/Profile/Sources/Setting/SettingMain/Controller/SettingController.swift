@@ -102,6 +102,20 @@ extension SettingController: ReactorKit.View {
         }
       }
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isLoading)
+      .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
+      .bind(with: self) { owner, isLoading in
+        if isLoading {
+          owner.showLoadingIndicactor()
+        } else {
+          owner.hideLoadingIndicator()
+        }
+      }
+      .disposed(by: disposeBag)
+    
   }
 }
 

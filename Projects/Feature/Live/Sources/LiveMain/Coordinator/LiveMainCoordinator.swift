@@ -27,7 +27,7 @@ public final class LiveMainCoordinator: BaseCoordinator {
   }
   
   deinit {
-    print("해제됨: LiveMainCoordinator")
+    self.deinitRootCoordinator()
   }
   
   public override func start() {

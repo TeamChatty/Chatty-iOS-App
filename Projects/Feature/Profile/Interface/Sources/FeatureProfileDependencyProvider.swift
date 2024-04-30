@@ -12,4 +12,10 @@ public protocol FeatureProfileDependencyProvider {
   func makeSaveMBTIUseCase() -> DefaultSaveMBTIUseCase
   func makeSaveInterestsUseCase() -> DefaultSaveInterestsUseCase
   func makeGetAllInterestsUseCase() -> DefaultGetAllInterestsUseCase
+  
+  func makeGetNotificationCheckedData() -> DefaultGetNotificationCheckedData
+  func makeSaveNotificationBoolean() -> DefaultSaveNotificationBoolean
+  
+  func makeLogoutUseCase() -> DefaultLogoutUseCase
+  func makeLeaveAccountUseCase() -> DefaultLeaveAccountUseCase
 }
