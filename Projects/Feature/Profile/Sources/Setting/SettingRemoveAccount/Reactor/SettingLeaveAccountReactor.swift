@@ -1,6 +1,6 @@
 //
-//  SettingReactor.swift
-//  FeatureProfileInterface
+//  SettingLeaveAccountReactor.swift
+//  FeatureProfile
 //
 //  Created by 윤지호 on 4/11/24.
 //
@@ -12,7 +12,9 @@ import DomainUser
 import DomainUserInterface
 import DomainCommon
 
-final class SettingRemoveAccountReactor: Reactor {
+final class SettingLeaveAccountReactor: Reactor {
+  private let leaveAccountUseCase: LeaveAccountUseCase
+  
   enum Action {
     case TabremoveAccount
   }
@@ -31,7 +33,8 @@ final class SettingRemoveAccountReactor: Reactor {
   
   var initialState: State
   
-  public init() {
+  public init(leaveAccountUseCase: LeaveAccountUseCase) {
+    self.leaveAccountUseCase = leaveAccountUseCase
     self.initialState = State()
   }
   
@@ -40,13 +43,17 @@ final class SettingRemoveAccountReactor: Reactor {
   }
 }
 
-extension SettingRemoveAccountReactor {
+extension SettingLeaveAccountReactor {
   func mutate(action: Action) -> Observable<Mutation> {
     switch action {
     case .TabremoveAccount:
       return .concat([
         .just(.setIsLoading(true)),
-        .just(.removeAccount),
+        leaveAccountUseCase.execute()
+          .map { _ in .removeAccount }
+          .catch { error -> Observable<Mutation> in
+            return error.toMutation()
+          },
         .just(.setIsLoading(false))
       ])
     }
@@ -68,8 +75,8 @@ extension SettingRemoveAccountReactor {
 }
 
 extension Error {
-  func toMutation() -> Observable<SettingRemoveAccountReactor.Mutation> {
-    let errorMutation: Observable<SettingRemoveAccountReactor.Mutation> = {
+  func toMutation() -> Observable<SettingLeaveAccountReactor.Mutation> {
+    let errorMutation: Observable<SettingLeaveAccountReactor.Mutation> = {
       guard let error = self as? NetworkError else {
         return .just(.setError(.unknownError))
       }

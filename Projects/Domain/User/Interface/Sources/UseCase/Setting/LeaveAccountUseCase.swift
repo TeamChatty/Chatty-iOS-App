@@ -6,3 +6,9 @@
 //
 
 import Foundation
+import RxSwift
+
+/// 회원 탈퇴
+public protocol LeaveAccountUseCase {
+  func execute() -> Observable<Void>
+}

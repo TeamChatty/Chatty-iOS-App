@@ -121,6 +121,7 @@ extension SettingController: ReactorKit.View {
 
 extension SettingController {
   private func setView() {
+    tabBarController?.tabBar.isHidden = true
     self.view.addSubview(mainView)
     
     mainView.snp.makeConstraints {

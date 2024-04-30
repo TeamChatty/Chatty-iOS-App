@@ -48,8 +48,8 @@ extension SettingCoordinator: SettingControllerDelegate {
   }
   
   func pushAccountRemoveView() {
-    let reactor = SettingRemoveAccountReactor()
-    let settingRemoveAccountController = SettingRemoveAccountController(reactor: reactor)
+    let reactor = SettingLeaveAccountReactor(leaveAccountUseCase: featureProfileDependencyProvider.makeLeaveAccountUseCase())
+    let settingRemoveAccountController = SettingLeaveAccountController(reactor: reactor)
     settingRemoveAccountController.delegate = self
     navigationController.pushViewController(settingRemoveAccountController, animated: true)
   }
@@ -60,7 +60,7 @@ extension SettingCoordinator: SettingControllerDelegate {
   }
 }
 
-extension SettingCoordinator: SettingRemoveAccountControllerDelegate {
+extension SettingCoordinator: SettingLeaveAccountControllerDelegate {
   func pushToSettingNotificationView() {
     DispatchQueue.main.async {
       _ = self.navigationController.popViewController(animated: true)

@@ -1,6 +1,6 @@
 //
-//  SettingView.swift
-//  FeatureProfileInterface
+//  SettingRemoveAccountView.swift
+//  FeatureProfile
 //
 //  Created by 윤지호 on 4/11/24.
 //
@@ -13,7 +13,7 @@ import Then
 import RxSwift
 import RxCocoa
 
-final class SettingRemoveAccountView: BaseView, Touchable {
+final class SettingLeaveAccountView: BaseView, Touchable {
   // MARK: - View Property
   private let headerLabel: UILabel = UILabel().then {
     $0.text = "정말 삭제하시겠어요?"
@@ -39,9 +39,10 @@ final class SettingRemoveAccountView: BaseView, Touchable {
   }
   private let warningLabel: UILabel = UILabel().then {
     $0.text = "구독 중인 멤버십은 계정 삭제 시 자동으로 해지되지 않아요.\n계정 삭제 전 구독을 취소했는지 확인해 주세요."
+    $0.numberOfLines = 2
     $0.textAlignment = .left
     $0.textColor = SystemColor.basicBlack.uiColor
-    $0.font = SystemFont.headLine01.font
+    $0.font = SystemFont.caption02.font
   }
   
   private let accountHeader: UILabel = UILabel().then {
@@ -58,7 +59,10 @@ final class SettingRemoveAccountView: BaseView, Touchable {
       isEnabled: true,
       font: SystemFont.title03.font
     )
+    $0.setState(commonState, for: .enabled)
+    $0.currentState = .enabled
     
+    $0.cornerRadius = 8
     $0.title = "알림 끄러가기"
   }
   private let removeAccountButton: FillButton = FillButton().then {
@@ -69,7 +73,10 @@ final class SettingRemoveAccountView: BaseView, Touchable {
       isEnabled: true,
       font: SystemFont.title03.font
     )
+    $0.setState(commonState, for: .enabled)
+    $0.currentState = .enabled
     
+    $0.cornerRadius = 8
     $0.title = "서비스 탈퇴"
   }
 
@@ -103,14 +110,14 @@ final class SettingRemoveAccountView: BaseView, Touchable {
   }
 }
 
-extension SettingRemoveAccountView {
+extension SettingLeaveAccountView {
   enum TouchEventType {
     case showSettingNoti
     case removeAccount
   }
 }
 
-extension SettingRemoveAccountView {
+extension SettingLeaveAccountView {
   private func setupTitleSection() {
     addSubview(headerLabel)
     addSubview(descriptionLabel)

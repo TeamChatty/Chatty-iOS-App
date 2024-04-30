@@ -31,6 +31,7 @@ final class SettingNotificationController: BaseController {
   // MARK: - Life Method
   override func viewDidLoad() {
     super.viewDidLoad()
+    reactor?.action.onNext(.viewDidLoad)
   }
   
   // MARK: - Initialize Method
@@ -68,6 +69,19 @@ extension SettingNotificationController: ReactorKit.View {
           owner.reactor?.action.onNext(.toggleChattingNoti(bool))
         case .feedNoti(let bool):
           owner.reactor?.action.onNext(.toggleFeedNoti(bool))
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.isLoading)
+      .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
+      .bind(with: self) { owner, isLoading in
+        if isLoading {
+          owner.showLoadingIndicactor()
+        } else {
+          owner.hideLoadingIndicator()
         }
       }
       .disposed(by: disposeBag)
