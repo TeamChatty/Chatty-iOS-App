@@ -119,3 +119,10 @@ extension FeedMainPageViewController: UIPageViewControllerDelegate {
   }
 }
 
+extension FeedMainPageViewController {
+  func refreshRecentFeeds(postId: Int) {
+    if let recentVC = dataViewControllers.first as? FeedTypeTableView {
+      recentVC.refreshFeeds(postId: postId)
+    }
+  }
+}

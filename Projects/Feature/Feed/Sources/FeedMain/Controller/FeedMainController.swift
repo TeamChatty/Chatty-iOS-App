@@ -162,3 +162,8 @@ extension FeedMainController {
   }
 }
 
+extension FeedMainController {
+  func refreshRecentFeeds(postId: Int) {
+    mainView.refreshRecentFeeds(postId: postId)
+  }
+}

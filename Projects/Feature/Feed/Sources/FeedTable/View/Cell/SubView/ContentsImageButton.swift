@@ -42,6 +42,31 @@ final class ContentsImageButton: BaseView, Touchable {
     $0.font = SystemFont.body03.font
     $0.textColor = SystemColor.gray500.uiColor
   }
+  
+  private var likeCount: Int? {
+    didSet {
+      guard let likeCount else { return }
+      
+      if likeCount == 0 {
+        self.heartCountLabel.text = ""
+
+        heartCountLabel.snp.updateConstraints {
+          $0.leading.equalTo(heartButton.snp.trailing).offset(4)
+          $0.width.greaterThanOrEqualTo(1)
+          $0.centerY.equalToSuperview()
+        }
+      } else {
+        self.heartCountLabel.text = "\(likeCount)"
+      }
+    }
+  }
+  
+  private var commentCount: Int? {
+    didSet {
+      guard let commentCount else { return }
+      self.commentCountLabel.text = commentCount == 0 ? "" : "\(commentCount)"
+    }
+  }
 
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()
@@ -59,6 +84,7 @@ final class ContentsImageButton: BaseView, Touchable {
       $0.leading.verticalEdges.equalToSuperview()
       $0.width.equalTo(24)
     }
+    
     heartCountLabel.snp.makeConstraints {
       $0.leading.equalTo(heartButton.snp.trailing).offset(4)
       $0.width.greaterThanOrEqualTo(1)
@@ -81,15 +107,21 @@ final class ContentsImageButton: BaseView, Touchable {
   // MARK: - UIBindable
   override func bind() {
     heartButton.touchEventRelay
-      .map { TouchEventType.heart }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
-    heartButton.touchEventRelay
-      .bind(with: self) { owner, _ in
-        let nowState = owner.heartButton.currentState
-        owner.heartButton.currentState = nowState == .enabled ? .disabled : .enabled
+      .do(onNext: { [weak self] _ in
+        guard let self,
+              let likeCount else { return }
+        let nowState = self.heartButton.currentState
+
+        self.likeCount = nowState == .enabled ? likeCount - 1 : likeCount + 1
+        self.heartButton.currentState = nowState == .enabled ? .disabled : .enabled
+      })
+      .debounce(.seconds(1), scheduler: MainScheduler.asyncInstance)
+      .withUnretained(self)
+      .map { owner, _ in
+        let nowState: Bool = owner.heartButton.currentState == .enabled ? true : false
+        return TouchEventType.heart(nowState: nowState)
       }
+      .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
     commentButton.touchEventRelay
@@ -101,7 +133,7 @@ final class ContentsImageButton: BaseView, Touchable {
 
 extension ContentsImageButton {
   enum TouchEventType {
-    case heart
+    case heart(nowState: Bool)
     case comment
   }
 }
@@ -109,17 +141,11 @@ extension ContentsImageButton {
 extension ContentsImageButton {
   func updateHeartButton(marked: Bool, heartCount: Int) {
     heartButton.currentState = marked ? .enabled : .disabled
-    heartCountLabel.text = "\(heartCount)"
-    if heartCountLabel.text?.isEmpty ?? true {
-      heartCountLabel.snp.updateConstraints {
-        $0.leading.equalTo(heartButton.snp.trailing).offset(4)
-        $0.width.greaterThanOrEqualTo(1)
-        $0.centerY.equalToSuperview()
-      }
-    }
+    likeCount = heartCount
+    
   }
   
   func updateCommentCountLabel(commentCount: Int) {
-    commentCountLabel.text = "\(commentCount)"
+    self.commentCount = commentCount
   }
 }

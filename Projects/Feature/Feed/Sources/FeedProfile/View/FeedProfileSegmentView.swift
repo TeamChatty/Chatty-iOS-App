@@ -33,7 +33,7 @@ final class FeedProfileSegmentView: BaseView, Touchable {
     $0.setState(selected, for: .disabled)
     $0.setState(deselected, for: .enabled)
     
-    $0.title = "최신"
+    $0.title = "작성한 글"
   }
   private let myCommentButton: FillButton = FillButton().then {
     typealias Configuration = FillButton.Configuration
@@ -53,7 +53,7 @@ final class FeedProfileSegmentView: BaseView, Touchable {
     $0.setState(selected, for: .disabled)
     $0.setState(deselected, for: .enabled)
     
-    $0.title = "추천"
+    $0.title = "내 댓글"
   }
   private let savedFeedButton: FillButton = FillButton().then {
     typealias Configuration = FillButton.Configuration
@@ -73,7 +73,7 @@ final class FeedProfileSegmentView: BaseView, Touchable {
     $0.setState(selected, for: .disabled)
     $0.setState(deselected, for: .enabled)
     
-    $0.title = "추천"
+    $0.title = "저장한 글"
   }
   
   private let bottomBar: UIView = UIView().then {

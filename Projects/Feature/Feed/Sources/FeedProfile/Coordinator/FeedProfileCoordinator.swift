@@ -35,9 +35,15 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
     let myCommentVC = UIViewController()
     myCommentVC.view.backgroundColor = .brown
     let dataViewControllers: [UIViewController] = [
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .wirtedFeed)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        feedType: .myPosts)),
       myCommentVC,
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .savedFeed)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        feedType: .myBookmark)),
     ]
     let feedProfilePageViewController = FeedProfilePageViewController(dataViewControllers: dataViewControllers)
     

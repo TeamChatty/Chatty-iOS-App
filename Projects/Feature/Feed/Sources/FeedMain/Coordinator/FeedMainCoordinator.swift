@@ -32,11 +32,18 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   }
   
   let disposeBag = DisposeBag()
+  
   public override func start() {
     let reactor = FeedMainReactor()
     let dataViewControllers: [UIViewController] = [
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .lastest)),
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .recommend)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        feedType: .recent)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        feedType: .topLiked)),
     ]
     let feedMainPageViewController = FeedMainPageViewController(dataViewControllers: dataViewControllers)
     
@@ -93,6 +100,9 @@ extension FeedMainCoordinator: FeedWriteModalDelegate {
   
   func successWrited(postId: Int) {
     navigationController.dismiss(animated: true)
+    if let vc = navigationController.viewControllers.last as? FeedMainController {
+      vc.refreshRecentFeeds(postId: postId)
+    }
   }
 }
 

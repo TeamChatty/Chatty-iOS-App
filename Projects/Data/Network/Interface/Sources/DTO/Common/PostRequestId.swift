@@ -9,4 +9,8 @@ import Foundation
 
 public struct PostRequestId {
   let postId: Int
+  
+  public init(postId: Int) {
+    self.postId = postId
+  }
 }

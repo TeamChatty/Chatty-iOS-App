@@ -16,8 +16,15 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }
+  
   func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase {
     return DefaultWriteFeedUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
+  func makeSetBookmarkAndLikeUseCase() -> DefaultSetBookmarkAndLikeUseCase {
+    return DefaultSetBookmarkAndLikeUseCase(
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }

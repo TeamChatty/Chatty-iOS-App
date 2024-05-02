@@ -110,10 +110,13 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
         switch event {
         case .comment:
           return TouchEventType.showDetail(postId: owner.feed?.postId ?? 0)
-        case .bookmark:
-          return TouchEventType.bookmark(postId: owner.feed?.postId ?? 0)
-        case .favorite:
-          return TouchEventType.favorite(postId: owner.feed?.postId ?? 0)
+        case .bookmark(let nowState):
+          if let bookmark = owner.feed?.bookmark {
+            owner.feed?.bookmark = !bookmark
+          }
+          return TouchEventType.bookmark(postId: owner.feed?.postId ?? 0, nowState: nowState)
+        case .favorite(let nowState):
+          return TouchEventType.favorite(postId: owner.feed?.postId ?? 0, nowState: nowState)
         }
       }
       .bind(to: touchEventRelay)
@@ -125,8 +128,8 @@ extension FeedTableViewCell {
   enum TouchEventType {
     case showDetail(postId: Int)
     case report(userId: Int)
-    case bookmark(postId: Int)
-    case favorite(postId: Int)
+    case bookmark(postId: Int, nowState: Bool)
+    case favorite(postId: Int, nowState: Bool)
   }
 }
 

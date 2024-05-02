@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import Then
+import SharedUtil
 import SharedDesignSystem
 import DomainCommunityInterface
 
@@ -96,13 +97,6 @@ extension HeaderSecionView {
   func setData(feedData: Feed) {
     profileImageView.setImageKF(urlString: feedData.imageUrl)
     nicknameLabel.text = feedData.nickname
-    timeLabel.text = feedData.createdAt
-    if feedData.postId == 0 {
-      timeLabel.text = "1분 전"
-
-    } else {
-      timeLabel.text = "3분 전"
-
-    }
+    timeLabel.text = feedData.createdAt.toTimeDifference()
   }
 }

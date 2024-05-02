@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DomainCommunityInterface
 
 public struct GetFeedResponseDTO: CommonResponseDTO {
   public typealias Data = FeedResponseDTO
@@ -13,4 +14,8 @@ public struct GetFeedResponseDTO: CommonResponseDTO {
   public var status: String
   public var message: String
   public var data: Data
+  
+  public func toDomain() -> Feed {
+    return data.toDomain()
+  }
 }

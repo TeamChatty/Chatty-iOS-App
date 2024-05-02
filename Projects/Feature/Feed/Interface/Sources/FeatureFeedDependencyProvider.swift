@@ -5,4 +5,5 @@ import DomainCommunity
 public protocol FeatureFeedDependencyProvider {
   func makeGetFeedsPageUseCase() -> DefaultGetFeedsPageUseCase
   func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase
+  func makeSetBookmarkAndLikeUseCase() -> DefaultSetBookmarkAndLikeUseCase
 }
