@@ -1,8 +1,8 @@
 //
-//  FeedTableViewCell.swift
+//  FeedDetailCell.swift
 //  FeatureFeed
 //
-//  Created by 윤지호 on 4/15/24.
+//  Created by 윤지호 on 5/3/24.
 //
 
 import UIKit
@@ -14,8 +14,8 @@ import RxCocoa
 import SharedDesignSystem
 import DomainCommunityInterface
 
-final class FeedTableViewCell: UITableViewCell, Touchable {
-  static let cellId: String = "FeedTableViewCell"
+final class FeedDetailCell: UITableViewCell, Touchable {
+  static let cellId: String = "FeedDetailCell"
   
   // MARK: - View Property
   // HeaderSection
@@ -24,7 +24,7 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
   }
   
   // ContentSection
-  private let contentSectionView: ContentSectionView = ContentSectionView().then {
+  private let contentSectionView: DetailContentSectionView = DetailContentSectionView().then {
     $0.backgroundColor = SystemColor.basicWhite.uiColor
 
   }
@@ -68,13 +68,7 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  override func prepareForReuse() {
-    super.prepareForReuse()
-    disposeBag = DisposeBag()
-    reuseCell()
-  }
-  
+
   // MARK: - UIConfigurable
   private func configureUI() {
     setView()
@@ -97,8 +91,8 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
       .withUnretained(self)
       .map { owner, event in
         switch event {
-        case .moreDetail:
-          return TouchEventType.showDetail(postId: owner.feed?.postId ?? 0)
+        case .images:
+          return TouchEventType.images
         }
       }
       .bind(to: touchEventRelay)
@@ -108,12 +102,12 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
       .withUnretained(self)
       .map { owner, event in
         switch event {
-        case .comment:
-          return TouchEventType.showDetail(postId: owner.feed?.postId ?? 0)
         case .bookmark(let changedState):
           return TouchEventType.bookmark(postId: owner.feed?.postId ?? 0, changedState: changedState)
         case .favorite(let changedState):
           return TouchEventType.favorite(postId: owner.feed?.postId ?? 0, changedState: changedState)
+        case .comment:
+          return TouchEventType.comment
         }
       }
       .bind(to: touchEventRelay)
@@ -121,51 +115,25 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
   }
 }
 
-extension FeedTableViewCell {
+extension FeedDetailCell {
   enum TouchEventType {
-    case showDetail(postId: Int)
     case report(userId: Int)
+    case images
+    case comment
     case bookmark(postId: Int, changedState: Bool)
     case favorite(postId: Int, changedState: Bool)
   }
 }
 
-/// update Stored Property
-extension FeedTableViewCell {
-  func setData(feedData: Feed) {
-    feed = feedData
-  }
-}
-
-/// prepareForReuse Method
-extension FeedTableViewCell {
-  private func reuseCell() {
-    resuseHeaderSection()
-    resuseContentSection()
-    resuseBottomSection()
-  }
-  private func resuseHeaderSection() {
-    
-  }
-  
-  private func resuseContentSection() {
-    contentSectionView.reuseView()
-  }
-  
-  private func resuseBottomSection() {
-    
-  }
-}
-
 /// SetView
-extension FeedTableViewCell {
+extension FeedDetailCell {
   private func setView() {
     contentView.addSubview(headerSectionView)
     contentView.addSubview(contentSectionView)
     contentView.addSubview(divider)
     contentView.addSubview(bottomSectionView)
     contentView.addSubview(insetView)
-
+    
     headerSectionView.snp.makeConstraints {
       $0.top.equalToSuperview().inset(16)
       $0.horizontalEdges.equalToSuperview().inset(20)
@@ -195,14 +163,8 @@ extension FeedTableViewCell {
   }
 }
 
-/// update View Layout
-extension FeedTableViewCell {
-  private func updateContentSectionView() {
-    let imagesButtonHeight = (CGRect.appFrame.width - 40) / 2
-    contentSectionView.snp.remakeConstraints {
-      $0.top.equalTo(headerSectionView.snp.bottom).offset(8)
-      $0.horizontalEdges.equalToSuperview().inset(20)
-      $0.height.greaterThanOrEqualTo(80 + imagesButtonHeight)
-    }
+extension FeedDetailCell {
+  func setData(feedData: Feed) {
+    self.feed = feedData
   }
 }

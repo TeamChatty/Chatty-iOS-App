@@ -1,9 +1,10 @@
 //
-//  ContentSectionView.swift
+//  DetailContentSectionView.swift
 //  FeatureFeed
 //
-//  Created by 윤지호 on 4/19/24.
+//  Created by 윤지호 on 5/3/24.
 //
+
 
 import UIKit
 import RxSwift
@@ -13,22 +14,16 @@ import Then
 import SharedDesignSystem
 import DomainCommunityInterface
 
-final class ContentSectionView: BaseView, Touchable {
+final class DetailContentSectionView: BaseView, Touchable {
   // MARK: - View Property
   private let contentLabel: UILabel = UILabel().then {
     $0.textAlignment = .left
-    $0.numberOfLines = 3
+    $0.numberOfLines = 0
     $0.textColor = SystemColor.basicBlack.uiColor
     $0.font = SystemFont.body03.font
     $0.sizeToFit()
   }
-  private let moreContentButton: TextButton = TextButton().then {
-    $0.title = "...더보기"
-    $0.textAlignment = .left
-    $0.tintColor = SystemColor.gray600.uiColor
-    $0.font = SystemFont.body03.font
-    $0.backgroundColor = .clear
-  }
+  
   private let imagesButton: FeedImagesButton = FeedImagesButton().then {
     $0.layer.cornerRadius = 8
     $0.clipsToBounds = true
@@ -46,28 +41,22 @@ final class ContentSectionView: BaseView, Touchable {
   
   // MARK: - UIBindable
   override func bind() {
-    moreContentButton.touchEventRelay
-      .map { TouchEventType.moreDetail }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
     imagesButton.touchEventRelay
-      .map { TouchEventType.moreDetail }
+      .map { TouchEventType.images }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
   }
 }
 
-extension ContentSectionView {
+extension DetailContentSectionView {
   enum TouchEventType {
-    case moreDetail
+    case images
   }
 }
 
-extension ContentSectionView {
+extension DetailContentSectionView {
   private func setupContentSection() {
     addSubview(contentLabel)
-    addSubview(moreContentButton)
     addSubview(imagesButton)
     
     contentLabel.snp.makeConstraints {
@@ -75,14 +64,9 @@ extension ContentSectionView {
       $0.horizontalEdges.equalToSuperview()
       $0.height.greaterThanOrEqualTo(20)
     }
-    moreContentButton.snp.makeConstraints {
-      $0.top.equalTo(contentLabel.snp.bottom)
-      $0.trailing.equalTo(contentLabel.snp.trailing)
-      $0.height.equalTo(20)
-    }
     
     imagesButton.snp.makeConstraints {
-      $0.top.equalTo(moreContentButton.snp.bottom).offset(8)
+      $0.top.equalTo(contentLabel.snp.bottom).offset(8)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(1)
       $0.bottom.equalToSuperview()
@@ -91,15 +75,9 @@ extension ContentSectionView {
   
   private func updateImagesButton(isEmptyImage: Bool) {
     if isEmptyImage == false {
-      moreContentButton.snp.remakeConstraints {
-        $0.top.equalTo(contentLabel.snp.bottom)
-        $0.trailing.equalTo(contentLabel.snp.trailing)
-        $0.height.equalTo(20)
-      }
-      
       let imagesButtonHeight = (CGRect.appFrame.width - 40) / 2
       imagesButton.snp.remakeConstraints {
-        $0.top.equalTo(moreContentButton.snp.bottom).offset(8)
+        $0.top.equalTo(contentLabel.snp.bottom).offset(8)
         $0.horizontalEdges.equalToSuperview()
         $0.height.equalTo(imagesButtonHeight)
         $0.bottom.equalToSuperview()
@@ -108,23 +86,11 @@ extension ContentSectionView {
   }
 }
 
-extension ContentSectionView {
+extension DetailContentSectionView {
   func setData(feedData: Feed) {
     imagesButton.updateImageViews(images: feedData.postImages)
     updateImagesButton(isEmptyImage: feedData.postImages.isEmpty)
+    
     contentLabel.text = feedData.content
-  }
-  
-  func reuseView() {
-    imagesButton.snp.removeConstraints()
-    
-    moreContentButton.snp.remakeConstraints {
-      $0.top.equalTo(contentLabel.snp.bottom)
-      $0.trailing.equalTo(contentLabel.snp.trailing)
-      $0.height.equalTo(20)
-      $0.bottom.equalToSuperview()
-    }
-    
-    imagesButton.reuseView()
   }
 }

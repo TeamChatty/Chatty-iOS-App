@@ -16,21 +16,21 @@ public final class DefaultSetBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase {
     self.communityAPIRepository = communityAPIRepository
   }
   
-  public func executeLike(nowState: Bool, postId: Int) -> Observable<Int> {
-    switch nowState {
+  public func executeLike(changedState: Bool, postId: Int) -> Observable<Int> {
+    switch changedState {
     case true:
-      return communityAPIRepository.deleteLike(postId: postId)
-    case false:
       return communityAPIRepository.setLike(postId: postId)
+    case false:
+      return communityAPIRepository.deleteLike(postId: postId)
     }
   }
   
-  public func executeBookmark(nowState: Bool, postId: Int) -> Observable<Int> {
-    switch nowState {
+  public func executeBookmark(changedState: Bool, postId: Int) -> Observable<Int> {
+    switch changedState {
     case true:
-      return communityAPIRepository.deleteBookmark(postId: postId)
-    case false:
       return communityAPIRepository.setBookmark(postId: postId)
+    case false:
+      return communityAPIRepository.deleteBookmark(postId: postId)
     }
   }
 }

@@ -11,6 +11,7 @@ import Shared
 import SharedDesignSystem
 import SharedUtil
 import FeatureFeedInterface
+import DomainCommunityInterface
 
 import RxSwift
 public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
@@ -20,10 +21,10 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   
   private var madalNavigationController: UINavigationController?
   
-  private let featureProfileDependencyProvider: FeatureFeedDependencyProvider
+  private let featureFeedDependencyProvider: FeatureFeedDependencyProvider
 
   public init(navigationController: CustomNavigationController, featureProfileDependencyProvider: FeatureFeedDependencyProvider) {
-    self.featureProfileDependencyProvider = featureProfileDependencyProvider
+    self.featureFeedDependencyProvider = featureProfileDependencyProvider
     super.init(navigationController: navigationController)
   }
   
@@ -37,14 +38,14 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
     let reactor = FeedMainReactor()
     let dataViewControllers: [UIViewController] = [
       FeedTypeTableView(reactor: FeedTypeTableReactor(
-        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
-        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
-        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
+        getFeedsPageUseCase: featureFeedDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
         feedType: .recent)),
       FeedTypeTableView(reactor: FeedTypeTableReactor(
-        getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
-        setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
-        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
+        getFeedsPageUseCase: featureFeedDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
         feedType: .topLiked)),
     ]
     let feedMainPageViewController = FeedMainPageViewController(dataViewControllers: dataViewControllers)
@@ -56,13 +57,22 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
 }
 
 extension FeedMainCoordinator: FeedMainControllerDelegate {
+  func pushToDetailView(postId: Int) {
+    let feedDetailCoordinator = FeedDetailCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
+    
+    feedDetailCoordinator.finishDelegate = self
+    childCoordinators.append(feedDetailCoordinator)
+    
+    feedDetailCoordinator.start(postId: postId)
+  }
+  
   
   func pushToNotificationView() {
     print("push - NotificationView")
   }
   
   func pushToFeedProfileView() {
-    let feedProfileCoordinator = FeedProfileCoordinator(navigationController: navigationController, featureProfileDependencyProvider: featureProfileDependencyProvider)
+    let feedProfileCoordinator = FeedProfileCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
     
     childCoordinators.append(feedProfileCoordinator)
     feedProfileCoordinator.finishDelegate = self
@@ -71,7 +81,7 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
   
   func presentFeedWriteModal() {
    
-    let reactor = FeedWriteReactor(writefeedUseCase: featureProfileDependencyProvider.makeWriteFeedUseCase())
+    let reactor = FeedWriteReactor(writefeedUseCase: featureFeedDependencyProvider.makeWriteFeedUseCase())
     let modal = FeedWriteModal(reactor: reactor)
     modal.delegate = self
     

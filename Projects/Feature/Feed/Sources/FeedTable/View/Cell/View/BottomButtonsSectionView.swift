@@ -41,8 +41,8 @@ final class BottomButtonsSectionView: BaseView, Touchable {
     heartAndCommentButtonView.touchEventRelay
       .map { event in
         switch event {
-        case .heart(let nowState):
-          return TouchEventType.favorite(nowState: nowState)
+        case .heart(let changedState):
+          return TouchEventType.favorite(changedState: changedState)
         case .comment:
           return TouchEventType.comment
         }
@@ -57,8 +57,8 @@ final class BottomButtonsSectionView: BaseView, Touchable {
       .debounce(.seconds(1), scheduler: MainScheduler.asyncInstance)
       .withUnretained(self)
       .map { owner, _ in
-        let nowState: Bool = owner.bookmarkButton.currentState == .enabled ? true : false
-        return TouchEventType.bookmark(nowState: nowState)
+        let changedState: Bool = owner.bookmarkButton.currentState == .enabled ? true : false
+        return TouchEventType.bookmark(changedState: changedState)
       }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
@@ -67,9 +67,9 @@ final class BottomButtonsSectionView: BaseView, Touchable {
 
 extension BottomButtonsSectionView {
   enum TouchEventType {
-    case favorite(nowState: Bool)
+    case favorite(changedState: Bool)
     case comment
-    case bookmark(nowState: Bool)
+    case bookmark(changedState: Bool)
   }
 }
 
@@ -103,15 +103,7 @@ extension BottomButtonsSectionView {
     bookmarkButton.currentState = feedData.bookmark ? .enabled : .disabled
   }
   
-  func updateHeartButton(marked: Bool, heartCount: Int) {
-    heartAndCommentButtonView.updateHeartButton(marked: marked, heartCount: heartCount)
-  }
-  
   func updateCommentCountLabel(commentCount: Int) {
     heartAndCommentButtonView.updateCommentCountLabel(commentCount: commentCount)
-  }
-  
-  func updateBookMarkButton(marked: Bool) {
-    bookmarkButton.currentState = marked ? .enabled : .disabled
   }
 }

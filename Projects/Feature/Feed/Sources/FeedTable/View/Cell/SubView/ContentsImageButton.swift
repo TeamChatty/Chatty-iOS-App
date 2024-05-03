@@ -118,8 +118,8 @@ final class ContentsImageButton: BaseView, Touchable {
       .debounce(.seconds(1), scheduler: MainScheduler.asyncInstance)
       .withUnretained(self)
       .map { owner, _ in
-        let nowState: Bool = owner.heartButton.currentState == .enabled ? true : false
-        return TouchEventType.heart(nowState: nowState)
+        let changedState: Bool = owner.heartButton.currentState == .enabled ? true : false
+        return TouchEventType.heart(changedState: changedState)
       }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
@@ -133,7 +133,7 @@ final class ContentsImageButton: BaseView, Touchable {
 
 extension ContentsImageButton {
   enum TouchEventType {
-    case heart(nowState: Bool)
+    case heart(changedState: Bool)
     case comment
   }
 }

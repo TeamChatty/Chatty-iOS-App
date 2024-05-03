@@ -37,6 +37,7 @@ final class FeedTypeTableView: UIViewController {
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
+    case pushToDetailView(postId: Int)
     case pushToWriteFeed
     case popToFeedMain
     case presentReportModal(userId: Int)
@@ -176,15 +177,14 @@ extension FeedTypeTableView: UITableViewDataSource {
       .bind(with: self) { owner, event in
         switch event {
         case .showDetail(let postId):
-          owner.reactor?.action.onNext(.showDetail(postId: postId))
-          print("showDetail - \(postId)")
+          owner.touchEventRelay.accept(.pushToDetailView(postId: postId))
           
         case .report(let userId):
           owner.presentAlert(userId: userId)
-        case .bookmark(let postId, let nowState):
-          owner.reactor?.action.onNext(.bookmark(postId: postId, nowState: nowState))
-        case .favorite(let postId, let nowState):
-          owner.reactor?.action.onNext(.favorite(postId: postId, nowState: nowState))
+        case .bookmark(let postId, let changedState):
+          owner.reactor?.action.onNext(.bookmark(postId: postId, changedState: changedState))
+        case .favorite(let postId, let changedState):
+          owner.reactor?.action.onNext(.favorite(postId: postId, changedState: changedState))
         }
       }
       .disposed(by: cell.disposeBag)

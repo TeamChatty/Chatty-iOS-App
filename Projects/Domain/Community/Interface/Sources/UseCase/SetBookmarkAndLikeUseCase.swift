@@ -9,6 +9,6 @@ import Foundation
 import RxSwift
 
 public protocol SetBookmarkAndLikeUseCase {
-  func executeLike(nowState: Bool, postId: Int) -> Observable<Int>
-  func executeBookmark(nowState: Bool, postId: Int) -> Observable<Int>
+  func executeLike(changedState: Bool, postId: Int) -> Observable<Int>
+  func executeBookmark(changedState: Bool, postId: Int) -> Observable<Int>
 }

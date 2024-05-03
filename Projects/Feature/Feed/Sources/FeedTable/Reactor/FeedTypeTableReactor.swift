@@ -27,8 +27,8 @@ final class FeedTypeTableReactor: Reactor {
     case reportBlockUser(userId: Int)
     case reportPost(postId: Int)
     
-    case bookmark(postId: Int, nowState: Bool)
-    case favorite(postId: Int, nowState: Bool)
+    case bookmark(postId: Int, changedState: Bool)
+    case favorite(postId: Int, changedState: Bool)
   }
   
   enum Mutation {
@@ -37,8 +37,8 @@ final class FeedTypeTableReactor: Reactor {
     case setNextPage(feeds: [Feed])
     case setTableState
     
-    case setLike(postId: Int, editedState: Bool)
-    case setBookmark(postId: Int, editedState: Bool)
+    case setLike(postId: Int, changedState: Bool)
+    case setBookmark(postId: Int, changedState: Bool)
     
     case setBlockedId(userId: Int?)
     case setReportedId(postId: Int?)
@@ -160,16 +160,28 @@ extension FeedTypeTableReactor {
     case .showDetail(postId: let postId):
       return .concat([])
   
-    case .bookmark(let postId, let nowState):
-      return setBookmarkAndLikeUseCase.executeBookmark(nowState: nowState, postId: postId)
-        .map { [nowState] postId in
-          return .setBookmark(postId: postId, editedState: !nowState)
-        }
-    case .favorite(let postId, let nowState):
-      return setBookmarkAndLikeUseCase.executeLike(nowState: nowState, postId: postId)
-        .map { [nowState] postId in
-          return .setLike(postId: postId, editedState: !nowState)
-        }
+    case .bookmark(let postId, let changedState):
+      if let index = currentState.feeds.firstIndex(where: { $0.postId == postId }),
+         currentState.feeds[index].bookmark == changedState {
+        return .just(.setIsLoading(false))
+      } else {
+        return setBookmarkAndLikeUseCase.executeBookmark(changedState: changedState, postId: postId)
+          .map { [changedState] postId in
+            return .setBookmark(postId: postId, changedState: changedState)
+          }
+      }
+          
+    
+    case .favorite(let postId, let changedState):
+      if let index = currentState.feeds.firstIndex(where: { $0.postId == postId }),
+         currentState.feeds[index].like == changedState {
+        return .just(.setIsLoading(false))
+      } else {
+        return setBookmarkAndLikeUseCase.executeLike(changedState: changedState, postId: postId)
+          .map { [changedState] postId in
+            return .setLike(postId: postId, changedState: changedState)
+          }
+      }
 
     case .reportBlockUser(userId: let userId):
       return .concat([
@@ -227,12 +239,13 @@ extension FeedTypeTableReactor {
     case .setLike(let postId, let editedState):
       if let index = newState.feeds.firstIndex(where: { $0.postId == postId }) {
         newState.feeds[index].like = editedState
+        let likeCount = newState.feeds[index].likeCount
+        newState.feeds[index].likeCount = editedState ? likeCount + 1 : likeCount - 1
       }
     case .setBookmark(let postId, let editedState):
       if let index = newState.feeds.firstIndex(where: { $0.postId == postId }) {
         newState.feeds[index].bookmark = editedState
       }
-      print("===> \(newState.feeds[0].createdAt.toTimeDifference())")
 
     case .setIsFetchingPage(let bool):
       newState.isFetchingPage = bool

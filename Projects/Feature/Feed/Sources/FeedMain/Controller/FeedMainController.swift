@@ -7,6 +7,7 @@
 
 import UIKit
 import SharedDesignSystem
+import DomainCommunityInterface
 
 import SnapKit
 import RxSwift
@@ -14,6 +15,7 @@ import RxCocoa
 import ReactorKit
 
 protocol FeedMainControllerDelegate: AnyObject {
+  func pushToDetailView(postId: Int)
   func pushToNotificationView()
   func pushToFeedProfileView()
   func presentFeedWriteModal()
@@ -109,6 +111,8 @@ extension FeedMainController: ReactorKit.View {
           return
         case .pushToWriteFeed:
           owner.delegate?.presentFeedWriteModal()
+        case .pushToDetailView(postId: let postId):
+          owner.delegate?.pushToDetailView(postId: postId)
         }
       }
       .disposed(by: disposeBag)
@@ -144,6 +148,7 @@ extension FeedMainController: ReactorKit.View {
 
 extension FeedMainController {
   private func setView() {
+    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)

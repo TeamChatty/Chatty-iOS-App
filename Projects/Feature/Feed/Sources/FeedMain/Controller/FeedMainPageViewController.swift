@@ -34,6 +34,7 @@ final class FeedMainPageViewController: UIPageViewController {
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
     case changePage(Int)
+    case pushToDetailView(postId: Int)
     case presentReportModal(Int)
     case pushToWriteFeed
     case none
@@ -65,6 +66,8 @@ final class FeedMainPageViewController: UIPageViewController {
             return .none
           case .presentReportModal(let userId):
             return TouchEventType.presentReportModal(userId)
+          case .pushToDetailView(postId: let postId):
+            return TouchEventType.pushToDetailView(postId: postId)
           }
         }
         .bind(to: touchEventRelay)

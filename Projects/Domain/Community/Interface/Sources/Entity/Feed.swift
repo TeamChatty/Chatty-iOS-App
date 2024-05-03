@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Feed {
+public struct Feed: Equatable {
   public let postId: Int
   public let content: String
   public let viewCount: Int
@@ -37,5 +37,10 @@ public struct Feed {
     self.commentCount = commentCount
     self.like = like
     self.bookmark = bookmark
+  }
+  
+  
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.postId == rhs.postId && lhs.content == rhs.content && lhs.viewCount == rhs.viewCount && lhs.createdAt == rhs.createdAt && lhs.userId == rhs.userId && lhs.nickname == rhs.nickname && lhs.imageUrl == rhs.imageUrl && lhs.postImages == rhs.postImages && lhs.owner == rhs.owner && lhs.likeCount == rhs.likeCount && lhs.commentCount == rhs.commentCount && lhs.like == rhs.like && lhs.bookmark == rhs.bookmark
   }
 }

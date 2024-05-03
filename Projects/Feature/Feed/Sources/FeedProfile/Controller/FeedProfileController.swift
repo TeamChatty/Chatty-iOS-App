@@ -14,6 +14,7 @@ import RxCocoa
 import ReactorKit
 
 protocol FeedProfileControllerDelegate: AnyObject {
+  func pushToDetailView(postId: Int)
   func popToFeedMain()
   func presentFeedWriteModal()
   func presentReportModal(userId: Int)
@@ -84,6 +85,8 @@ extension FeedProfileController: ReactorKit.View {
           owner.delegate?.popToFeedMain()
         case .presentReportModal(userId: let userId):
           owner.delegate?.presentReportModal(userId: userId)
+        case .pushToDetailView(postId: let postId):
+          owner.delegate?.pushToDetailView(postId: postId)
         }
       }
       .disposed(by: disposeBag)
@@ -124,6 +127,7 @@ extension FeedProfileController: ReactorKit.View {
 
 extension FeedProfileController {
   private func setView() {
+    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)
