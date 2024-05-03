@@ -16,6 +16,7 @@ import ReactorKit
 protocol FeedProfileControllerDelegate: AnyObject {
   func popToFeedMain()
   func presentFeedWriteModal()
+  func presentReportModal(userId: Int)
 }
 
 final class FeedProfileController: BaseController {
@@ -81,6 +82,8 @@ extension FeedProfileController: ReactorKit.View {
           owner.delegate?.presentFeedWriteModal()
         case .popToFeedMain:
           owner.delegate?.popToFeedMain()
+        case .presentReportModal(userId: let userId):
+          owner.delegate?.presentReportModal(userId: userId)
         }
       }
       .disposed(by: disposeBag)
@@ -139,4 +142,8 @@ extension FeedProfileController {
   }
 }
 
-
+extension FeedProfileController {
+  func removeReportedFeed(userId: Int) {
+    mainView.removeReportedUserPost(userId: userId)
+  }
+}

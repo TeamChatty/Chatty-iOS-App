@@ -28,4 +28,10 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }
+  
+  func makeReportUseCase() -> DefaultReportUseCase {
+    return DefaultReportUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
 }

@@ -29,8 +29,16 @@ final class FeedMainPageViewController: UIPageViewController {
     super.init(coder: coder)
   }
   
-  var touchEventRelay: PublishRelay<TouchEventType> = .init()
   private let disposeBag = DisposeBag()
+  
+  var touchEventRelay: PublishRelay<TouchEventType> = .init()
+  enum TouchEventType {
+    case changePage(Int)
+    case presentReportModal(Int)
+    case pushToWriteFeed
+    case none
+  }
+  
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -46,27 +54,25 @@ final class FeedMainPageViewController: UIPageViewController {
   // MARK: - UIBindable
   private func bind() {
     self.dataViewControllers.forEach { vc in
-//      guard let vc = vc as? ProfileEditMainPageTypeViewController else {
-//        return
-//      }
-//      
-//      vc.touchEventRelay
-//        .map { event in
-//
-//          }
-//        }
-//        .bind(to: touchEventRelay)
-//        .disposed(by: disposeBag)
+      guard let vc = vc as? FeedTypeTableView else { return }
+      
+      vc.touchEventRelay
+        .map { event in
+          switch event {
+          case .pushToWriteFeed:
+            return TouchEventType.pushToWriteFeed
+          case .popToFeedMain:
+            return .none
+          case .presentReportModal(let userId):
+            return TouchEventType.presentReportModal(userId)
+          }
+        }
+        .bind(to: touchEventRelay)
+        .disposed(by: disposeBag)
     }
   }
 }
 
-extension FeedMainPageViewController {
-  enum TouchEventType {
-    case changePage(Int)
-    
-  }
-}
 
 extension FeedMainPageViewController: UIPageViewControllerDataSource {
   func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
@@ -123,6 +129,14 @@ extension FeedMainPageViewController {
   func refreshRecentFeeds(postId: Int) {
     if let recentVC = dataViewControllers.first as? FeedTypeTableView {
       recentVC.refreshFeeds(postId: postId)
+    }
+  }
+  
+  func removeReportedUserPost(userId: Int) {
+    self.dataViewControllers.forEach { vc in
+      guard let vc = vc as? FeedTypeTableView else { return }
+      
+      vc.removeReportedFeed(userId: userId)
     }
   }
 }

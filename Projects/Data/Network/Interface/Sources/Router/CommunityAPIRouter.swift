@@ -35,6 +35,9 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case postBookmark(PostRequestId)
   case postBookmarkDelete(PostRequestId)
   
+  /// Report
+  case reportBlock(userId: Int)
+  case reportPost
 }
 
 public extension CommunityAPIRouter {
@@ -56,6 +59,12 @@ public extension CommunityAPIRouter {
 
     case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete:
       return "/v1"
+      
+    /// Report
+    case .reportBlock(userId: let userId):
+      return "/v1/block/\(userId)"
+    case .reportPost:
+      return "/v1/block"
     default:
       return "/v1/post"
     }
@@ -97,6 +106,10 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/bookmark"
     case .postBookmarkDelete(let requestId):
       return "/\(requestId.postId)/bookmark"
+      
+    /// Report
+    case .reportBlock, .reportPost:
+      return ""
     }
   }
   
@@ -104,7 +117,7 @@ public extension CommunityAPIRouter {
     switch self {
     case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComment, .getCommentReplies:
       return .get
-    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark:
+    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost:
       return .post
     case .postLikeDelete, .postBookmarkDelete:
       return .delete
@@ -120,6 +133,9 @@ public extension CommunityAPIRouter {
       return .requestPlain
       
     case .postLike, .postBookmark, .postLikeDelete, .postBookmarkDelete:
+      return .requestPlain
+      
+    case .reportBlock, .reportPost:
       return .requestPlain
 
     case .writePost(let requestDTO):

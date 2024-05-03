@@ -17,6 +17,7 @@ protocol FeedMainControllerDelegate: AnyObject {
   func pushToNotificationView()
   func pushToFeedProfileView()
   func presentFeedWriteModal()
+  func presentReportModal(userId: Int)
 }
 
 final class FeedMainController: BaseController {
@@ -102,6 +103,12 @@ extension FeedMainController: ReactorKit.View {
         switch event {
         case .changePage(let index):
           owner.reactor?.action.onNext(.changePage(index))
+        case .presentReportModal(userId: let userId):
+          owner.delegate?.presentReportModal(userId: userId)
+        case .none:
+          return
+        case .pushToWriteFeed:
+          owner.delegate?.presentFeedWriteModal()
         }
       }
       .disposed(by: disposeBag)
@@ -165,5 +172,9 @@ extension FeedMainController {
 extension FeedMainController {
   func refreshRecentFeeds(postId: Int) {
     mainView.refreshRecentFeeds(postId: postId)
+  }
+  
+  func removeReportedFeed(userId: Int) {
+    mainView.removeReportedUserPost(userId: userId)
   }
 }

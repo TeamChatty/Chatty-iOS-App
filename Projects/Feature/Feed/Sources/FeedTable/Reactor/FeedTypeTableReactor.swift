@@ -14,6 +14,7 @@ import SharedUtil
 final class FeedTypeTableReactor: Reactor {
   private let getFeedsPageUseCase: GetFeedsPageUseCase
   private let setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase
+  private let reportUseCase: ReportUseCase
 
   enum Action {
     case viewDidLoad
@@ -22,7 +23,10 @@ final class FeedTypeTableReactor: Reactor {
     case scrollToNextPage
     
     case showDetail(postId: Int)
-    case report(userId: Int)
+    
+    case reportBlockUser(userId: Int)
+    case reportPost(postId: Int)
+    
     case bookmark(postId: Int, nowState: Bool)
     case favorite(postId: Int, nowState: Bool)
   }
@@ -35,6 +39,9 @@ final class FeedTypeTableReactor: Reactor {
     
     case setLike(postId: Int, editedState: Bool)
     case setBookmark(postId: Int, editedState: Bool)
+    
+    case setBlockedId(userId: Int?)
+    case setReportedId(postId: Int?)
     
     case setIsFetchingPage(Bool)
     case isReloading(Bool)
@@ -49,6 +56,9 @@ final class FeedTypeTableReactor: Reactor {
     
     var tableState: FeedTableState? = nil
     var isFetchingPage: Bool = false
+    
+    var blockedIndexs: [Int]? = nil
+    var reportedIdIndex: Int? = nil
 
     var isReloading: Bool = false
     var isLoading: Bool = false
@@ -74,9 +84,10 @@ final class FeedTypeTableReactor: Reactor {
   
   var initialState: State
   
-  init(getFeedsPageUseCase: GetFeedsPageUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, feedType: FeedPageType) {
+  init(getFeedsPageUseCase: GetFeedsPageUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, reportUseCase: ReportUseCase, feedType: FeedPageType) {
     self.getFeedsPageUseCase = getFeedsPageUseCase
     self.setBookmarkAndLikeUseCase = setBookmarkAndLikeUseCase
+    self.reportUseCase = reportUseCase
     self.initialState = State(
       feedType: feedType
     )
@@ -148,8 +159,7 @@ extension FeedTypeTableReactor {
 
     case .showDetail(postId: let postId):
       return .concat([])
-    case .report(userId: let userId):
-      return .concat([])
+  
     case .bookmark(let postId, let nowState):
       return setBookmarkAndLikeUseCase.executeBookmark(nowState: nowState, postId: postId)
         .map { [nowState] postId in
@@ -161,6 +171,18 @@ extension FeedTypeTableReactor {
           return .setLike(postId: postId, editedState: !nowState)
         }
 
+    case .reportBlockUser(userId: let userId):
+      return .concat([
+        .just(.setBlockedId(userId: nil)),
+        reportUseCase.executeBlock(userId: userId)
+          .map { _ in .setBlockedId(userId: userId) }
+      ])
+    case .reportPost(postId: let postId):
+      return .concat([
+        .just(.setReportedId(postId: nil)),
+        reportUseCase.executePost(postId: postId)
+          .map { _ in Mutation.setReportedId(postId: postId) }
+      ])
     }
   }
   
@@ -221,7 +243,23 @@ extension FeedTypeTableReactor {
     case .isReloading(let bool):
       newState.isReloading = bool
    
-
+    case .setBlockedId(userId: let userId):
+      var indexs = [Int]()
+      for (idx, item) in newState.feeds.enumerated() {
+        if item.userId == userId {
+          indexs.append(idx)
+        }
+      }
+      for index in indexs {
+        newState.feeds.remove(at: index)
+      }
+      
+      newState.blockedIndexs = indexs
+    case .setReportedId(postId: let postId):
+      if let index = newState.feeds.firstIndex(where: { $0.postId == postId }) {
+        newState.feeds.remove(at: index)
+        newState.reportedIdIndex = postId
+      }
     }
     return newState
   }
@@ -244,5 +282,3 @@ extension Error {
     ])
   }
 }
-
-

@@ -103,5 +103,15 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
       .map { $0.data.postId }
   }
 
+  public func reportBlockUser(userId: Int) -> Observable<Int> {
+    return communityAPIService.request(endPoint: .reportBlock(userId: userId), responseDTO: ReportBlockResponseDTO.self)
+      .asObservable()
+      .map { $0.data.blockedId }
+  }
   
+  public func reportPost(postId: Int) -> Observable<Int> {
+    return communityAPIService.request(endPoint: .reportBlock(userId: postId), responseDTO: ReportBlockResponseDTO.self)
+      .asObservable()
+      .map { $0.data.blockedId }
+  }
 }

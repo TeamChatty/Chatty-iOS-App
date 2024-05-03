@@ -38,11 +38,13 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
       FeedTypeTableView(reactor: FeedTypeTableReactor(
         getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
         setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
         feedType: .myPosts)),
       myCommentVC,
       FeedTypeTableView(reactor: FeedTypeTableReactor(
         getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
         setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
         feedType: .myBookmark)),
     ]
     let feedProfilePageViewController = FeedProfilePageViewController(dataViewControllers: dataViewControllers)
@@ -71,6 +73,19 @@ extension FeedProfileCoordinator: FeedProfileControllerDelegate {
       navigationController.present(madalNavigationController, animated: true)
     }
   }
+  
+  func presentReportModal(userId: Int) {
+    let reactor = FeedReportReactor(userId: userId)
+    let modal = FeedReportModalController(reactor: reactor)
+    modal.delegate = self
+    
+    madalNavigationController = UINavigationController(rootViewController: modal)
+    if let madalNavigationController {
+      madalNavigationController.modalPresentationStyle = .pageSheet
+      navigationController.present(madalNavigationController, animated: true)
+    }
+  }
+  
 }
 
 extension FeedProfileCoordinator: FeedWriteModalDelegate {
@@ -127,4 +142,19 @@ extension FeedProfileCoordinator: PHPickerViewControllerDelegate {
       }
     }
   }
+}
+
+extension FeedProfileCoordinator: FeedReportModalControllerDelegate {
+  func dismissModal() {
+    navigationController.dismiss(animated: true)
+  }
+  
+  func successReport(userId: Int) {
+    navigationController.dismiss(animated: true)
+    if let vc = navigationController.viewControllers.last as? FeedProfileController {
+      vc.removeReportedFeed(userId: userId)
+    }
+  }
+  
+  
 }

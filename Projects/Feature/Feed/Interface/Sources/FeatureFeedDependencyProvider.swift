@@ -6,4 +6,5 @@ public protocol FeatureFeedDependencyProvider {
   func makeGetFeedsPageUseCase() -> DefaultGetFeedsPageUseCase
   func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase
   func makeSetBookmarkAndLikeUseCase() -> DefaultSetBookmarkAndLikeUseCase
+  func makeReportUseCase() -> DefaultReportUseCase
 }

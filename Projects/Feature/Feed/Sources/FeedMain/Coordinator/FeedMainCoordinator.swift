@@ -39,10 +39,12 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
       FeedTypeTableView(reactor: FeedTypeTableReactor(
         getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
         setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
         feedType: .recent)),
       FeedTypeTableView(reactor: FeedTypeTableReactor(
         getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(),
         setBookmarkAndLikeUseCase: featureProfileDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureProfileDependencyProvider.makeReportUseCase(),
         feedType: .topLiked)),
     ]
     let feedMainPageViewController = FeedMainPageViewController(dataViewControllers: dataViewControllers)
@@ -54,6 +56,7 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
 }
 
 extension FeedMainCoordinator: FeedMainControllerDelegate {
+  
   func pushToNotificationView() {
     print("push - NotificationView")
   }
@@ -75,6 +78,18 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
     madalNavigationController = UINavigationController(rootViewController: modal)
     if let madalNavigationController {
       madalNavigationController.modalPresentationStyle = .fullScreen
+      navigationController.present(madalNavigationController, animated: true)
+    }
+  }
+  
+  func presentReportModal(userId: Int) {
+    let reactor = FeedReportReactor(userId: userId)
+    let modal = FeedReportModalController(reactor: reactor)
+    modal.delegate = self
+    
+    madalNavigationController = UINavigationController(rootViewController: modal)
+    if let madalNavigationController {
+      madalNavigationController.modalPresentationStyle = .pageSheet
       navigationController.present(madalNavigationController, animated: true)
     }
   }
@@ -132,6 +147,19 @@ extension FeedMainCoordinator: PHPickerViewControllerDelegate {
           }
         }
       }
+    }
+  }
+}
+
+extension FeedMainCoordinator: FeedReportModalControllerDelegate {
+  func dismissModal() {
+    navigationController.dismiss(animated: true)
+  }
+  
+  func successReport(userId: Int) {
+    navigationController.dismiss(animated: true)
+    if let vc = navigationController.viewControllers.last as? FeedMainController {
+      vc.removeReportedFeed(userId: userId)
     }
   }
 }

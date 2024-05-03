@@ -27,5 +27,8 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   /// Bookmark
   func setBookmark(postId: Int) -> Observable<Int>
   func deleteBookmark(postId: Int) -> Observable<Int>
-
+  
+  /// Report
+  func reportBlockUser(userId: Int) -> Observable<Int>
+  func reportPost(postId: Int) -> Observable<Int>
 }

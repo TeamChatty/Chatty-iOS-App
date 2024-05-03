@@ -23,7 +23,7 @@ final class FeedTypeTableView: UIViewController {
   private let refreshControl: UIRefreshControl = UIRefreshControl()
   private lazy var emptyFeedView: EmptyFeedView = EmptyFeedView()
   private let footerView: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: CGRect.appFrame.width, height: 100))
-
+  
   // MARK: - Reactor Property
   typealias Reactor = FeedTypeTableReactor
     
@@ -39,6 +39,7 @@ final class FeedTypeTableView: UIViewController {
   enum TouchEventType {
     case pushToWriteFeed
     case popToFeedMain
+    case presentReportModal(userId: Int)
   }
   
   // MARK: - Initialize Method
@@ -90,24 +91,10 @@ extension FeedTypeTableView: ReactorKit.View {
       }
       .disposed(by: disposeBag)
     
-    emptyFeedView.touchEventRelay
-      .withUnretained(self)
-      .map { owner, _ in
-        switch owner.reactor?.currentState.feedType {
-        case .myBookmark:
-          return TouchEventType.popToFeedMain
-        default:
-          return TouchEventType.pushToWriteFeed
-        }
-      }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
     reactor.state
       .map(\.tableState)
       .distinctUntilChanged()
       .bind(with: self) { owner, tableState in
-        print("[200]--->>\(tableState)")
         guard let tableState else { return }
         switch tableState {
         case .loaded:
@@ -140,6 +127,25 @@ extension FeedTypeTableView: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
+      .map(\.blockedIndexs)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, blockedIndexs in
+        guard let blockedIndexs else { return }
+        let indexPaths = blockedIndexs.map { IndexPath(row: $0, section: 0) }
+        owner.tableView.deleteRows(at: indexPaths, with: .fade)
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.reportedIdIndex)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, reportedIdIndex in
+        guard let reportedIdIndex else { return }
+        owner.tableView.deleteRows(at: [IndexPath(row: reportedIdIndex, section: 0)], with: .fade)
+      }
+      .disposed(by: disposeBag)
+
+    reactor.state
       .map(\.isReloading)
       .distinctUntilChanged()
       .bind(with: self) { owner, isReloading in
@@ -151,9 +157,6 @@ extension FeedTypeTableView: ReactorKit.View {
       }
       .disposed(by: disposeBag)
   }
-
-  
- 
 }
 
 extension FeedTypeTableView: UITableViewDataSource {
@@ -175,9 +178,9 @@ extension FeedTypeTableView: UITableViewDataSource {
         case .showDetail(let postId):
           owner.reactor?.action.onNext(.showDetail(postId: postId))
           print("showDetail - \(postId)")
+          
         case .report(let userId):
-          owner.reactor?.action.onNext(.report(userId: userId))
-          print("report - \(userId)")
+          owner.presentAlert(userId: userId)
         case .bookmark(let postId, let nowState):
           owner.reactor?.action.onNext(.bookmark(postId: postId, nowState: nowState))
         case .favorite(let postId, let nowState):
@@ -195,9 +198,7 @@ extension FeedTypeTableView: UITableViewDelegate {
   }
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard let reactor else {
-      return
-    }
+    guard let reactor else { return }
     let height: CGFloat = scrollView.frame.size.height
     let contentYOffset: CGFloat = scrollView.contentOffset.y
     let scrollViewHeight: CGFloat = scrollView.contentSize.height
@@ -216,8 +217,22 @@ extension FeedTypeTableView: UITableViewDelegate {
 }
 
 extension FeedTypeTableView {
-  func refreshFeeds(postId: Int) {
-    reactor?.action.onNext(.refreshSuccessWrited(postId: postId))
+  private func presentAlert(userId: Int) {
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    let declaration = UIAlertAction(title: "신고", style: .default) { [weak self] action in
+      self?.touchEventRelay.accept(.presentReportModal(userId: userId))
+    }
+    let block = UIAlertAction(title: "이 친구의 모든 글 차단", style: .default) { [weak self] action in
+      self?.reactor?.action.onNext(.reportBlockUser(userId: userId))
+    }
+    let cancel = UIAlertAction(title: "취소", style: .cancel)
+    
+    alert.addAction(declaration)
+    alert.addAction(block)
+    alert.addAction(cancel)
+    
+    self.present(alert, animated: true)
   }
 }
 
@@ -257,5 +272,16 @@ extension FeedTypeTableView {
     } else {
       emptyFeedView.removeFromSuperview()
     }
+  }
+}
+
+
+extension FeedTypeTableView {
+  func refreshFeeds(postId: Int) {
+    reactor?.action.onNext(.refreshSuccessWrited(postId: postId))
+  }
+  
+  func removeReportedFeed(userId: Int) {
+//    reactor?.action.onNext(.reportBlockUser(userId: userId))
   }
 }
