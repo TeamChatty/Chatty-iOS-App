@@ -14,11 +14,11 @@ public struct ProfileState {
   var nickName: String
   var gender: Gender
   var porfileImage: UIImage? = nil
-  var birth: Date
+  var birth: Date? = nil
   var interest: [Interest]
   var mbti: MBTI
   
-  init(nickName: String, gender: Gender, porfileImage: UIImage? = nil, birth: Date, interest: [Interest], mbti: MBTI) {
+  init(nickName: String, gender: Gender, porfileImage: UIImage? = nil, birth: Date? = nil, interest: [Interest], mbti: MBTI) {
     self.nickName = nickName
     self.gender = gender
     self.porfileImage = porfileImage
