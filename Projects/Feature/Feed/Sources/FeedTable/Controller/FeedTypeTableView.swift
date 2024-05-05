@@ -23,7 +23,7 @@ final class FeedTypeTableView: UIViewController {
   private let refreshControl: UIRefreshControl = UIRefreshControl()
   private lazy var emptyFeedView: EmptyFeedView = EmptyFeedView()
   private let footerView: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: CGRect.appFrame.width, height: 100))
-
+  
   // MARK: - Reactor Property
   typealias Reactor = FeedTypeTableReactor
     
@@ -37,8 +37,10 @@ final class FeedTypeTableView: UIViewController {
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
+    case pushToDetailView(postId: Int)
     case pushToWriteFeed
     case popToFeedMain
+    case presentReportModal(userId: Int)
   }
   
   // MARK: - Initialize Method
@@ -77,41 +79,73 @@ extension FeedTypeTableView: ReactorKit.View {
       .disposed(by: disposeBag)
     
     emptyFeedView.touchEventRelay
-      .withUnretained(self)
-      .map { owner, _ in
-        switch owner.reactor?.currentState.feedType {
-        case .savedFeed:
-          return TouchEventType.popToFeedMain
-        default:
-          return TouchEventType.pushToWriteFeed
+      .bind(with: self) { owner, _ in
+        guard let reactor = owner.reactor else { return }
+        switch reactor.currentState.feedType {
+        case .recent, .topLiked:
+          owner.reactor?.action.onNext(.refresh)
+        case .myBookmark:
+          owner.touchEventRelay.accept(.popToFeedMain)
+        case .myPosts:
+          owner.touchEventRelay.accept(.pushToWriteFeed)
         }
       }
-      .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
     reactor.state
-      .map(\.newPageItemCount)
+      .map(\.tableState)
       .distinctUntilChanged()
-      .bind(with: self) { owner, pageItemCount in
-        let feedType = reactor.currentState.feedType
-        switch feedType {
-        case .wirtedFeed, .savedFeed:
-          let isShowing = reactor.currentState.feeds.isEmpty
-          owner.setupEmptyView(feedListType: feedType, isShowing: isShowing)
-        default:
-          print("newPageItemCount")
-        }
-        
-        guard let pageItemCount else { return }
-        switch pageItemCount {
-        case 0, -1:
+      .bind(with: self) { owner, tableState in
+        guard let tableState else { return }
+        switch tableState {
+        case .loaded:
           owner.tableView.reloadData()
-        default:
+          owner.tableView.tableFooterView = owner.footerView
+          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+          owner.setupEmptyView()
+
+        case .loadedLastPage:
+          owner.tableView.reloadData()
+          owner.tableView.tableFooterView = UIView(frame: .zero)
+          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+          owner.setupEmptyView()
+
+        case .loadedEmpty:
+          owner.tableView.reloadData()
+          owner.tableView.tableFooterView = UIView(frame: .zero)
+          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+          owner.setupEmptyView(feedListType: owner.reactor?.currentState.feedType)
+
+        case .paged:
           owner.tableView.insertRows(at: owner.reactor?.newPageIndexPath ?? [], with: .automatic)
+                  
+        case .lastPage:
+          owner.tableView.tableFooterView = UIView(frame: .zero)
+        default:
+          return
         }
       }
       .disposed(by: disposeBag)
     
+    reactor.state
+      .map(\.blockedIndexs)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, blockedIndexs in
+        guard let blockedIndexs else { return }
+        let indexPaths = blockedIndexs.map { IndexPath(row: $0, section: 0) }
+        owner.tableView.deleteRows(at: indexPaths, with: .fade)
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.reportedIdIndex)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, reportedIdIndex in
+        guard let reportedIdIndex else { return }
+        owner.tableView.deleteRows(at: [IndexPath(row: reportedIdIndex, section: 0)], with: .fade)
+      }
+      .disposed(by: disposeBag)
+
     reactor.state
       .map(\.isReloading)
       .distinctUntilChanged()
@@ -123,22 +157,7 @@ extension FeedTypeTableView: ReactorKit.View {
         }
       }
       .disposed(by: disposeBag)
-    
-    reactor.state
-      .map(\.isLastPage)
-      .distinctUntilChanged()
-      .bind(with: self) { owner, isLastPage in
-        if isLastPage {
-          owner.tableView.tableFooterView = UIView(frame: .zero)
-        } else {
-          owner.tableView.tableFooterView = owner.footerView
-        }
-      }
-      .disposed(by: disposeBag)
   }
-
-  
- 
 }
 
 extension FeedTypeTableView: UITableViewDataSource {
@@ -158,17 +177,14 @@ extension FeedTypeTableView: UITableViewDataSource {
       .bind(with: self) { owner, event in
         switch event {
         case .showDetail(let postId):
-          owner.reactor?.action.onNext(.showDetail(postId: postId))
-          print("showDetail - \(postId)")
+          owner.touchEventRelay.accept(.pushToDetailView(postId: postId))
+          
         case .report(let userId):
-          owner.reactor?.action.onNext(.report(userId: userId))
-          print("report - \(userId)")
-        case .bookmark(let postId):
-          owner.reactor?.action.onNext(.bookmark(postId: postId))
-          print("bookmark - \(postId)")
-        case .favorite(let postId):
-          owner.reactor?.action.onNext(.favorite(postId: postId))
-          print("favorite - \(postId)")
+          owner.presentAlert(userId: userId)
+        case .bookmark(let postId, let changedState):
+          owner.reactor?.action.onNext(.bookmark(postId: postId, changedState: changedState))
+        case .favorite(let postId, let changedState):
+          owner.reactor?.action.onNext(.favorite(postId: postId, changedState: changedState))
         }
       }
       .disposed(by: cell.disposeBag)
@@ -182,14 +198,41 @@ extension FeedTypeTableView: UITableViewDelegate {
   }
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard let reactor else { return }
     let height: CGFloat = scrollView.frame.size.height
     let contentYOffset: CGFloat = scrollView.contentOffset.y
     let scrollViewHeight: CGFloat = scrollView.contentSize.height
     let distanceFromBottom: CGFloat = scrollViewHeight - contentYOffset
 
-    if distanceFromBottom < height && reactor?.currentState.isFetchingPage == false && reactor?.currentState.isLastPage == false {
-      self.reactor?.action.onNext(.scrollToNextPage)
+    
+    if distanceFromBottom < height && reactor.currentState.isFetchingPage == false {
+      switch reactor.currentState.tableState {
+      case .loaded, .paged:
+        reactor.action.onNext(.scrollToNextPage)
+      default:
+        return
+      }
     }
+  }
+}
+
+extension FeedTypeTableView {
+  private func presentAlert(userId: Int) {
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    let declaration = UIAlertAction(title: "신고", style: .default) { [weak self] action in
+      self?.touchEventRelay.accept(.presentReportModal(userId: userId))
+    }
+    let block = UIAlertAction(title: "이 친구의 모든 글 차단", style: .default) { [weak self] action in
+      self?.reactor?.action.onNext(.reportBlockUser(userId: userId))
+    }
+    let cancel = UIAlertAction(title: "취소", style: .cancel)
+    
+    alert.addAction(declaration)
+    alert.addAction(block)
+    alert.addAction(cancel)
+    
+    self.present(alert, animated: true)
   }
 }
 
@@ -218,9 +261,9 @@ extension FeedTypeTableView {
   private func setupRefreshControl() {
     tableView.refreshControl = refreshControl
   }
-  
-  private func setupEmptyView(feedListType: FeedListType, isShowing: Bool) {
-    if isShowing {
+   
+  private func setupEmptyView(feedListType: FeedPageType? = nil) {
+    if let feedListType {
       view.addSubview(emptyFeedView)
       emptyFeedView.snp.makeConstraints {
         $0.horizontalEdges.verticalEdges.equalTo(tableView)
@@ -229,5 +272,16 @@ extension FeedTypeTableView {
     } else {
       emptyFeedView.removeFromSuperview()
     }
+  }
+}
+
+
+extension FeedTypeTableView {
+  func refreshFeeds(postId: Int) {
+    reactor?.action.onNext(.refreshSuccessWrited(postId: postId))
+  }
+  
+  func removeReportedFeed(userId: Int) {
+//    reactor?.action.onNext(.reportBlockUser(userId: userId))
   }
 }

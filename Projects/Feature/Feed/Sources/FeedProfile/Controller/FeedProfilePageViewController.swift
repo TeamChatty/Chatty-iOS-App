@@ -59,6 +59,10 @@ final class FeedProfilePageViewController: UIPageViewController {
               return TouchEventType.pushToWriteFeed
             case .popToFeedMain:
               return TouchEventType.popToFeedMain
+            case .presentReportModal(let userId):
+              return TouchEventType.presentReportModal(userId: userId)
+            case .pushToDetailView(postId: let postId):
+              return TouchEventType.pushToDetailView(postId: postId)
             }
           }
           .bind(to: touchEventRelay)
@@ -81,8 +85,10 @@ final class FeedProfilePageViewController: UIPageViewController {
 extension FeedProfilePageViewController {
   enum TouchEventType {
     case changePage(Int)
+    case pushToDetailView(postId: Int)
     case pushToWriteFeed
     case popToFeedMain
+    case presentReportModal(userId: Int)
   }
 }
 
@@ -143,6 +149,14 @@ extension FeedProfilePageViewController {
       return
     }
     vc.reactor?.action.onNext(.refresh)
+  }
+  
+  func removeReportedUserPost(userId: Int) {
+    self.dataViewControllers.forEach { vc in
+      guard let vc = vc as? FeedTypeTableView else { return }
+      
+      vc.removeReportedFeed(userId: userId)
+    }
   }
 }
 

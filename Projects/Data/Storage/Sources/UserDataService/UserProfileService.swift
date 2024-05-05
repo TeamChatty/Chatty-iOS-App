@@ -31,6 +31,10 @@ public final class UserProfileService: UserProfileServiceProtocol {
     self.userProfile = userProfile
   }
   
+  public func resetProfile() {
+    self.userProfile = UserProfile(userId: 0, nickname: nil, mobileNumber: "", authority: .user, blueCheck: false)
+  }
+  
   public func saveAllInterests(interests: Interests) {
     self.allInterests = interests.interests
     self.userProfile.interests = userProfile.interests.map { interest in

@@ -37,4 +37,43 @@ public extension String {
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
     return dateFormatter.date(from: self)
   }
+  
+  func toTimeDifference() -> String {
+    guard let standardTime = self.toDateFromISO8601() else { return "" }
+    
+    let component = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from:  standardTime, to: Date.now)
+    
+    if let year = component.year,
+       let month = component.month,
+       let day = component.day,
+       let hour = component.hour {
+     
+      if year > 0 {
+        return "\(year)년 전"
+      }
+      if month > 0 {
+        return "\(month)달 전"
+      }
+      if day > 0 {
+        return "\(day)일 전"
+      }
+      
+      /// Xcode 오류인지 현재 시간이 잘못 입력됨.
+      if hour + 9 > 0 {
+        return "\(hour + 9)시간 전"
+      }
+      
+      if let minute = component.minute {
+        if minute > 0 {
+          return "\(minute)분 전"
+        } else {
+          return "방금 전"
+        }
+      }
+      return "\(year)년 \(month)월 \(day)일 \(hour)시간 \(month)분 만큼 차이남"
+    } else {
+      return ""
+    }
+
+  }
 }

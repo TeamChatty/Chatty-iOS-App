@@ -12,6 +12,7 @@ import SnapKit
 import Then
 
 import SharedDesignSystem
+import DomainCommunityInterface
 
 final class EmptyFeedView: BaseView, Touchable {
   // MARK: - View Property
@@ -23,8 +24,8 @@ final class EmptyFeedView: BaseView, Touchable {
     $0.textColor = SystemColor.gray800.uiColor
     $0.font = SystemFont.body02.font
   }
-  private let feedbutton: FillButton = FillButton(horizontalInset: 16).then {
-    typealias Config = FillButton.Configuration
+  private let feedbutton: FillButtonTemp = FillButtonTemp(horizontalInset: 16).then {
+    typealias Config = FillButtonTemp.Configuration
     let config = Config(backgroundColor: SystemColor.primaryNormal.uiColor, isEnabled: true, font: SystemFont.body01.font)
 
     $0.setState(config, for: .enabled)
@@ -76,7 +77,7 @@ extension EmptyFeedView {
     }
   }
   
-  func updateLadel(feedListType: FeedListType) {
+  func updateLadel(feedListType: FeedPageType) {
     descriptionLabel.text = feedListType.description
     feedbutton.title = feedListType.buttonTitle
   }

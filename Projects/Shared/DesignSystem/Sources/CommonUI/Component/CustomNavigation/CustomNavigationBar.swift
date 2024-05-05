@@ -102,8 +102,6 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
       item.touchEventRelay
         .withUnretained(self)
         .map { _ in
-          print("dddd ==>")
-
             return .rightButtons(.allCases[index])
         }
         .bind(to: self.touchEventRelay)

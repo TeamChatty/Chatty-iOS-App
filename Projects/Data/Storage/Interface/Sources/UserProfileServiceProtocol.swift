@@ -11,5 +11,6 @@ import DomainUserInterface
 public protocol UserProfileServiceProtocol {
   func getData() -> UserProfile
   func setData(userProfile: UserProfile)
+  func resetProfile()
   func saveAllInterests(interests: Interests)
 }

@@ -12,5 +12,6 @@ import DomainCommon
 public protocol UserProfileRepositoryProtocol {
   func saveUserProfile(userProfile: UserProfile)
   func getUserProfile() -> UserProfile
+  func resetProfile()
   func saveAllInterests(interests: Interests)
 }

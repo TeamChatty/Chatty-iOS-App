@@ -16,6 +16,14 @@ import DomainUserInterface
 
 final class ProfileMainView: BaseView, Touchable {
   // MARK: - View Property
+  private let scrollView: UIScrollView = UIScrollView().then {
+    $0.backgroundColor = .white
+  }
+  private let stackView: UIStackView = UIStackView().then {
+    $0.axis = .vertical
+    $0.alignment = .top
+  }
+  
   private let profileBoxView: ProfileMainBoxView = ProfileMainBoxView().then {
     $0.backgroundColor = .white
   }
@@ -36,10 +44,8 @@ final class ProfileMainView: BaseView, Touchable {
   
   // MARK: - UIConfigurable
   override func configureUI() {
-    self.backgroundColor = SystemColor.gray100.uiColor
-    setupProfileBoxView()
-    setupCashItemButtons()
-    setupProblemServicesView()
+    setupScrollView()
+    setupStackView()
   }
   
   // MARK: - UIBindable
@@ -91,29 +97,41 @@ extension ProfileMainView {
 }
 
 extension ProfileMainView {
-  private func setupProfileBoxView() {
-    addSubview(profileBoxView)
-    profileBoxView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(295)
+  private func setupScrollView() {
+    addSubview(scrollView)
+    scrollView.addSubview(stackView)
+    
+    scrollView.snp.makeConstraints {
+      $0.horizontalEdges.verticalEdges.equalToSuperview()
     }
-  }
-  
-  private func setupCashItemButtons() {
-    addSubview(profileCashsItemView)
-    profileCashsItemView.snp.makeConstraints {
-      $0.top.equalTo(profileBoxView.snp.bottom)
-      $0.height.equalTo(162)
+    
+    stackView.snp.makeConstraints {
       $0.horizontalEdges.equalToSuperview()
+
+      $0.top.equalTo(scrollView.contentLayoutGuide.snp.top)
+      $0.width.equalTo(scrollView.frameLayoutGuide.snp.width)
+      
+      $0.bottom.equalTo(scrollView.contentLayoutGuide.snp.bottom)
     }
   }
   
-  private func setupProblemServicesView() {
-    addSubview(problemServicesView)
-    problemServicesView.snp.makeConstraints {
-      $0.top.equalTo(profileCashsItemView.snp.bottom).offset(5)
-      $0.horizontalEdges.bottom.equalToSuperview()
+  private func setupStackView() {
+    stackView.addArrangedSubview(profileBoxView)
+    profileBoxView.snp.makeConstraints {
+      $0.width.equalToSuperview()
     }
+    
+    stackView.addArrangedSubview(profileCashsItemView)
+    profileCashsItemView.snp.makeConstraints {
+      $0.width.equalToSuperview()
+    }
+    
+    stackView.addArrangedSubview(problemServicesView)
+    problemServicesView.snp.makeConstraints {
+      $0.width.equalToSuperview()
+    }
+    
+
   }
 }
 

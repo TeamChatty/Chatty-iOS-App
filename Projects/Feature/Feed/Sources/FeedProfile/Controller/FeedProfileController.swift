@@ -14,15 +14,17 @@ import RxCocoa
 import ReactorKit
 
 protocol FeedProfileControllerDelegate: AnyObject {
+  func pushToDetailView(postId: Int)
   func popToFeedMain()
   func presentFeedWriteModal()
+  func presentReportModal(userId: Int)
 }
 
 final class FeedProfileController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: FeedProfileSegmentView = FeedProfileSegmentView()
   private let mainView: FeedProfilePageViewController
-    
+  
   // MARK: - Reactor Property
   typealias Reactor = FeedProfileReactor
   
@@ -81,6 +83,10 @@ extension FeedProfileController: ReactorKit.View {
           owner.delegate?.presentFeedWriteModal()
         case .popToFeedMain:
           owner.delegate?.popToFeedMain()
+        case .presentReportModal(userId: let userId):
+          owner.delegate?.presentReportModal(userId: userId)
+        case .pushToDetailView(postId: let postId):
+          owner.delegate?.pushToDetailView(postId: postId)
         }
       }
       .disposed(by: disposeBag)
@@ -121,6 +127,7 @@ extension FeedProfileController: ReactorKit.View {
 
 extension FeedProfileController {
   private func setView() {
+    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)
@@ -139,4 +146,8 @@ extension FeedProfileController {
   }
 }
 
-
+extension FeedProfileController {
+  func removeReportedFeed(userId: Int) {
+    mainView.removeReportedUserPost(userId: userId)
+  }
+}

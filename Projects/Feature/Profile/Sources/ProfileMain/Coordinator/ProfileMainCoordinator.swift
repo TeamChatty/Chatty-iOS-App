@@ -22,7 +22,7 @@ public final class ProfileMainCoordinator: BaseCoordinator, ProfileMainCoordinat
   }
   
   deinit {
-    print("해제됨: ProfileMainCoordinator")
+    self.deinitRootCoordinator()
   }
   
   public override func start() {
@@ -44,6 +44,7 @@ extension ProfileMainCoordinator: ProfileMainControllerDelegate {
       featureProfileDependencyProvider: featureProfileDependencyProvider
     )
     childCoordinators.append(settingCoordinator)
+    settingCoordinator.finishDelegate = self
     settingCoordinator.start()
   }
   

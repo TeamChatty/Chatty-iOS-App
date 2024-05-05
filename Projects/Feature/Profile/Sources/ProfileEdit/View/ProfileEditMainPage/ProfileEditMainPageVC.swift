@@ -160,7 +160,7 @@ extension ProfileEditMainPageViewController {
   func setUserData(userData: UserProfile) {
     self.viewControllers?.forEach { viewController in
       guard let vc = viewController as? ProfileEditMainPageTypeViewController else { return }
-      vc.setUserData(userData: userData)
+      vc.updateUserProfile(userProfile: userData)
     }
   }
 }

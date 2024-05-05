@@ -30,7 +30,11 @@ final class ProfileEditMainController: BaseController {
   // MARK: - View Property
   private let segumentButtonView: ProfileEditSegmentView = ProfileEditSegmentView()
   private let mainView = ProfileEditMainPageViewController()
-    
+  private let toastMessageButton: ToastMessageView = ToastMessageView().then {
+    $0.layer.masksToBounds = false
+    $0.clipsToBounds = false
+  }
+
   // MARK: - Reactor Property
   typealias Reactor = ProfileEditMainReactor
   
@@ -127,6 +131,15 @@ extension ProfileEditMainController: ReactorKit.View {
         owner.mainView.setUserData(userData: userData)
       }
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.editedProfile)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, type in
+        guard type != nil else { return }
+        owner.toastMessageButton.showToastMessage(message: reactor.editedProfileToastText)
+      }
+      .disposed(by: disposeBag)
 
   }
 }
@@ -146,6 +159,13 @@ extension ProfileEditMainController {
     mainView.view.snp.makeConstraints {
       $0.top.equalTo(segumentButtonView.snp.bottom)
       $0.horizontalEdges.bottom.equalTo(self.view.safeAreaLayoutGuide)
+    }
+    
+    self.view.addSubview(toastMessageButton)
+    toastMessageButton.snp.makeConstraints {
+      $0.height.equalTo(1)
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
     }
   }
 }

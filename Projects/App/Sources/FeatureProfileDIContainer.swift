@@ -74,4 +74,28 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
       userProfileRepository: makeUserProfileRepository()
     )
   }
+  
+  func makeGetNotificationCheckedData() -> DefaultGetNotificationCheckedData {
+    return DefaultGetNotificationCheckedData(
+      userAPIRepository: makeUserAPIRepository()
+    )
+  }
+  
+  func makeSaveNotificationBoolean() -> DefaultSaveNotificationBoolean {
+    return DefaultSaveNotificationBoolean(
+      userAPIRepository: makeUserAPIRepository()
+    )
+  }
+  
+  func makeLogoutUseCase() -> DefaultLogoutUseCase {
+    return DefaultLogoutUseCase(
+      keychainRepository: makeKeychainRepository(),
+      userProfileRepository: makeUserProfileRepository())
+  }
+  
+  func makeLeaveAccountUseCase() -> DefaultLeaveAccountUseCase {
+    return DefaultLeaveAccountUseCase(
+      keychainRepository: makeKeychainRepository(),
+      userProfileRepository: makeUserProfileRepository())
+  }
 }

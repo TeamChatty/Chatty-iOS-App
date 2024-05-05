@@ -27,7 +27,8 @@ enum ProfileEditMainCellType {
 
 final class ProfileEditMainPageTypeViewController: UIViewController {
   // MARK: - View Property
-  private var tableView: UITableView = UITableView()
+  private var editPageView: EditPageView?
+  private var previewPageView: PreviewPageView?
   
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()
@@ -36,15 +37,20 @@ final class ProfileEditMainPageTypeViewController: UIViewController {
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   
   private let pageType: ProfileEditMainType
-  private let dataSource: [ProfileEditMainCellType]
   private var userData: UserProfile? = nil
   
   // MARK: - Initialize Method
   required init(pageType: ProfileEditMainType) {
     self.pageType = pageType
-    self.dataSource = [.profileImage, .basicInformation, .additionalInformation]
+    switch pageType {
+    case .edit:
+      editPageView = EditPageView()
+    case .preview:
+      previewPageView = PreviewPageView()
+    }
     super.init(nibName: nil, bundle: nil)
-    configureUI(type: pageType)
+    configureUI(pageType)
+    bind(pageType)
   }
   
   required init?(coder: NSCoder) {
@@ -52,13 +58,60 @@ final class ProfileEditMainPageTypeViewController: UIViewController {
   }
   
   // MARK: - UIConfigurable
-  private func configureUI(type: ProfileEditMainType) {
-    setTableView()
+  private func configureUI(_ type: ProfileEditMainType) {
+    switch type {
+    case .edit:
+      guard let editPageView else { return }
+      self.view.addSubview(editPageView)
+      editPageView.snp.makeConstraints {
+        $0.horizontalEdges.verticalEdges.equalToSuperview()
+      }
+      
+    case .preview:
+      guard let previewPageView else { return }
+      self.view.addSubview(previewPageView)
+      previewPageView.snp.makeConstraints {
+        $0.horizontalEdges.verticalEdges.equalToSuperview()
+      }
+    }
   }
   
   // MARK: - UIBindable
-  private func setEditCells() {
-    
+  private func bind(_ type: ProfileEditMainType) {
+    switch type {
+    case .edit:
+      guard let editPageView else { return }
+      editPageView.touchEventRelay
+        .map { event in
+          switch event {
+          case .chatImageGuide:
+            return TouchEventType.chatImageGuide
+          case .imageGuide:
+            return TouchEventType.imageGuide
+          case .selectImage:
+            return TouchEventType.selectImage
+          case .nickname:
+            return TouchEventType.nickname
+          case .address:
+            return TouchEventType.address
+          case .job:
+            return TouchEventType.job
+          case .school:
+            return TouchEventType.school
+          case .introduce:
+            return TouchEventType.introduce
+          case .mbti:
+            return TouchEventType.mbti
+          case .interests:
+            return TouchEventType.interests
+          }
+        }
+        .bind(to: touchEventRelay)
+        .disposed(by: disposeBag)
+      
+    case .preview:
+      return
+    }
   }
 }
 
@@ -79,174 +132,13 @@ extension ProfileEditMainPageTypeViewController {
   }
 }
 
-extension ProfileEditMainPageTypeViewController: UITableViewDataSource {
-  
-  func numberOfSections(in tableView: UITableView) -> Int {
-    return dataSource.count
-  }
-  
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 1
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cellCase = dataSource[indexPath.section]
-    switch pageType {
-    case .edit:
-      switch cellCase {
-      case .profileImage:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: EditImageTableViewCell.cellId, for: indexPath) as? EditImageTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        cell.touchEventRelay
-          .map { event in
-            switch event {
-            case .chatImageGuide:
-              return TouchEventType.chatImageGuide
-            case .imageGuide:
-              return TouchEventType.imageGuide
-            case .selectImage:
-              return TouchEventType.selectImage
-            }
-          }
-          .bind(to: touchEventRelay)
-          .disposed(by: disposeBag)
-        
-        return cell
-      case .basicInformation:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: EditBasicInfoTableViewCell.cellId, for: indexPath) as? EditBasicInfoTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        cell.touchEventRelay
-          .map { event in
-            switch event {
-            case .nickname:
-              return TouchEventType.nickname
-            case .address:
-              return TouchEventType.address
-            case .job:
-              return TouchEventType.job
-            case .school:
-              return TouchEventType.school
-            }
-          }
-          .bind(to: touchEventRelay)
-          .disposed(by: disposeBag)
-          
-        return cell
-      case .additionalInformation:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: EditAdditionalInfoTableViewCell.cellId, for: indexPath) as? EditAdditionalInfoTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        cell.touchEventRelay
-          .map { event in
-            switch event {
-            case .introduce:
-              return TouchEventType.introduce
-            case .mbti:
-              return TouchEventType.mbti
-            case .interests:
-              return TouchEventType.interests
-            }
-          }
-          .bind(to: touchEventRelay)
-          .disposed(by: disposeBag)
-        
-        return cell
-      }
-    case .preview:
-      switch cellCase {
-      case .profileImage:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: PreviewImageTableViewCell.cellId, for: indexPath) as? PreviewImageTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        return cell
-      case .basicInformation:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: PreviewBasicInfoTableViewCell.cellId, for: indexPath) as? PreviewBasicInfoTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        return cell
-      case .additionalInformation:
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: PreviewAdditionalInfoTableViewCell.cellId, for: indexPath) as? PreviewAdditionalInfoTableViewCell else { return UITableViewCell() }
-        cell.updateCell(userData: userData!)
-        return cell
-      }
-    }
-  }
-}
-
-extension ProfileEditMainPageTypeViewController: UITableViewDelegate {
-
-  public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-      return false
-  }
-}
-
 extension ProfileEditMainPageTypeViewController {
-  private func setTableView() {
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.rowHeight = UITableView.automaticDimension
-    tableView.estimatedRowHeight = UITableView.automaticDimension
-    tableView.separatorStyle = .none
-    
+  func updateUserProfile(userProfile: UserProfile) {
     switch pageType {
     case .edit:
-      registerEditCell()
+        editPageView?.updateUserProfile(userProfile)
     case .preview:
-      registerPreviewCell()
-    }
-    
-    self.view.addSubview(tableView)
-    tableView.snp.makeConstraints {
-      $0.horizontalEdges.verticalEdges.equalToSuperview()
-    }
-  }
-  
-  private func registerEditCell() {
-    tableView.register(EditImageTableViewCell.self, forCellReuseIdentifier: EditImageTableViewCell.cellId)
-    tableView.register(EditBasicInfoTableViewCell.self, forCellReuseIdentifier: EditBasicInfoTableViewCell.cellId)
-    tableView.register(EditAdditionalInfoTableViewCell.self, forCellReuseIdentifier: EditAdditionalInfoTableViewCell.cellId)
-  }
-  
-  private func registerPreviewCell() {
-    tableView.register(PreviewImageTableViewCell.self, forCellReuseIdentifier: PreviewImageTableViewCell.cellId)
-    tableView.register(PreviewBasicInfoTableViewCell.self, forCellReuseIdentifier: PreviewBasicInfoTableViewCell.cellId)
-    tableView.register(PreviewAdditionalInfoTableViewCell.self, forCellReuseIdentifier: PreviewAdditionalInfoTableViewCell.cellId)
-  }
-}
-
-extension ProfileEditMainPageTypeViewController {
-  func setUserData(userData: UserProfile) {
-    self.userData = userData
-    switch pageType {
-    case .edit:
-      setUserDataEdit(userData)
-    case .preview:
-      setUserDataPreview(userData)
-    }
-  }
-
-  private func setUserDataEdit(_ userData: UserProfile) {
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? EditImageTableViewCell {
-      cell.updateCell(userData: userData)
-    }
-    
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? EditBasicInfoTableViewCell {
-      cell.updateCell(userData: userData)
-    }
-    
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? EditAdditionalInfoTableViewCell {
-      cell.updateCell(userData: userData)
-    }
-  }
-  
-  private func setUserDataPreview(_ userData: UserProfile) {
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? PreviewImageTableViewCell {
-      cell.updateCell(userData: userData)
-    }
-    
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? PreviewBasicInfoTableViewCell {
-      cell.updateCell(userData: userData)
-    }
-    
-    if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? PreviewAdditionalInfoTableViewCell {
-      cell.updateCell(userData: userData)
+      previewPageView?.updateUserProfile(profileImage: userProfile.imageUrl, nickname: userProfile.nickname ?? "", americanAge: userProfile.americanAge, gender: userProfile.genderStringKR, blueCheck: userProfile.blueCheck, address: userProfile.address, job: userProfile.job, school: userProfile.school, introduce: userProfile.introduce, mbti: userProfile.mbti, interests: userProfile.interests.map { $0.name })
     }
   }
 }

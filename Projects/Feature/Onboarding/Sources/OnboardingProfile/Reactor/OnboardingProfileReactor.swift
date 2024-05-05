@@ -67,7 +67,7 @@ public final class OnboardingProfileReactor: Reactor {
       case .gender:
         state.isContinueEnabled = state.profileData.gender != .none
       case .birth:
-        state.isContinueEnabled = true
+        state.isContinueEnabled = state.profileData.birth != nil ? true : false
       case .profileImage:
         state.isContinueEnabled = state.profileData.porfileImage != nil
       case .interest:
@@ -128,7 +128,7 @@ extension OnboardingProfileReactor {
           .just(.isLoading(true)),
           saveProfileDataUseCase.executeObs(
             gender: profileData.gender.requestString,
-            birth: profileData.birth.toStringYearMonthDay(),
+            birth: profileData.birth?.toStringYearMonthDay() ?? "",
             imageData: profileData.porfileImage?.toProfileRequestData() ?? nil,
             interests: profileData.interest,
             mbti: profileData.mbti.requestString
@@ -150,8 +150,13 @@ extension OnboardingProfileReactor {
       newState.profileData.gender = gender
       newState.isContinueEnabled = true
     case .inputedBirth(let date):
-      newState.profileData.birth = date
-      newState.isContinueEnabled = true
+      if newState.profileData.birth == nil {
+        newState.profileData.birth = Date()
+      } else {
+        newState.profileData.birth = date
+        newState.isContinueEnabled = true
+      }
+    
     case .inputedImage(let image):
       newState.profileData.porfileImage = image
       newState.isContinueEnabled = true

@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import Then
+import SharedUtil
 import SharedDesignSystem
 import DomainCommunityInterface
 
@@ -32,9 +33,11 @@ final class HeaderSecionView: BaseView, Touchable {
   private let reportButton: ChangeableImageButton = ChangeableImageButton().then {
     typealias Config = ChangeableImageButton.Configuration
     let image = Images._3DotHorizontal.image.withRenderingMode(.alwaysTemplate)
-    let commonState = Config(image: image, tintColor: SystemColor.basicBlack.uiColor, isEnabled: true)
-    $0.setState(commonState, for: .enabled)
-    $0.currentState = .enabled
+    let enabled = Config(image: image, tintColor: SystemColor.basicBlack.uiColor, isEnabled: true)
+    let disabled = Config(image: UIImage(), tintColor: SystemColor.basicWhite.uiColor, isEnabled: false)
+    
+    $0.setState(enabled, for: .enabled)
+    $0.setState(disabled, for: .disabled)
   }
   
   // MARK: - Rx Property
@@ -96,13 +99,8 @@ extension HeaderSecionView {
   func setData(feedData: Feed) {
     profileImageView.setImageKF(urlString: feedData.imageUrl)
     nicknameLabel.text = feedData.nickname
-    timeLabel.text = feedData.createdAt
-    if feedData.postId == 0 {
-      timeLabel.text = "1분 전"
-
-    } else {
-      timeLabel.text = "3분 전"
-
-    }
+    timeLabel.text = feedData.createdAt.toTimeDifference()
+    
+    reportButton.currentState = feedData.owner ? .disabled : .enabled
   }
 }

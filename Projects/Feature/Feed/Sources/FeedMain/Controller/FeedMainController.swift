@@ -7,6 +7,7 @@
 
 import UIKit
 import SharedDesignSystem
+import DomainCommunityInterface
 
 import SnapKit
 import RxSwift
@@ -14,9 +15,11 @@ import RxCocoa
 import ReactorKit
 
 protocol FeedMainControllerDelegate: AnyObject {
+  func pushToDetailView(postId: Int)
   func pushToNotificationView()
   func pushToFeedProfileView()
   func presentFeedWriteModal()
+  func presentReportModal(userId: Int)
 }
 
 final class FeedMainController: BaseController {
@@ -102,6 +105,14 @@ extension FeedMainController: ReactorKit.View {
         switch event {
         case .changePage(let index):
           owner.reactor?.action.onNext(.changePage(index))
+        case .presentReportModal(userId: let userId):
+          owner.delegate?.presentReportModal(userId: userId)
+        case .none:
+          return
+        case .pushToWriteFeed:
+          owner.delegate?.presentFeedWriteModal()
+        case .pushToDetailView(postId: let postId):
+          owner.delegate?.pushToDetailView(postId: postId)
         }
       }
       .disposed(by: disposeBag)
@@ -137,6 +148,7 @@ extension FeedMainController: ReactorKit.View {
 
 extension FeedMainController {
   private func setView() {
+    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)
@@ -162,3 +174,12 @@ extension FeedMainController {
   }
 }
 
+extension FeedMainController {
+  func refreshRecentFeeds(postId: Int) {
+    mainView.refreshRecentFeeds(postId: postId)
+  }
+  
+  func removeReportedFeed(userId: Int) {
+    mainView.removeReportedUserPost(userId: userId)
+  }
+}
