@@ -19,21 +19,13 @@ final class FeedCommentCell: UITableViewCell, Touchable {
   
   // MARK: - View Property
   // HeaderSection
-  private let contentSection: UIView = UIView().then {
-    $0.backgroundColor = .brown
-  }
-  private let replySection: UIView = UIView().then {
-    $0.backgroundColor = .blue
+  private let contentSection: FeedCommentView = FeedCommentView()
+  private let replySection: UIStackView = UIStackView()
+  private let replyButton: IconTitleButton = IconTitleButton().then {
+    $0.backgroundColor = .clear
   }
   
   // MARK: - Stored Property
-  private var feed: Feed? {
-    didSet {
-      if let feed {
-        
-      }
-    }
-  }
   
   // MARK: - Rx Property
   var disposeBag = DisposeBag()
@@ -66,9 +58,14 @@ final class FeedCommentCell: UITableViewCell, Touchable {
 
 extension FeedCommentCell {
   enum TouchEventType {
+    /// comment
     case report(commentId: Int)
-    case favorite(postId: Int, nowState: Bool)
-    case reply(commentId: Int)
+    case commentLike(commentId: Int, changedState: Bool)
+    case commentReply(commentId: Int)
+    
+    /// reply
+    case replylike(replyId: Int, changedState: Bool)
+    case getReplyPage(lastReplyId: Int)
   }
 }
 
@@ -79,16 +76,31 @@ extension FeedCommentCell {
     contentView.addSubview(replySection)
     
     contentSection.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(50)
+      $0.top.equalToSuperview()
+      $0.horizontalEdges.equalToSuperview().inset(20)
     }
     
     replySection.snp.makeConstraints {
       $0.top.equalTo(contentSection.snp.top)
-      $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(8)
+      $0.leading.equalToSuperview().inset(59)
+      $0.trailing.equalToSuperview().inset(20)
+      $0.height.greaterThanOrEqualTo(1)
       $0.bottom.equalToSuperview()
     }
   }
 }
 
+extension FeedCommentCell {
+  private func setDate(comment: FeedDetailComment) {
+    contentSection.updateData(isOwner: comment.isOwner, isReply: comment.isReply, commentId: comment.commentId, profileImage: comment.profileImage, nickname: comment.nickname, content: comment.content, createdAt: comment.createdAt, isLike: comment.isLike, likeCount: comment.likeCount)
+    
+    if comment.childCount > 0 {
+      
+      
+    }
+  }
+  
+  func updateReplyStackView() {
+    
+  }
+}
