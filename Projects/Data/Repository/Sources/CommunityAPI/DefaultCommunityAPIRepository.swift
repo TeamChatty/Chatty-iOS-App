@@ -124,6 +124,18 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
       .map { $0.data.postId }
   }
   
+  public func setCommentLike(commentId: Int) -> Observable<Int> {
+    return communityAPIService.request(endPoint: .commentLike(commentId: commentId), responseDTO: CommentLikeResponseDTO.self)
+      .asObservable()
+      .map { $0.data.commentId }
+  }
+  
+  public func deleteCommentLike(commentId: Int) -> Observable<Int> {
+    return communityAPIService.request(endPoint: .commentLikeDelete(commentId: commentId), responseDTO: CommentLikeResponseDTO.self)
+      .asObservable()
+      .map { $0.data.commentId }
+  }
+  
   /// Bookmark
   /// Post Id를 반환
   public func setBookmark(postId: Int) -> Observable<Int> {

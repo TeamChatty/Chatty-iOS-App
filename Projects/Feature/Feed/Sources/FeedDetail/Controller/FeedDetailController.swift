@@ -272,7 +272,6 @@ extension FeedDetailController: UITableViewDataSource {
     switch reactor.cellCase[indexPath.section] {
     case .content:
       guard let cell = tableView.dequeueReusableCell(withIdentifier: FeedDetailCell.cellId, for: indexPath) as? FeedDetailCell else { return UITableViewCell() }
-      cell.disposeBag = DisposeBag()
       
       if let feed = reactor.currentState.feed {
         cell.setData(feedData: feed)
@@ -307,12 +306,12 @@ extension FeedDetailController: UITableViewDataSource {
           switch event {
           case .report(let commentId):
             owner.presentAlert(userId: commentId)
-          case .commentLike:
-            print("")
+          case .commentLike(let commentId, let changedState):
+            owner.reactor?.action.onNext(.tabCommentLike(commentId: commentId, changedState: changedState))
           case .commentReply:
             print("")
-          case .replylike:
-            print("")
+          case .replylike(let parentId, let replyId, let changedState):
+            owner.reactor?.action.onNext(.tabReplyLike(parentsId: parentId, replyId: replyId, changedState: changedState))
           case .getReplyPage(let commentId):
             owner.reactor?.action.onNext(.startComment(.reply(commentId: commentId)))
           }

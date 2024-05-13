@@ -31,6 +31,9 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case postLike(PostRequestId)
   case postLikeDelete(PostRequestId)
   
+  case commentLike(commentId: Int)
+  case commentLikeDelete(commentId: Int)
+  
   /// Bookmark
   case postBookmark(PostRequestId)
   case postBookmarkDelete(PostRequestId)
@@ -57,9 +60,10 @@ public extension CommunityAPIRouter {
     case .getMyPosts(let requestDTO):
       return "/v1/my-posts?lastPostId=\(requestDTO.lastPostId)&size=\(requestDTO.size)"
 
-    case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete:
+    case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete, .commentLike, .commentLikeDelete:
       return "/v1"
       
+    /// Comment / Reply
     case .getComments(let requestDTO):
       return "/v2/post/\(requestDTO.postId)/comments?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
     case .getCommentReplies(let requestDTO):
@@ -103,7 +107,11 @@ public extension CommunityAPIRouter {
     case .postLikeDelete(postId: let requestId):
       return "/\(requestId.postId)/like"
 
-      
+    case .commentLike(commentId: let commentId):
+      return "/comment-like/\(commentId)"
+    case .commentLikeDelete(commentId: let commentId):
+      return "/comment-like/\(commentId)"
+
     /// Bookmark
     case .postBookmark(let requestId):
       return "/\(requestId.postId)/bookmark"
@@ -120,9 +128,9 @@ public extension CommunityAPIRouter {
     switch self {
     case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComments, .getCommentReplies:
       return .get
-    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost:
+    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost, .commentLike:
       return .post
-    case .postLikeDelete, .postBookmarkDelete:
+    case .postLikeDelete, .postBookmarkDelete, .commentLikeDelete:
       return .delete
     }
   }
@@ -152,6 +160,9 @@ public extension CommunityAPIRouter {
         let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
         return .uploadMultipart([titleData, dataData])
       }
+      
+    case .commentLike, .commentLikeDelete:
+      return .requestPlain
      
     case .writeComment(_ , let requestDTO):
       return .requestJSONEncodable(requestDTO)
@@ -178,23 +189,3 @@ public extension CommunityAPIRouter {
     }
   }
 }
-
-
-//func createMultiImageMultiPartBody(boundary : String,imageDataArray : [Data]) -> Data {
-//  var body = Data()
-//  
-//  let mimetype = "image/jpg"
-//  
-//  for imageData in imageDataArray {
-//    body.append("--\(boundary)\r\n".data(using: String.Encoding.utf8)!)
-//    body.append("Content-Disposition: form-data; name=\"externalImages\"; filename=\"\(Date().timeIntervalSince1970).jpg\"\r\n".data(using: String.Encoding.utf8)!)
-//    
-//    body.append("Content-Type: \(mimetype)\r\n\r\n".data(using: String.Encoding.utf8)!)
-//    body.append(imageData)
-//    body.append("\r\n".data(using: String.Encoding.utf8)!)
-//    
-//  }
-//  // Just take this line out of the images loop
-//  body.append("--\(boundary)--\r\n".data(using: String.Encoding.utf8)!)
-//  return body
-//}

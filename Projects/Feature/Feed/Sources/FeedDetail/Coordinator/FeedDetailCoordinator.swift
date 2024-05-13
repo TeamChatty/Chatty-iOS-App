@@ -33,6 +33,7 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
     let reactor = FeedDetailReactor(
       getFeedUseCase: featureFeedDependencyProvider.makeGetFeedUseCase(),
       setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+      setCommentLikeUseCase: featureFeedDependencyProvider.makeSetCommentLikeUseCase(),
       reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
       getCommetUseCase: featureFeedDependencyProvider.makeGetCommetUseCase(),
       writeCommentUseCase: featureFeedDependencyProvider.makeWriteCommentUseCase(),

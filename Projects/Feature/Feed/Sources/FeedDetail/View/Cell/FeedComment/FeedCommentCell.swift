@@ -48,6 +48,7 @@ final class FeedCommentCell: UITableViewCell, Touchable {
   
   override func prepareForReuse() {
     super.prepareForReuse()
+    disposeBag = DisposeBag()
   }
 
   // MARK: - UIConfigurable
@@ -62,7 +63,21 @@ final class FeedCommentCell: UITableViewCell, Touchable {
         return TouchEventType.commentReply(commentId: self?.commentId ?? 0)
       }
       .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
+      .disposed(by: cellDisposeBag)
+    
+    contentSection.touchEventRelay
+      .map { event in
+        switch event {
+        case .report(let commentId):
+          return TouchEventType.report(commentId: commentId)
+        case .reply(let commentId):
+          return TouchEventType.commentReply(commentId: commentId)
+        case .like(let commentId, let isReply, let changedState):
+          return TouchEventType.commentLike(commentId: commentId, changedState: changedState)
+        }
+      }
+      .bind(to: touchEventRelay)
+      .disposed(by: cellDisposeBag)
   }
 }
 
@@ -74,7 +89,7 @@ extension FeedCommentCell {
     case commentReply(commentId: Int)
     
     /// reply
-    case replylike(replyId: Int, changedState: Bool)
+    case replylike(parentId: Int, replyId: Int, changedState: Bool)
     case getReplyPage(lastReplyId: Int)
   }
 }
@@ -105,7 +120,7 @@ extension FeedCommentCell {
   public func setDate(comment: FeedDetailComment) {
     self.commentId = comment.commentId
     contentSection.updateData(isOwner: comment.isOwner, isReply: comment.isReply, commentId: comment.commentId, profileImage: comment.profileImage, nickname: comment.nickname, content: comment.content, createdAt: comment.createdAt, isLike: comment.isLike, likeCount: comment.likeCount)
-    
+    print("commentiD ==> \(comment.commentId), likeCount --\(comment.likeCount)")
     if comment.childCount > 0 {
       
       

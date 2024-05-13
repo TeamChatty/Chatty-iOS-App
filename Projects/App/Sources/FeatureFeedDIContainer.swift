@@ -35,6 +35,12 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
     )
   }
   
+  func makeSetCommentLikeUseCase() -> DefaultSetCommentLikeUseCase {
+    return DefaultSetCommentLikeUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
   func makeReportUseCase() -> DefaultReportUseCase {
     return DefaultReportUseCase(
       communityAPIRepository: makeCommunityAPIRepository()

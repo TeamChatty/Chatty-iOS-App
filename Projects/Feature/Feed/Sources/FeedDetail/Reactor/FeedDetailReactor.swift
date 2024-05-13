@@ -15,6 +15,7 @@ import DomainCommunityInterface
 public final class FeedDetailReactor: Reactor {
   private let getFeedUseCase: GetFeedUseCase
   private let setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase
+  private let setCommentLikeUseCase: SetCommentLikeUseCase
   private let reportUseCase: ReportUseCase
   
   private let getCommetUseCase: GetCommetUseCase
@@ -39,6 +40,9 @@ public final class FeedDetailReactor: Reactor {
     case inputComment(String)
     case sendComment
     
+    case tabCommentLike(commentId: Int, changedState: Bool)
+    case tabReplyLike(parentsId: Int, replyId: Int, changedState: Bool)
+
     case reportBlockUser(userId: Int)
     case reportPost(postId: Int)
   }
@@ -49,6 +53,9 @@ public final class FeedDetailReactor: Reactor {
     
     case setLike(postId: Int, changedState: Bool)
     case setBookmark(postId: Int, changedState: Bool)
+    
+    case setCommentLike(commentId: Int, changedState: Bool)
+    case setReplyLike(parentsId: Int, replyId: Int, changedState: Bool)
     
     /// Comment
     case setComments(comments: [FeedDetailComment])
@@ -92,10 +99,11 @@ public final class FeedDetailReactor: Reactor {
   }
   
   public var initialState: State
-
-  public init(getFeedUseCase: GetFeedUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, reportUseCase: ReportUseCase, getCommetUseCase: GetCommetUseCase, writeCommentUseCase: WriteCommentUseCase, postId: Int) {
+  
+  public init(getFeedUseCase: GetFeedUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, setCommentLikeUseCase: SetCommentLikeUseCase, reportUseCase: ReportUseCase, getCommetUseCase: GetCommetUseCase, writeCommentUseCase: WriteCommentUseCase, postId: Int) {
     self.getFeedUseCase = getFeedUseCase
     self.setBookmarkAndLikeUseCase = setBookmarkAndLikeUseCase
+    self.setCommentLikeUseCase = setCommentLikeUseCase
     self.reportUseCase = reportUseCase
     self.getCommetUseCase = getCommetUseCase
     self.writeCommentUseCase = writeCommentUseCase
@@ -197,6 +205,7 @@ extension FeedDetailReactor {
             return .setLike(postId: postId, changedState: changedState)
           }
       }
+
       
     /// Comment
     case .startComment(let type):
@@ -227,7 +236,29 @@ extension FeedDetailReactor {
       default:
         return .just(.setIsLoading(false))
       }
-    
+      
+    case .tabCommentLike(commentId: let commentId, changedState: let changedState):
+      if let nowState = currentState.comments.firstIndex(where: { $0.commentId == commentId }),
+         currentState.comments[nowState].isLike == changedState{
+        return .just(.setIsLoading(false))
+      } else {
+        return setCommentLikeUseCase.execute(changedState: changedState, commentId: commentId)
+          .map { [changedState] postId in
+            return .setCommentLike(commentId: commentId, changedState: changedState)
+          }
+      }
+     
+    case .tabReplyLike(let parentsId, let replyId, let changedState):
+      if let parentsIndex = currentState.comments.firstIndex(where: { $0.commentId == parentsId }),
+         let replyIndex = currentState.comments[parentsIndex].childReplys.firstIndex(where: { $0.commentId == replyId }),
+         currentState.comments[parentsIndex].childReplys[replyIndex].isLike == changedState {
+        return .just(.setIsLoading(false))
+      } else {
+        return setCommentLikeUseCase.execute(changedState: changedState, commentId: replyId)
+          .map { [changedState] postId in
+            return .setReplyLike(parentsId: parentsId, replyId: replyId, changedState: changedState)
+          }
+      }
       
     /// Report
     case .reportBlockUser(userId: let userId):
@@ -292,6 +323,29 @@ extension FeedDetailReactor {
         newState.commentTableState = .commentlastPage
       } else {
         newState.commentTableState = .commentPaged(addedCount: comments.count)
+      }
+      
+    // like Comment / Reply
+    case .setCommentLike(let commentId, let changedState):
+      if let commentIndex = currentState.comments.firstIndex(where: { $0.commentId == commentId }) {
+        let likeCount = newState.comments[commentIndex].likeCount
+        newState.comments[commentIndex].isLike = changedState
+        newState.comments[commentIndex].likeCount = changedState ? likeCount + 1 : likeCount - 1
+      }
+              
+    case .setReplyLike(parentsId: let parentsId, replyId: let replyId, changedState: let changedState):
+      if let parentsIndex = currentState.comments.firstIndex(where: { $0.commentId == parentsId }),
+         let replyIndex = currentState.comments[parentsIndex].childReplys.firstIndex(where: { $0.commentId == replyId }) {
+        newState.comments[parentsIndex].childReplys[replyIndex].isLike = changedState
+        
+        let likeCount = newState.comments[parentsIndex].childReplys[replyIndex].likeCount
+        
+        if likeCount > 0 {
+          newState.comments[parentsIndex].childReplys[replyIndex].likeCount = changedState ? likeCount + 1 : likeCount - 1
+        } else {
+          newState.comments[parentsIndex].childReplys[replyIndex].likeCount = changedState ? likeCount + 1 : likeCount
+        }
+        
       }
       
     /// Write Comment

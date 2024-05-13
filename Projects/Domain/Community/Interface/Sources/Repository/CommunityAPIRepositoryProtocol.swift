@@ -30,6 +30,10 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   /// Like
   func setLike(postId: Int) -> Observable<Int>
   func deleteLike(postId: Int) -> Observable<Int>
+  
+  func setCommentLike(commentId: Int) -> Observable<Int>
+  func deleteCommentLike(commentId: Int) -> Observable<Int>
+
   /// Bookmark
   func setBookmark(postId: Int) -> Observable<Int>
   func deleteBookmark(postId: Int) -> Observable<Int>
