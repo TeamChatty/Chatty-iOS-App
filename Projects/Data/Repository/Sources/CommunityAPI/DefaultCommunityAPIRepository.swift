@@ -69,6 +69,43 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
       .asObservable()
       .map { $0.toDomain() }
   }
+    
+  /// Comment
+  public func writeComment(postId: Int, content: String) -> Observable<Comment> {
+    let requestId = PostRequestId(postId: postId)
+    let requestDTO = WriteCommonCommentReqeustDTO(content: content)
+    
+    return communityAPIService.request(endPoint: .writeComment(requestIds: requestId, requestDTO: requestDTO), responseDTO: WriteCommentResponseDTO.self)
+      .map { $0.toDomain() }
+      .asObservable()
+  }
+  
+  public func writeReply(postId: Int, commentId: Int, content: String) -> Observable<Reply> {
+    let requestId = CommentRequestIds(postId: postId, commentId: commentId)
+    let requestDTO = WriteCommonCommentReqeustDTO(content: content)
+    
+    return communityAPIService.request(endPoint: .writeCommentReply(requestIds: requestId, requestDTO: requestDTO), responseDTO: WriteReplyResponseDTO.self)
+      .map { [commentId] response in
+        return response.toDomain(parentId: commentId)
+      }
+      .asObservable()
+  }
+  
+  public func getComments(postId: Int, lastCommentId: Int64, size: Int) -> Observable<[Comment]> {
+    let requestId = GetCommnetsRequestDTO(postId: postId, lastCommentId: lastCommentId, size: size)
+    
+    return communityAPIService.request(endPoint: .getComments(requestId), responseDTO: GetCommnetsResponseDTO.self)
+      .map { $0.toDomain() }
+      .asObservable()
+  }
+  
+  public func getReplies(commentId: Int, lastCommentId: Int64, size: Int) -> Observable<[Reply]> {
+    let requestId = GetRepliesRequestDTO(commentId: commentId, lastCommentId: lastCommentId, size: size)
+    
+    return communityAPIService.request(endPoint: .getCommentReplies(requestId), responseDTO: GetRepliesResponseDTO.self)
+      .map { $0.toDomain() }
+      .asObservable()
+  }
   
   
   /// Like

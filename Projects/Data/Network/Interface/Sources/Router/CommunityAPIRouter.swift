@@ -24,8 +24,8 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   /// Comment
   case writeComment(requestIds: PostRequestId, requestDTO: WriteCommonCommentReqeustDTO)
   case writeCommentReply(requestIds: CommentRequestIds, requestDTO: WriteCommonCommentReqeustDTO)
-  case getComment(PostRequestId)
-  case getCommentReplies(CommentRequestIds)
+  case getComments(GetCommnetsRequestDTO)
+  case getCommentReplies(GetRepliesRequestDTO)
   
   /// Like
   case postLike(PostRequestId)
@@ -60,6 +60,11 @@ public extension CommunityAPIRouter {
     case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete:
       return "/v1"
       
+    case .getComments(let requestDTO):
+      return "/v2/post/\(requestDTO.postId)/comments?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
+    case .getCommentReplies(let requestDTO):
+      return "/v2/comment-replies/\(requestDTO.commentId)?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
+      
     /// Report
     case .reportBlock(userId: let userId):
       return "/v1/block/\(userId)"
@@ -75,7 +80,7 @@ public extension CommunityAPIRouter {
     /// Write Post
     case .writePost:
       return ""
-    
+     
     /// Posts Page
     case .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts:
       return ""
@@ -89,10 +94,8 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/comment"
     case .writeCommentReply(let requestIds, _):
       return "/\(requestIds.postId)/comment/\(requestIds.commentId)/comment-reply"
-    case .getComment(let requestId):
-      return "/\(requestId.postId)/comments"
-    case .getCommentReplies(let requestIds):
-      return "/\(requestIds.postId)/comment/\(requestIds.commentId)/comment-replies"
+    case .getComments, .getCommentReplies:
+      return ""
     
     /// Like
     case .postLike(postId: let requestId):
@@ -115,7 +118,7 @@ public extension CommunityAPIRouter {
   
   var method: Moya.Method {
     switch self {
-    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComment, .getCommentReplies:
+    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComments, .getCommentReplies:
       return .get
     case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost:
       return .post
@@ -126,7 +129,7 @@ public extension CommunityAPIRouter {
   
   var task: Moya.Task {
     switch self {
-    case .getPost, .getComment, .getCommentReplies:
+    case .getPost, .getComments, .getCommentReplies:
       return .requestPlain
 
     case .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts:

@@ -17,27 +17,57 @@ public final class FeedDetailReactor: Reactor {
   private let setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase
   private let reportUseCase: ReportUseCase
   
+  private let getCommetUseCase: GetCommetUseCase
+  private let writeCommentUseCase: WriteCommentUseCase
+  
+  
   let cellCase: [DetailCellCase] = [.content, .comment]
   
   public enum Action {
     case viewDidLoad
+    case refresh
+    case refreshSuccessWrited(commentId: Int)
+    case scrollToNextPage
+//    case tabRepliesButton(commentId: Int)
     
+    ///  Feed
     case bookmark(postId: Int, changedState: Bool)
     case favorite(postId: Int, changedState: Bool)
+    
+    /// Comment
+    case startComment(CommentInputType)
+    case inputComment(String)
+    case sendComment
     
     case reportBlockUser(userId: Int)
     case reportPost(postId: Int)
   }
   
   public enum Mutation {
+    /// Feed
     case setFeed(Feed)
     
     case setLike(postId: Int, changedState: Bool)
     case setBookmark(postId: Int, changedState: Bool)
     
+    /// Comment
+    case setComments(comments: [FeedDetailComment])
+    case setCommentsRefresh(comments: [FeedDetailComment])
+    case setNextCommentsPage(comments: [FeedDetailComment])
+//    case setReplies(replies: [FeedDetailReply])
+    case setCommentInputType(CommentInputType)
+    case setInputedText(String)
+    
+    /// WriteComment
+    case setSavedComment(FeedDetailComment)
+    case setSavedReply(FeedDetailReply)
+    
     case setBlockedId(userId: Int?)
     case setReportedId(postId: Int?)
     
+    case setTableState
+    case setIsFetchingCommentPage(Bool)
+    case setIsReloading(Bool)
     case setIsLoading(Bool)
     case setError(ErrorType?)
   }
@@ -46,22 +76,46 @@ public final class FeedDetailReactor: Reactor {
     var postId: Int
     var feed: Feed?
     
-    var commentType: CommentType?
+    var comments: [FeedDetailComment] = []
+    
+    var commentInputType: CommentInputType? = nil
+    var commentTableState: CommentTableState? = nil
+    var inputedText: String = ""
     
     var blockedId: Int?
     var reportedPostId: Int?
     
+    var isFetchingComment: Bool = false
+    var isReloading: Bool = false
     var isLoading: Bool = false
     var errorState: ErrorType? = nil
   }
   
   public var initialState: State
-  
-  public init(getFeedUseCase: GetFeedUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, reportUseCase: ReportUseCase, postId: Int) {
+
+  public init(getFeedUseCase: GetFeedUseCase, setBookmarkAndLikeUseCase: SetBookmarkAndLikeUseCase, reportUseCase: ReportUseCase, getCommetUseCase: GetCommetUseCase, writeCommentUseCase: WriteCommentUseCase, postId: Int) {
     self.getFeedUseCase = getFeedUseCase
     self.setBookmarkAndLikeUseCase = setBookmarkAndLikeUseCase
     self.reportUseCase = reportUseCase
+    self.getCommetUseCase = getCommetUseCase
+    self.writeCommentUseCase = writeCommentUseCase
     self.initialState = State(postId: postId)
+  }
+  
+  var newPageIndexPath: [IndexPath] {
+    guard let tableState = currentState.commentTableState else { return [] }
+    
+    switch tableState {
+    case .commentPaged(let addedCount):
+      var indexPaths: [IndexPath] = []
+      let lastRowIndex: Int = currentState.comments.count - addedCount
+      for count in 0..<addedCount {
+        indexPaths.append(IndexPath(row: lastRowIndex + count, section: 0))
+      }
+      return indexPaths
+    default:
+      return []
+    }
   }
   
   public enum ErrorType: Error {
@@ -81,12 +135,48 @@ extension FeedDetailReactor {
     switch action {
     case .viewDidLoad:
       return .concat([
+        .just(.setTableState),
         .just(.setIsLoading(true)),
         getFeedUseCase.execute(postId: initialState.postId)
           .map { .setFeed($0) },
+        getCommetUseCase.executeComments(postId: initialState.postId, lastCommentId: Int64.max, size: 10)
+          .map { .setComments(comments: $0) },
         .just(.setIsLoading(false)),
       ])
-  
+      
+    case .refresh:
+      return .concat([
+        .just(.setTableState),
+        .just(.setIsReloading(true)),
+        getFeedUseCase.execute(postId: initialState.postId)
+          .map { .setFeed($0) },
+        getCommetUseCase.executeComments(postId: initialState.postId, lastCommentId: Int64.max, size: 10)
+          .map { .setCommentsRefresh(comments: $0) },
+        .just(.setIsReloading(false)),
+      ])
+    case .refreshSuccessWrited(commentId: let commentId):
+      return .concat([
+        .just(.setTableState),
+        .just(.setIsLoading(true)),
+        getFeedUseCase.execute(postId: initialState.postId)
+          .map { .setFeed($0) },
+        getCommetUseCase.executeComments(postId: initialState.postId, lastCommentId: Int64.max, size: 10)
+          .map { .setCommentsRefresh(comments: $0) },
+        .just(.setIsLoading(false)),
+      ])
+    case .scrollToNextPage:
+      let lastPostId = currentState.comments.last?.commentId ?? Int.max
+      return .concat([
+        .just(.setTableState),
+        .just(.setIsFetchingCommentPage(true)),
+        getCommetUseCase.executeComments(postId: initialState.postId, lastCommentId: Int64(lastPostId), size: 10)
+          .map { .setNextCommentsPage(comments: $0) },
+        .just(.setIsFetchingCommentPage(false)),
+      ])
+//    case .tabRepliesButton(commentId: let commentId):
+//      <#code#>
+      
+      /// Feed
     case .bookmark(let postId, let changedState):
       if currentState.feed?.bookmark == changedState {
         return .just(.setIsLoading(false))
@@ -108,6 +198,38 @@ extension FeedDetailReactor {
           }
       }
       
+    /// Comment
+    case .startComment(let type):
+      return .just(.setCommentInputType(type))
+      
+    case .inputComment(let text):
+      return .just(.setInputedText(text))
+      
+    case .sendComment:
+      switch currentState.commentInputType {
+      case .comment:
+        return .concat([
+          .just(.setTableState),
+          .just(.setIsLoading(true)),
+          writeCommentUseCase.executeComment(postId: initialState.postId, content: currentState.inputedText)
+            .map { .setSavedComment($0) },
+          .just(.setIsLoading(false))
+        ])
+      case .reply(let commentId):
+        return .concat([
+          .just(.setTableState),
+          .just(.setIsLoading(true)),
+          writeCommentUseCase.executeReply(postId: initialState.postId, commentId: commentId, content: currentState.inputedText)
+            .map { .setSavedReply($0) },
+          .just(.setIsLoading(false))
+        ])
+        
+      default:
+        return .just(.setIsLoading(false))
+      }
+    
+      
+    /// Report
     case .reportBlockUser(userId: let userId):
       return .concat([
         .just(.setBlockedId(userId: nil)),
@@ -129,8 +251,7 @@ extension FeedDetailReactor {
     case .setFeed(let feed):
       newState.feed = feed
       
-    case .setIsLoading(let bool):
-      newState.isLoading = bool
+    /// Feed
     case .setLike(postId: let postId, changedState: let editedState):
       newState.feed?.like = editedState
       if let likeCount = newState.feed?.likeCount {
@@ -138,12 +259,80 @@ extension FeedDetailReactor {
       }
     case .setBookmark(postId: let postId, changedState: let editedState):
       newState.feed?.bookmark = editedState
+      
+    /// Comment
+    case .setComments(comments: let comments):
+      newState.comments = comments
+      
+      if comments.isEmpty {
+        newState.commentTableState = .commentLoadedEmpty
+      } else if comments.count == currentState.feed?.commentCount {
+        newState.commentTableState = .commentLoadedLastPage
+      } else if comments.count < 10 {
+        newState.commentTableState = .commentLoadedLastPage
+      } else {
+        newState.commentTableState = .commentLoaded
+      }
+      
+    case .setCommentsRefresh(comments: let comments):
+      newState.comments = comments
+      
+      if comments.isEmpty {
+        newState.commentTableState = .commentLoadedEmpty
+      } else if comments.count < 10 {
+        newState.commentTableState = .commentLoadedLastPage
+      } else {
+        newState.commentTableState = .commentLoaded
+      }
+      
+    case .setNextCommentsPage(comments: let comments):
+      newState.comments += comments
+      
+      if comments.count < 10 {
+        newState.commentTableState = .commentlastPage
+      } else {
+        newState.commentTableState = .commentPaged(addedCount: comments.count)
+      }
+      
+    /// Write Comment
+    case .setCommentInputType(let type):
+      newState.commentInputType = type
+
+    case .setInputedText(let text):
+      newState.inputedText = text
+      
+    case .setSavedComment(let comment):
+      newState.comments.insert(comment, at: 0)
+      newState.commentTableState = .savedcomment
+      newState.feed?.commentCount += 1
+      newState.commentInputType = .cancel
+      
+    case .setSavedReply(let reply):
+      if let index = newState.comments.firstIndex(where: { $0.commentId == reply.parentsId}) {
+        newState.comments[index].childCount += 1
+        newState.comments[index].childReplys.insert(reply, at: 0)
+        
+        newState.commentTableState = .savedReply(parentsId: reply.parentsId)
+        newState.commentInputType = .cancel
+      }
+
+    /// Report
     case .setBlockedId(userId: let userId):
       newState.blockedId = userId
     case .setReportedId(postId: let postId):
       newState.reportedPostId = postId
+      
     case .setError(let error):
       newState.errorState = error
+    case .setIsLoading(let bool):
+      newState.isLoading = bool
+   
+    case .setTableState:
+      newState.commentTableState = nil
+    case .setIsFetchingCommentPage(let bool):
+      newState.isFetchingComment = bool
+    case .setIsReloading(let bool):
+      newState.isReloading = bool
     }
     return newState
   }

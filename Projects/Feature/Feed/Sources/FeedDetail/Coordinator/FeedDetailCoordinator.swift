@@ -34,6 +34,8 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
       getFeedUseCase: featureFeedDependencyProvider.makeGetFeedUseCase(),
       setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
       reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
+      getCommetUseCase: featureFeedDependencyProvider.makeGetCommetUseCase(),
+      writeCommentUseCase: featureFeedDependencyProvider.makeWriteCommentUseCase(),
       postId: postId)
    
     let feedDetailController = FeedDetailController(reactor: reactor)

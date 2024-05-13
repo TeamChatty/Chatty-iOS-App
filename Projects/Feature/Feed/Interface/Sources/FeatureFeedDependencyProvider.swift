@@ -8,4 +8,7 @@ public protocol FeatureFeedDependencyProvider {
   func makeSetBookmarkAndLikeUseCase() -> DefaultSetBookmarkAndLikeUseCase
   func makeReportUseCase() -> DefaultReportUseCase
   func makeGetFeedUseCase() -> DefaultGetFeedUseCase
+  
+  func makeGetCommetUseCase() -> DefaultGetCommetUseCase
+  func makeWriteCommentUseCase() -> DefaultWriteCommentUseCase
 }

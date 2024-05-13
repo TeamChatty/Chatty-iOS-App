@@ -19,6 +19,7 @@ final class FeedCommentView: BaseView, Touchable {
   private let profileImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
     $0.layer.cornerRadius = 36 / 2
+    $0.clipsToBounds = true
   }
   private let nicknameLabel: UILabel = UILabel().then {
     $0.font = SystemFont.body02.font
@@ -38,7 +39,7 @@ final class FeedCommentView: BaseView, Touchable {
     $0.textColor = SystemColor.basicBlack.uiColor
   }
   
-  private let     createdAtLabel: UILabel = UILabel().then {
+  private let createdAtLabel: UILabel = UILabel().then {
     $0.font = SystemFont.caption03.font
     $0.textColor = SystemColor.gray500.uiColor
   }
@@ -65,7 +66,7 @@ final class FeedCommentView: BaseView, Touchable {
         return
       }
       
-      if isReply == false {
+      if isReply == true {
         self.replyButton.removeFromSuperview()
       }
     }
@@ -121,10 +122,17 @@ final class FeedCommentView: BaseView, Touchable {
     likeButton.touchEventRelay
       .do(onNext: { [weak self] _ in
         guard let self,
-              let likeCount else { return }
+              let likeCount = self.likeCount else { return }
         let nowState = self.likeButton.currentState
 
-        self.likeCount = nowState == .enabled ? likeCount - 1 : likeCount + 1
+        if nowState == .enabled {
+          if likeCount > 0 {
+            self.likeCount = likeCount - 1
+          }
+        } else {
+          self.likeCount = likeCount + 1
+        }
+        
         self.likeButton.currentState = nowState == .enabled ? .disabled : .enabled
       })
       .debounce(.seconds(1), scheduler: MainScheduler.asyncInstance)
@@ -149,20 +157,22 @@ extension FeedCommentView {
     addSubview(nicknameLabel)
     addSubview(contentLabel)
     
-    addSubview(    createdAtLabel)
+    addSubview(createdAtLabel)
     addSubview(likeButton)
     addSubview(replyButton)
     
     profileImageView.snp.makeConstraints {
-      $0.top.leading.equalToSuperview()
+      $0.top.equalToSuperview().inset(12)
+      $0.leading.equalToSuperview()
       $0.width.height.equalTo(36)
     }
     reportButton.snp.makeConstraints {
-      $0.top.trailing.equalToSuperview()
+      $0.top.equalTo(profileImageView.snp.top)
+      $0.trailing.equalToSuperview()
       $0.width.height.equalTo(24)
     }
     nicknameLabel.snp.makeConstraints {
-      $0.top.equalToSuperview().inset(3)
+      $0.top.equalTo(profileImageView.snp.top).offset(-3)
       $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
       $0.trailing.equalTo(reportButton.snp.leading).offset(8)
       $0.height.equalTo(20)
@@ -175,19 +185,20 @@ extension FeedCommentView {
       $0.height.equalTo(20)
     }
     
-        createdAtLabel.snp.makeConstraints {
+    createdAtLabel.snp.makeConstraints {
       $0.top.equalTo(contentLabel.snp.bottom).offset(8)
+      $0.height.equalTo(18)
       $0.leading.equalTo(nicknameLabel.snp.leading)
       $0.bottom.equalToSuperview().inset(8)
     }
     likeButton.snp.makeConstraints {
-      $0.centerX.equalTo(    createdAtLabel.snp.centerX)
-      $0.leading.equalTo(    createdAtLabel.snp.trailing)
+      $0.centerY.equalTo(createdAtLabel.snp.centerY)
+      $0.leading.equalTo(createdAtLabel.snp.trailing)
       $0.width.height.equalTo(18)
     }
     replyButton.snp.makeConstraints {
-      $0.centerX.equalTo(    createdAtLabel.snp.centerX)
-      $0.leading.equalTo(replyButton.snp.trailing)
+      $0.centerY.equalTo(createdAtLabel.snp.centerY)
+      $0.leading.equalTo(likeButton.snp.trailing)
       $0.height.equalTo(18)
     }
   }
@@ -203,7 +214,7 @@ extension FeedCommentView {
     nicknameLabel.text = nickname
     contentLabel.text = content
     
-        createdAtLabel.text = "\(createdAt.toTimeDifference()) ・ "
+    createdAtLabel.text = "\(createdAt.toTimeDifference()) ・ "
     
     self.isLike = isLike
     self.likeCount = likeCount

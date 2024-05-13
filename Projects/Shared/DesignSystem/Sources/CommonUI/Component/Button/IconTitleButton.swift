@@ -22,8 +22,7 @@ open class IconTitleButton: BaseControl, Touchable, Highlightable {
     $0.font = SystemFont.body02.font
     $0.textAlignment = .left
   }
-  
-  // MARK: - Stored Property
+
  
   
   // MARK: - Rx Property

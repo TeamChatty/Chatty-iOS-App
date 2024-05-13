@@ -21,6 +21,12 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   /// Post
   func getPost(postId: Int) -> Observable<Feed>
   
+  /// Comment
+  func writeComment(postId: Int, content: String) -> Observable<Comment>
+  func writeReply(postId: Int, commentId: Int, content: String) -> Observable<Reply>
+  func getComments(postId: Int, lastCommentId: Int64, size: Int) -> Observable<[Comment]>
+  func getReplies(commentId: Int, lastCommentId: Int64, size: Int) -> Observable<[Reply]>
+  
   /// Like
   func setLike(postId: Int) -> Observable<Int>
   func deleteLike(postId: Int) -> Observable<Int>

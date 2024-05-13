@@ -40,4 +40,18 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }
+  
+  func makeGetCommetUseCase() -> DefaultGetCommetUseCase {
+    return DefaultGetCommetUseCase(
+      communityAPIRepository: makeCommunityAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
+  func makeWriteCommentUseCase() -> DefaultWriteCommentUseCase {
+    return DefaultWriteCommentUseCase(
+      communityAPIRepository: makeCommunityAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
 }
