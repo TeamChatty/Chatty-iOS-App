@@ -60,4 +60,10 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
       userProfileRepository: makeUserProfileRepository()
     )
   }
+  
+  func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase {
+    return DefaultGetMyCommentsUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
 }

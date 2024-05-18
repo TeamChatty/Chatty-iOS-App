@@ -38,6 +38,7 @@ final class FeedProfileController: BaseController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    tabBarController?.tabBar.isHidden = false
   }
   
   // MARK: - Initialize Method
@@ -127,7 +128,6 @@ extension FeedProfileController: ReactorKit.View {
 
 extension FeedProfileController {
   private func setView() {
-    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)
@@ -146,8 +146,8 @@ extension FeedProfileController {
   }
 }
 
-extension FeedProfileController {
-  func removeReportedFeed(userId: Int) {
-    mainView.removeReportedUserPost(userId: userId)
-  }
-}
+//extension FeedProfileController {
+//  func removeReportedFeed(userId: Int) {
+//    mainView.removeReportedUserPost(userId: userId)
+//  }
+//}

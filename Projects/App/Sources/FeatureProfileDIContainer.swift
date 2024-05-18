@@ -19,6 +19,13 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
     )
   }
   
+  func makeSaveProfileImageUseCase() -> DefaultSaveProfileImageUseCase {
+    return DefaultSaveProfileImageUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),

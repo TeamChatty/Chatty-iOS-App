@@ -10,7 +10,7 @@ import RxSwift
 
 public protocol CommunityAPIRepositoryProtocol: AnyObject {
   /// Write Post
-  func writeFeed(title: String, content: String, images: [Data]) -> Observable<WritedFeed>
+  func writeFeed(content: String, images: [Data]) -> Observable<WritedFeed>
   
   /// Posts Page
   func getPosts(lastPostId: Int, size: Int) -> Observable<[Feed]>
@@ -26,7 +26,8 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   func writeReply(postId: Int, commentId: Int, content: String) -> Observable<Reply>
   func getComments(postId: Int, lastCommentId: Int64, size: Int) -> Observable<[Comment]>
   func getReplies(commentId: Int, lastCommentId: Int64, size: Int) -> Observable<[Reply]>
-  
+  func getMyComments(lastCommentId: Int64, size: Int) -> Observable<[Comment]>
+
   /// Like
   func setLike(postId: Int) -> Observable<Int>
   func deleteLike(postId: Int) -> Observable<Int>
@@ -40,5 +41,5 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   
   /// Report
   func reportBlockUser(userId: Int) -> Observable<Int>
-  func reportPost(postId: Int) -> Observable<Int>
+  func reportUser(userId: Int) -> Observable<Int>
 }

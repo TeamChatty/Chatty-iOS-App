@@ -26,6 +26,7 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case writeCommentReply(requestIds: CommentRequestIds, requestDTO: WriteCommonCommentReqeustDTO)
   case getComments(GetCommnetsRequestDTO)
   case getCommentReplies(GetRepliesRequestDTO)
+  case getMyComments(GetMyCommnetsRequestDTO)
   
   /// Like
   case postLike(PostRequestId)
@@ -40,12 +41,13 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   
   /// Report
   case reportBlock(userId: Int)
-  case reportPost
+  case reportUser(userId: Int)
 }
 
 public extension CommunityAPIRouter {
   var baseURL: URL {
-    return URL(string: Environment.baseURL + basePath)!
+    let url = URL(string: Environment.baseURL + basePath)!
+    return url
   }
   
   var basePath: String {
@@ -69,11 +71,14 @@ public extension CommunityAPIRouter {
     case .getCommentReplies(let requestDTO):
       return "/v2/comment-replies/\(requestDTO.commentId)?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
       
+    case .getMyComments(let requestDTO):
+      return "/v1/my-comments?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
+      
     /// Report
     case .reportBlock(userId: let userId):
       return "/v1/block/\(userId)"
-    case .reportPost:
-      return "/v1/block"
+    case .reportUser(let userId):
+      return "/v1/report/\(userId)"
     default:
       return "/v1/post"
     }
@@ -98,7 +103,7 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/comment"
     case .writeCommentReply(let requestIds, _):
       return "/\(requestIds.postId)/comment/\(requestIds.commentId)/comment-reply"
-    case .getComments, .getCommentReplies:
+    case .getComments, .getCommentReplies, .getMyComments:
       return ""
     
     /// Like
@@ -119,16 +124,16 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/bookmark"
       
     /// Report
-    case .reportBlock, .reportPost:
+    case .reportBlock, .reportUser:
       return ""
     }
   }
   
   var method: Moya.Method {
     switch self {
-    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComments, .getCommentReplies:
+    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComments, .getCommentReplies, .getMyComments:
       return .get
-    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost, .commentLike:
+    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportUser, .commentLike:
       return .post
     case .postLikeDelete, .postBookmarkDelete, .commentLikeDelete:
       return .delete
@@ -137,7 +142,7 @@ public extension CommunityAPIRouter {
   
   var task: Moya.Task {
     switch self {
-    case .getPost, .getComments, .getCommentReplies:
+    case .getPost, .getComments, .getCommentReplies, .getMyComments:
       return .requestPlain
 
     case .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts:
@@ -146,20 +151,25 @@ public extension CommunityAPIRouter {
     case .postLike, .postBookmark, .postLikeDelete, .postBookmarkDelete:
       return .requestPlain
       
-    case .reportBlock, .reportPost:
+    case .reportBlock, .reportUser:
       return .requestPlain
 
     case .writePost(let requestDTO):
-      if requestDTO.images.isEmpty {
-        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
-        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
-        return .uploadMultipart([titleData, dataData])
-      } else {
+      var multipartFormDatas: [MultipartFormData] = []
+      let contentData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
+      
+      multipartFormDatas.append(contentData)
+      
+      if requestDTO.images.isEmpty == false {
+        for (index, image) in requestDTO.images.enumerated() {
+          let imageData = MultipartFormData(provider: .data(image), name: "images", fileName: "image_\(index)", mimeType: "image/jpeg")
+
+          multipartFormDatas.append(imageData)
+        }
         
-        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
-        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
-        return .uploadMultipart([titleData, dataData])
       }
+      return .uploadMultipart(multipartFormDatas)
+
       
     case .commentLike, .commentLikeDelete:
       return .requestPlain

@@ -13,4 +13,6 @@ public protocol FeatureFeedDependencyProvider {
   
   func makeGetCommetUseCase() -> DefaultGetCommetUseCase
   func makeWriteCommentUseCase() -> DefaultWriteCommentUseCase
+  
+  func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase
 }

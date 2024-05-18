@@ -1,8 +1,8 @@
 //
-//  FeedCommentView.swift
+//  FeedMyCommentCellView.swift
 //  FeatureFeed
 //
-//  Created by 윤지호 on 5/5/24.
+//  Created by 윤지호 on 5/18/24.
 //
 
 import UIKit
@@ -13,7 +13,7 @@ import RxCocoa
 import SharedDesignSystem
 import SharedUtil
 
-final class FeedCommentView: BaseView, Touchable {
+final class FeedMyCommentCellView: BaseView, Touchable {
   
   // MARK: - View Property
   private let profileImageView: UIImageView = UIImageView().then {
@@ -25,14 +25,15 @@ final class FeedCommentView: BaseView, Touchable {
     $0.font = SystemFont.body02.font
     $0.textColor = SystemColor.basicBlack.uiColor
   }
-  private let reportButton: ChangeableImageButton = ChangeableImageButton().then {
-    typealias Config = ChangeableImageButton.Configuration
-    let image = Images._3DotHorizontal.image.withRenderingMode(.alwaysTemplate)
-    let enabled = Config(image: image, tintColor: SystemColor.basicBlack.uiColor, isEnabled: true)
-    let disabled = Config(image: UIImage(), tintColor: SystemColor.basicWhite.uiColor, isEnabled: false)
+  private let myCommentLabel: BasePaddingLabel = BasePaddingLabel(padding: UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)).then {
+    $0.text = "내 댓글"
+   
+    $0.font = SystemFont.custom(type: .Light, size: 10).font
+    $0.textColor = SystemColor.basicWhite.uiColor
     
-    $0.setState(enabled, for: .enabled)
-    $0.setState(disabled, for: .disabled)
+    $0.backgroundColor = SystemColor.primaryNormal.uiColor
+    $0.layer.cornerRadius = 20 / 2
+    $0.clipsToBounds = true
   }
   private let contentLabel: VerticalAlignLabel = VerticalAlignLabel().then {
     $0.font = SystemFont.body03.font
@@ -59,19 +60,9 @@ final class FeedCommentView: BaseView, Touchable {
   private let disposeBag = DisposeBag()
   
   // MARK: - Stored Property
+  private var postId: Int?
   private var commentId: Int?
-  private var parentsId: Int?
-  private var isReply: Bool? {
-    didSet {
-      guard let isReply else {
-        return
-      }
-      
-      if isReply == true {
-        self.replyButton.removeFromSuperview()
-      }
-    }
-  }
+  
   private var isLike: Bool? {
     didSet {
       guard let isLike else { return }
@@ -92,9 +83,8 @@ final class FeedCommentView: BaseView, Touchable {
   // MARK: - Touchable Property
   var touchEventRelay: PublishRelay<TouchEventType> = .init()
   enum TouchEventType {
-    case report(commentId: Int)
-    case reply(commentId: Int)
-    case like(parentsId: Int?, commentId: Int, changedState: Bool)
+    case showPostForReply(postId: Int)
+    case like(commentId: Int, changedState: Bool)
   }
 
   // MARK: - UIConfigurable
@@ -104,22 +94,6 @@ final class FeedCommentView: BaseView, Touchable {
   
   // MARK: - UIBindable
   override func bind() {
-    reportButton.touchEventRelay
-      .withUnretained(self)
-      .map { owner, _ in
-        return TouchEventType.report(commentId: owner.commentId ?? 0)
-      }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
-    replyButton.touchEventRelay
-      .withUnretained(self)
-      .map { owner, _ in
-        return TouchEventType.reply(commentId: owner.commentId ?? 0)
-      }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
     likeButton.touchEventRelay
       .do(onNext: { [weak self] _ in
         guard let self,
@@ -140,23 +114,28 @@ final class FeedCommentView: BaseView, Touchable {
       .withUnretained(self)
       .map { owner, _ in
         let changedState: Bool = owner.likeButton.currentState == .enabled ? true : false
-        let parentsId = owner.isReply ?? false ? owner.parentsId : nil
         return TouchEventType.like(
-          parentsId: parentsId,
-          commentId: owner.commentId ?? 0,
-          changedState: changedState
+          commentId: owner.commentId ?? 0, changedState: changedState
         )
+      }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
+    replyButton.touchEventRelay
+      .withUnretained(self)
+      .map { owner, _ in
+        return TouchEventType.showPostForReply(postId: owner.postId ?? 0)
       }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
   }
 }
 
-extension FeedCommentView {
+extension FeedMyCommentCellView {
   private func setupView() {
     addSubview(profileImageView)
-    addSubview(reportButton)
     addSubview(nicknameLabel)
+    addSubview(myCommentLabel)
     addSubview(contentLabel)
     
     addSubview(createdAtLabel)
@@ -168,22 +147,23 @@ extension FeedCommentView {
       $0.leading.equalToSuperview()
       $0.width.height.equalTo(36)
     }
-    reportButton.snp.makeConstraints {
-      $0.top.equalTo(profileImageView.snp.top)
-      $0.trailing.equalToSuperview()
-      $0.width.height.equalTo(24)
-    }
+  
     nicknameLabel.snp.makeConstraints {
       $0.top.equalTo(profileImageView.snp.top).offset(-3)
       $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
-      $0.trailing.equalTo(reportButton.snp.leading).offset(8)
+      $0.height.equalTo(20)
+    }
+    
+    myCommentLabel.snp.makeConstraints {
+      $0.centerY.equalTo(nicknameLabel.snp.centerY)
+      $0.leading.equalTo(nicknameLabel.snp.trailing).offset(6)
       $0.height.equalTo(20)
     }
     
     contentLabel.snp.makeConstraints {
       $0.top.equalTo(nicknameLabel.snp.bottom).offset(4)
       $0.leading.equalTo(nicknameLabel.snp.leading)
-      $0.trailing.equalTo(nicknameLabel.snp.trailing)
+      $0.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(20)
     }
     
@@ -206,10 +186,9 @@ extension FeedCommentView {
   }
 }
 
-extension FeedCommentView {
-  func updateData(isOwner: Bool, isReply: Bool, parentsId: Int?, commentId: Int, profileImage: String?, nickname: String, content: String, createdAt: String, isLike: Bool, likeCount: Int) {
-    reportButton.currentState = isOwner ? .disabled : .enabled
-    self.isReply = isReply
+extension FeedMyCommentCellView {
+  func updateData(postId: Int, commentId: Int, profileImage: String?, nickname: String, content: String, createdAt: String, isLike: Bool, likeCount: Int) {
+    self.postId = postId
     self.commentId = commentId
     
     profileImageView.setProfileImageKF(urlString: profileImage, gender: .male, scale: .s36)
@@ -220,6 +199,6 @@ extension FeedCommentView {
     
     self.isLike = isLike
     self.likeCount = likeCount
-    self.parentsId = parentsId
   }
 }
+
