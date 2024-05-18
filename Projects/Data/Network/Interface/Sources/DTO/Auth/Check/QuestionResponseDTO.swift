@@ -14,10 +14,10 @@ public struct QuestionResponseDTO: Decodable {
   public let data: DataClass
   
   public struct DataClass: Decodable {
-    let question: [String]
+    let problem: [String]
   }
   
   public func toDomain() -> [String] {
-    return data.question
+    return data.problem
   }
 }

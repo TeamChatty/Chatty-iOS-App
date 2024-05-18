@@ -35,6 +35,7 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     case setVerificationCode(String)
     case setSendVerificationCodeState(AsyncState<Void>)
     case setError(ErrorType?)
+    case setSendCount(Int)
   }
   
   public struct State {
@@ -43,6 +44,7 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     var sendSMSState: AsyncState<Void> = .idle
     var sendVerificationCodeState: AsyncState<Void> = .idle
     var verificationCode: String = ""
+    var sendCount: Int = 0
     var errorState: ErrorType? = nil
   }
   
@@ -68,7 +70,12 @@ extension OnboardingPhoneAuthenticationReactor {
         .just(.setSendSMSState(.loading)),
         self.sendVerificationCodeUseCase.execute(mobileNumber: self.currentState.phoneNumber)
           .asObservable()
-          .map { .setSendSMSState(.success(.sendSms)) }
+          .flatMap { count -> Observable<Mutation> in
+            return .concat([
+              .just(.setSendSMSState(.success(.sendSms))),
+              .just(.setSendCount(count))
+            ])
+          }
           .catch { error -> Observable<Mutation> in
             return error.toMutation()
           },
@@ -110,6 +117,8 @@ extension OnboardingPhoneAuthenticationReactor {
       newState.errorState = state
     case .setVerificationCode(let code):
       newState.verificationCode = code
+    case .setSendCount(let count):
+      newState.sendCount = count
     }
     return newState
   }
@@ -151,7 +160,7 @@ extension OnboardingPhoneAuthenticationReactor {
     case lengthNotValid
   }
   
-  public enum AsyncState<T> {
+  public enum AsyncState<T>: Equatable {
     case idle
     case loading
     case success(NetworkAction)

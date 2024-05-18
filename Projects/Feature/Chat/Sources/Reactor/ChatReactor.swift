@@ -10,6 +10,8 @@ import RxSwift
 import ReactorKit
 import DomainChatInterface
 import DomainChat
+import DomainUserInterface
+import DomainUser
 import FeatureChatInterface
 
 public final class ChatReactor: Reactor {
@@ -18,6 +20,7 @@ public final class ChatReactor: Reactor {
   private let chatRoomSubscribeUseCase: DefaultChatRoomSubscribeUseCase
   private let getChatMessageStreamUseCase: DefaultGetChatMessageStreamUseCase
   private let getChatMessagesUseCase: DefaultGetChatMessgesUseCase
+  private let getSomeoneProfileUseCase: DefaultGetSomeoneProfileUseCase
   
   public let roomViewData: ChatRoomViewData
   
@@ -28,16 +31,19 @@ public final class ChatReactor: Reactor {
     case sendMessage(MessageContentType)
     case observeChatMessage
     case scrollToUnreadMessage
+    case getPartnerProfile(userId: Int)
   }
   
   public enum Mutation {
     case setSocketState(SocketState)
     case setMessages([ChatMessageViewData], Bool)
     case setUnreadMessageIndexPath(IndexPath?)
+    case setPartnerProfileData(SomeoneProfile)
   }
   
   public struct State {
     var chatRooms: ChatRoomViewData
+    var partnerProfile: SomeoneProfile?
     var messages: ([ChatMessageViewData], Bool) = ([], false)
     var socketState: SocketState? = nil
     var unreadMessageIndexPath: IndexPath?
@@ -45,12 +51,17 @@ public final class ChatReactor: Reactor {
   
   public lazy var initialState: State = .init(chatRooms: roomViewData)
   
-  public init(chatServerConnectUseCase: DefaultChatSTOMPConnectUseCase, chatSendMessageUseCase: DefaultChatSendMessageUseCase, chatRoomSubscribeUseCase: DefaultChatRoomSubscribeUseCase, getChatMessageStreamUseCase: DefaultGetChatMessageStreamUseCase, getChatMessagesUseCase: DefaultGetChatMessgesUseCase, roomViewData: ChatRoomViewData) {
+  deinit {
+    print("deinit ChatReactor")
+  }
+  
+  public init(chatServerConnectUseCase: DefaultChatSTOMPConnectUseCase, chatSendMessageUseCase: DefaultChatSendMessageUseCase, chatRoomSubscribeUseCase: DefaultChatRoomSubscribeUseCase, getChatMessageStreamUseCase: DefaultGetChatMessageStreamUseCase, getChatMessagesUseCase: DefaultGetChatMessgesUseCase, getSomeoneProfileUseCase: DefaultGetSomeoneProfileUseCase, roomViewData: ChatRoomViewData) {
     self.chatServerConnectUseCase = chatServerConnectUseCase
     self.chatSendMessageUseCase = chatSendMessageUseCase
     self.chatRoomSubscribeUseCase = chatRoomSubscribeUseCase
     self.getChatMessageStreamUseCase = getChatMessageStreamUseCase
     self.getChatMessagesUseCase = getChatMessagesUseCase
+    self.getSomeoneProfileUseCase = getSomeoneProfileUseCase
     self.roomViewData = roomViewData
   }
 }
@@ -81,6 +92,7 @@ extension ChatReactor {
         .just(.setUnreadMessageIndexPath(nil))
       ])
     case .connectChatServer:
+      print("채팅 서버 연결 시도합니다")
       return chatServerConnectUseCase.connectSocket()
         .asObservable()
         .flatMap { state -> Observable<Mutation> in
@@ -103,6 +115,13 @@ extension ChatReactor {
           }
           return .just(.setMessages(messages.0, true))
         }
+    case .getPartnerProfile(userId: let userId):
+      print("파트너 프로필 조회 요청")
+      return getSomeoneProfileUseCase.execute(userId: userId)
+        .asObservable()
+        .flatMap { profile -> Observable<Mutation> in
+          return .just(.setPartnerProfileData(profile))
+        }
     }
   }
   
@@ -115,6 +134,8 @@ extension ChatReactor {
       newState.unreadMessageIndexPath = indexPath
     case .setSocketState(let state):
       newState.socketState = state
+    case .setPartnerProfileData(let profile):
+      newState.partnerProfile = profile
     }
     
     return newState

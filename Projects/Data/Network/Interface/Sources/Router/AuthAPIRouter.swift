@@ -14,6 +14,7 @@ public enum AuthAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case token
   case problem(QuestionRequestDTO)
   case check(CheckRequestDTO)
+  case profile(mobileNumber: String)
 }
 
 public extension AuthAPIRouter {
@@ -25,7 +26,7 @@ public extension AuthAPIRouter {
     switch self {
     case .mobile, .refresh, .token:
       return "/auth"
-    case .problem, .check:
+    case .problem, .check, .profile:
       return "/check"
     }
   }
@@ -48,10 +49,12 @@ public extension AuthAPIRouter {
     case .check(let dto):
       switch dto.checkType {
       case .birth:
-        return "/nickname"
-      case .nickname:
         return "/birth"
+      case .nickname:
+        return "/nickname"
       }
+    case .profile:
+      return "/profile"
     }
   }
   
@@ -59,9 +62,7 @@ public extension AuthAPIRouter {
     switch self {
     case .mobile, .refresh, .token:
       return .post
-    case .problem:
-      return .get
-    case .check:
+    case .problem, .check, .profile:
       return .post
     }
   }
@@ -78,12 +79,14 @@ public extension AuthAPIRouter {
       return .requestJSONEncodable(problemRequestDTO.body)
     case .check(let checkRequestDTO):
       return .requestJSONEncodable(checkRequestDTO.body)
+    case .profile(mobileNumber: let mobileNumber):
+      return .requestParameters(parameters: ["mobileNumber" : mobileNumber], encoding: JSONEncoding.default)
     }
   }
   
   var headers: [String : String]? {
     switch self {
-    case .mobile, .refresh, .token, .problem, .check:
+    case .mobile, .refresh, .token, .problem, .check, .profile:
       return ["Content-Type": "application/json"]
     }
   }

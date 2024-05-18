@@ -8,11 +8,16 @@
 import Foundation
 import FeatureChatInterface
 import DomainChat
+import DomainUser
 import DataRepository
 import DataNetwork
 import DataStorage
 
 final class FeatureChatDIContainer: RepositoryDIcontainer, FeatureChatDependecyProvider {
+  func makeGetSomeoneProfileUseCase() -> DomainUser.DefaultGetSomeoneProfileUseCase {
+    return DefaultGetSomeoneProfileUseCase(userAPIRepository: makeUserAPIRepository())
+  }
+  
   func makeGetChatMessagesUseCase() -> DomainChat.DefaultGetChatMessgesUseCase {
     return DefaultGetChatMessgesUseCase(chatAPIRepository: makeChatAPIRepository())
   }

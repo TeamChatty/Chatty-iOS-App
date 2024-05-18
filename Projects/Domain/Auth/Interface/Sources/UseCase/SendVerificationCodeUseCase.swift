@@ -9,5 +9,5 @@ import Foundation
 import RxSwift
 
 public protocol SendVerificationCodeUseCase {
-  func execute(mobileNumber: String) -> Single<Void>
+  func execute(mobileNumber: String) -> Single<Int>
 }

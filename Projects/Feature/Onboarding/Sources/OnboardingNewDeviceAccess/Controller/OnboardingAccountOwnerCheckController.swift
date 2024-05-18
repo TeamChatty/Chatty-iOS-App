@@ -42,6 +42,20 @@ extension OnboardingAccountOwnerCheckController: ReactorKit.View {
   public typealias Reactor = AccountSecurityQuestionReactor
   
   public func bind(reactor: Reactor) {
+    rx.viewDidLoad
+      .map {
+        .getProfileImage
+      }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.profileImageURL)
+      .bind(with: self) { owner, profileImageURL in
+        owner.mainView.profileImageURL = profileImageURL
+      }
+      .disposed(by: disposeBag)
+    
     mainView.touchEventRelay
       .bind(with: self) { owner, touchType in
         switch touchType {
@@ -49,6 +63,16 @@ extension OnboardingAccountOwnerCheckController: ReactorKit.View {
           reactor.action.onNext(.getQuestionNickname)
         case .createAccount:
           break
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.questions)
+      .bind(with: self) { owner, question in
+        guard let question else { return }
+        if case .nickname(let items) = question {
+          owner.delegate?.pushToQuestion(step: .nickname(items))
         }
       }
       .disposed(by: disposeBag)

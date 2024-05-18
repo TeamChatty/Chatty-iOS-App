@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DomainAuthInterface
 
 public struct CheckRequestDTO {
   public let checkType: AuthCheckType
@@ -19,5 +20,10 @@ public struct CheckRequestDTO {
   public struct CheckRequestBody: Encodable {
     let mobileNumber: String
     let answer: String
+    
+    public init(mobileNumber: String, answer: String) {
+      self.mobileNumber = mobileNumber
+      self.answer = answer
+    }
   }
 }

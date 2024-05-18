@@ -67,16 +67,13 @@ public final class OnboardingPhoneNumberEntryController: BaseController {
     alertView.addButton("전송", for: .positive)
     alertView.addButton("취소", for: .negative)
     
-    let alertController = CustomAlertController(alertView: alertView, delegate: self)
+    let alertController = CustomAlertController(alertView: alertView) { [weak self] in
+      self?.reactor?.action.onNext(.sendSMS)
+    } negativeAction: { [weak self] in
+      self?.activateTextField()
+    }
+
     navigationController?.present(alertController, animated: false)
-  }
-  
-  public override func destructiveAction() {
-    reactor?.action.onNext(.sendSMS)
-  }
-  
-  public override func cancelAction() {
-    self.activateTextField()
   }
 }
 
@@ -108,6 +105,7 @@ extension OnboardingPhoneNumberEntryController: ReactorKit.View {
     
     reactor.state
       .map(\.sendSMSState)
+      .distinctUntilChanged()
       .subscribe(with: self) { [weak self] owner, state in
         guard let self else { return }
         self.hideLoadingIndicator()

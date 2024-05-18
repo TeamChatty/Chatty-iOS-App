@@ -74,6 +74,7 @@ public final class RadioSegmentControl<State: IntCaseIterable>: BaseControl, Tou
   }
   
   private func setupButtons(_ buttons: [RadioButton]) {
+    disposeBag = DisposeBag()
     buttons.enumerated().forEach { index, button in
       stackView.addArrangedSubview(button)
       button.snp.makeConstraints {

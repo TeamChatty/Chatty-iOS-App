@@ -132,7 +132,7 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
   }
   
   public func someoneProfile(userId: Int) -> Single<SomeoneProfile> {
-    return profileAPIService.request(endPoint: .profile(userId: userId), responseDTO: UserProfileResponseDTO.self)
+    return profileAPIService.request(endPoint: .profile(userId: userId), responseDTO: SomeoneProfileResponseDTO.self)
       .map { $0.toDomain() }
   }
   

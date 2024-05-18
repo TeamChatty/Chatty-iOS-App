@@ -67,12 +67,10 @@ final class SettingController: BaseController {
     alertView.addButton("확인", for: .positive)
     alertView.addButton("취소", for: .negative)
     
-    let alertController = CustomAlertController(alertView: alertView, delegate: self)
+    let alertController = CustomAlertController(alertView: alertView, positiveAction:  { [weak self] in
+      self?.reactor?.action.onNext(.tabLogoutAlertButton)
+    })
     navigationController?.present(alertController, animated: false)
-  }
-  
-  public override func destructiveAction() {
-    reactor?.action.onNext(.tabLogoutAlertButton)
   }
 }
 

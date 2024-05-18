@@ -133,6 +133,9 @@ extension LiveMainCoordinator: LiveMatchingDelegate {
   func successMatching(room: ChatRoom) {
     print("successMatching - Matching")
     let chatCoordinatorDelegate = featureLiveDependencyProvider.getChatCoordinatorDelegate()
+    if let chatCoordinator = chatCoordinatorDelegate as? Coordinator {
+      addChildCoordinator(chatCoordinator)
+    }
     DispatchQueue.main.async {
       self.navigationController.dismiss(animated: false)
       (chatCoordinatorDelegate as? ChatCoordinatorDelegate)?.pushToTemporaryChatRoom(roomData: room)

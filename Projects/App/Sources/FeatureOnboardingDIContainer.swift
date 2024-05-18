@@ -11,6 +11,20 @@ import DomainUser
 import FeatureOnboardingInterface
 
 final class FeatureOnboardingDIContainer: RepositoryDIcontainer, FeatureOnboardingDependencyProvider {
+  func makePostAuthCheckAnswerUseCase() -> DomainAuth.DefaultPostAuthCheckAnswerIUseCase {
+    return DefaultPostAuthCheckAnswerIUseCase(
+      authAPIRepository: makeAuthAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
+  func makeGetAuthCheckProfileUseCase() -> DomainAuth.DefaultGetAuthCheckProfileUseCase {
+    return DefaultGetAuthCheckProfileUseCase(
+      authAPIRepository: makeAuthAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
   func makeGetAuthCheckQuestionUseCase() -> DomainAuth.DefaultGetAuthCheckQuestionUseCase {
     return DefaultGetAuthCheckQuestionUseCase(
       authAPIRepository: makeAuthAPIRepository(),

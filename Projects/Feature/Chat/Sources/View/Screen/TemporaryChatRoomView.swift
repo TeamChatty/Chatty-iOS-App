@@ -14,7 +14,7 @@ import SharedDesignSystem
 import DomainChatInterface
 
 public final class TemporaryChatRoomView: BaseView, Touchable {
-  private let chatRoomHeaderBar: TemporaryChatRoomHeaderBar = TemporaryChatRoomHeaderBar()
+  public let chatRoomHeaderBar: TemporaryChatRoomHeaderBar = TemporaryChatRoomHeaderBar()
   private let chatRoomAnnounceView: ChatRoomAnnounceView = ChatRoomAnnounceView()
   public lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
     $0.contentInset = .init(top: 52, left: 0, bottom: 0, right: 0)
@@ -46,6 +46,10 @@ public final class TemporaryChatRoomView: BaseView, Touchable {
     chatInputBar.inputEventRelay
       .bind(to: inputEventRelay)
       .disposed(by: disposeBag)
+  }
+  
+  public func updateTimeLabel(_ time: String) {
+    chatRoomHeaderBar.timerLabel.text = time
   }
   
   private func setChatRoomHeaderBar() {
@@ -131,19 +135,5 @@ extension TemporaryChatRoomView: UITextViewDelegate {
   
   private func updateSendButtonIsEnabeld(_ textView: UITextView) {
     chatInputBar.updateSendButtonIsEnabled(textView.hasText)
-  }
-  
-  public func textViewDidEndEditing(_ textView: UITextView) {
-    if textView.text.isEmpty {
-      textView.text = "메시지를 입력하세요"
-      textView.textColor = SystemColor.gray500.uiColor
-    }
-  }
-  
-  public func textViewDidBeginEditing(_ textView: UITextView) {
-    if textView.textColor == SystemColor.gray500.uiColor {
-      textView.text = nil
-      textView.textColor = SystemColor.basicBlack.uiColor
-    }
   }
 }

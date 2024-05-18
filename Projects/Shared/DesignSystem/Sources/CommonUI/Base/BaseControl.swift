@@ -20,7 +20,7 @@ import RxSwift
 ///
 open class BaseControl: UIControl, UIConfigurable, Bindable {
   
-  public let disposeBag = DisposeBag()
+  public var disposeBag = DisposeBag()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)

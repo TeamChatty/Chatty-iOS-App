@@ -41,12 +41,23 @@ extension AccountSecurityQuestionController: ReactorKit.View {
   
   public func bind(reactor: Reactor) {
     mainView.touchEventRelay
-      .bind(with: self) { owner, touchType in
+      .bind(with: self) { [weak self] owner, touchType in
         switch touchType {
         case .answer(let accountSecurityAnswerType):
+          print("정답 선택")
           reactor.action.onNext(.answerSelected(accountSecurityAnswerType))
         case .continueButton:
-          reactor.action.onNext(.answerEntered)
+          print("계속하기")
+          guard let self,
+                let answerPicker = reactor.currentState.answer?.rawValue else { return }
+          switch self.step {
+          case .birth(let items):
+            print("생년월일")
+            reactor.action.onNext(.answerEntered(type: .birth, answer: items[answerPicker].title))
+          case .nickname(let items):
+            print("닉네임")
+            reactor.action.onNext(.answerEntered(type: .nickname, answer: items[answerPicker].title))
+          }
         }
       }
       .disposed(by: disposeBag)
@@ -67,7 +78,7 @@ extension AccountSecurityQuestionController: ReactorKit.View {
         case .correct:
           switch owner.step {
           case .birth:
-            break
+            print("정답입니다~")
           case .nickname:
             break
           }
@@ -81,16 +92,17 @@ extension AccountSecurityQuestionController: ReactorKit.View {
       }
       .disposed(by: disposeBag)
     
-    reactor.state
-      .map(\.questions)
-      .bind(with: self) { owner, questionType in
-        guard let questionType else { return }
-        switch questionType {
+    rx.viewDidLoad
+      .bind(with: self) { owner, _ in
+        switch owner.step {
         case .birth(let question):
           let items = question.map { RadioSegmentItem(id: $0.id, title: $0.title) }
           owner.mainView.items.accept(items)
         case .nickname(let question):
-          let items = question.map { RadioSegmentItem(id: $0.id, title: $0.title) }
+          let items = question.map {
+            print($0.title)
+            return RadioSegmentItem(id: $0.id, title: $0.title)
+          }
           owner.mainView.items.accept(items)
         }
       }

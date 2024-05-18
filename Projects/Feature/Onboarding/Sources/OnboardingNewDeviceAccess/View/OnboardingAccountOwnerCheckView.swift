@@ -71,6 +71,17 @@ final class OnboardingAccountOwnerCheckView: BaseView, Touchable {
   // MARK: - Touchable
   public var touchEventRelay: PublishRelay<TouchEventType> = .init()
   
+  public var profileImageURL: String? {
+    didSet {
+      if let profileImageURL,
+         let source = URL(string: profileImageURL) {
+        profileImageView.kf.setImage(with: source)
+      } else {
+        profileImageView.image = UIImage(asset: Images.boyGray)
+      }
+    }
+  }
+  
   override func configureUI() {
     setupProfileTitleContainer()
     setupCreateAccountButton()

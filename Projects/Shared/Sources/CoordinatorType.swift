@@ -9,12 +9,13 @@ import UIKit
 
 public enum CoordinatorType {
   case app, tab
-  case chat, myChatty
+  case chat
   case live(LiveType)
   case onboarding(OnboardingType)
   case profile(ProfileType)
   case setting(SettingType)
   case feed(FeedType)
+  case notification
 }
 
 public enum LiveType {

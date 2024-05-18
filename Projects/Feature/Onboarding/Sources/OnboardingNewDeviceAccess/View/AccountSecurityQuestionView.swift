@@ -42,9 +42,9 @@ public enum AccountSecurityQuestionType {
   var stepValue: String {
     switch self {
     case .nickname:
-      return "1단계"
+      return "1/2단계"
     case .birth:
-      return "2단계"
+      return "2/2단계"
     }
   }
 }

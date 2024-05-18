@@ -52,10 +52,6 @@ public final class OnboardingVerificationCodeEntryController: BaseController {
       $0.bottom.equalToSuperview()
     }
   }
-  
-  public override func destructiveAction() {
-    reactor?.action.onNext(.sendVerificationCodeWithout)
-  }
 }
 
 extension OnboardingVerificationCodeEntryController: ReactorKit.View {
@@ -92,6 +88,13 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
         }
       }
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.sendCount)
+      .bind(with: self) { owner, count in
+        owner.mainView.errorNoticeType = .authentificationError(count)
+      }
+      .disposed(by: disposeBag)
   
     reactor.state
       .map(\.errorState)
@@ -102,9 +105,9 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
         case .invalidPhoneNumber:
           print("잘못된 번호 형식입니다.")
         case .invalidVerificationCode:
-          print("유효하지 않은 인증번호입니다.")
+          owner.mainView.title = "인증번호가 맞지 않아요\n다시 눌러주세요"
         case .smsFailed:
-          print("인증번호 발송에 실패하였습니다.")
+          owner.showErrorAlert(title: "인증번호 발송 실패", subTitle: "잠시 후 다시 시도해주세요.", negativeLabel: "확인")
         case .mismatchedDeviceId:
           print("기기 번호가 다릅니다. 계정 확인 화면으로~")
           owner.delegate?.pushToAccountAccess()
@@ -116,7 +119,9 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
           case .signIn:
             AppFlowControl.shared.delegete?.showMainFlow()
           case .signUp:
-            owner.showErrorAlert(title: "계정 확인", subTitle: "이미 가입된 계정이 있어요.", positiveLabel: "로그인", negativeLabel: "취소")
+            owner.showErrorAlert(title: "계정 확인", subTitle: "이미 가입된 계정이 있어요.", positiveLabel: "로그인", negativeLabel: "취소", positiveAction:  {
+              reactor.action.onNext(.sendVerificationCodeWithout)
+            })
           }
         case .profileNotCompleted:
           print("프로필 미완성! 닉네임으로~")

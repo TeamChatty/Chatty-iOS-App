@@ -19,8 +19,7 @@ public final class ChatInputBar: BaseView, InputReceivable, Touchable {
   public lazy var textView: UITextView = UITextView().then {
     $0.showsVerticalScrollIndicator = false
     $0.font = SystemFont.body03.font
-    $0.text = "메시지를 입력해 주세요"
-    $0.textColor = SystemColor.gray500.uiColor
+    $0.textColor = SystemColor.basicBlack.uiColor
     $0.isScrollEnabled = false
     $0.textContainerInset = .init(top: 2, left: 0, bottom: 0, right: 0)
     $0.backgroundColor = SystemColor.gray100.uiColor
@@ -43,6 +42,12 @@ public final class ChatInputBar: BaseView, InputReceivable, Touchable {
     $0.currentState = .disabled
   }
   
+  public var isEditable: Bool = false {
+    didSet {
+      textView.isEditable = isEditable
+    }
+  }
+  
   public var inputEventRelay: PublishRelay<MessageContentType> = .init()
   public var touchEventRelay: PublishRelay<Void> = .init()
   private let disposeBag: DisposeBag = DisposeBag()
@@ -57,11 +62,7 @@ public final class ChatInputBar: BaseView, InputReceivable, Touchable {
   
   public override func bind() {
     super.bind()
-    self.rx.tapGesture(configuration: { [weak self] gestureRecognizer, delegate in
-      guard let self else { return }
-      gestureRecognizer.delegate = self
-      delegate.simultaneousRecognitionPolicy = .always
-    })
+    textView.rx.tapGesture()
     .when(.recognized)
     .map { _ in () }
     .bind(to: touchEventRelay)
@@ -112,12 +113,5 @@ public final class ChatInputBar: BaseView, InputReceivable, Touchable {
   
   public func updateSendButtonIsEnabled(_ isEnabled: Bool) {
     sendButton.currentState = isEnabled ? .enabled : .disabled
-  }
-}
-
-extension ChatInputBar: UIGestureRecognizerDelegate {
-  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-    guard touch.view?.isDescendant(of: self.sendButton) == false else { return false }
-    return true
   }
 }

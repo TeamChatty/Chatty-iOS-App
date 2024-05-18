@@ -30,7 +30,7 @@ public final class OnboardingAccountOwnerCheckCoordinator: BaseCoordinator {
   }
   
   public override func start() {
-    let onboardingAccountOwnerCheckController = OnboardingAccountOwnerCheckController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase()))
+    let onboardingAccountOwnerCheckController = OnboardingAccountOwnerCheckController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase(), getAuthCheckProfileUseCase: dependencyProvider.makeGetAuthCheckProfileUseCase(), postAuthCheckAnswerUseCase: dependencyProvider.makePostAuthCheckAnswerUseCase()))
     onboardingAccountOwnerCheckController.delegate = self
     navigationController.pushViewController(onboardingAccountOwnerCheckController, animated: true)
   }
@@ -38,7 +38,7 @@ public final class OnboardingAccountOwnerCheckCoordinator: BaseCoordinator {
 
 extension OnboardingAccountOwnerCheckCoordinator: AccountOwnerCheckDelegate {
   public func pushToQuestion(step: AccountSecurityQuestionType) {
-    let accountSecurityQuestionController = AccountSecurityQuestionController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase()), step: step)
+    let accountSecurityQuestionController = AccountSecurityQuestionController(reactor: .init(getAuthCheckProblemUseCase: dependencyProvider.makeGetAuthCheckQuestionUseCase(), getAuthCheckProfileUseCase: dependencyProvider.makeGetAuthCheckProfileUseCase(), postAuthCheckAnswerUseCase: dependencyProvider.makePostAuthCheckAnswerUseCase()), step: step)
     accountSecurityQuestionController.delegate = self
     navigationController.pushViewController(accountSecurityQuestionController, animated: true)
   }

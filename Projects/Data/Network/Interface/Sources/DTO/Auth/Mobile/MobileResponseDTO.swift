@@ -13,11 +13,12 @@ public struct MobileResponseDTO: CommonResponseDTO {
   public var message: String
   public var data: AuthNumber
   
-  public func toDomain() -> Void {
-    return ()
+  public func toDomain() -> Int {
+    return data.limitNumber
   }
 }
 
 public struct AuthNumber: Decodable {
   public let authNumber: String
+  public let limitNumber: Int
 }

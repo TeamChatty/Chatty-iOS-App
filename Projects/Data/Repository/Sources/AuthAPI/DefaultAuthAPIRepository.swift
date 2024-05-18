@@ -11,8 +11,14 @@ import DataRepositoryInterface
 import RxSwift
 import Moya
 import DomainCommon
+import DomainAuthInterface
 
 public struct DefaultAuthAPIRepository: AuthAPIRepository {
+  public func getAuthCheckProfileImageURL(mobileNumber: String) -> Single<String?> {
+    return authAPIService.request(endPoint: .profile(mobileNumber: mobileNumber), responseDTO: ProfileResponseDTO.self)
+      .map { $0.toDomain() }
+  }
+  
   private let authAPIService: any AuthAPIService
   
   public init(authAPIService: any AuthAPIService) {
@@ -25,7 +31,7 @@ public struct DefaultAuthAPIRepository: AuthAPIRepository {
       .map { $0.toDomain() }
   }
   
-  public func sendVerificationCode(mobileNumber: String, deviceId: String) -> Single<Void> {
+  public func sendVerificationCode(mobileNumber: String, deviceId: String) -> Single<Int> {
     let request = MobileRequestDTO(mobileNumber: mobileNumber, deviceId: deviceId)
     return authAPIService.request(endPoint: .mobile(request), responseDTO: MobileResponseDTO.self)
       .map { $0.toDomain() }
@@ -46,5 +52,10 @@ public struct DefaultAuthAPIRepository: AuthAPIRepository {
     return authAPIService.request(endPoint: .problem(.init(checkType: .birth, body: .init(mobileNumber: mobileNumber))), responseDTO: QuestionResponseDTO.self).map {
       $0.toDomain()
     }
+  }
+  
+  public func submitAuthCheckAnswer(type: AuthCheckType, answer: String, mobileNumber: String) -> Single<Bool> {
+    return authAPIService.request(endPoint: .check(.init(checkType: type, body: CheckRequestDTO.CheckRequestBody(mobileNumber: mobileNumber, answer: answer))), responseDTO: CheckResponseDTO.self)
+      .map { $0.toDomain() } 
   }
 }

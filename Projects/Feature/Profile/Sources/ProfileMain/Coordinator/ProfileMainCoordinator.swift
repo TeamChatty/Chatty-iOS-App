@@ -21,10 +21,6 @@ public final class ProfileMainCoordinator: BaseCoordinator, ProfileMainCoordinat
     super.init(navigationController: navigationController)
   }
   
-  deinit {
-    print("해제됨: ProfileMainCoordinator")
-  }
-  
   public override func start() {
     let reactor = ProfileMainReactor(getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase())
     let profileMainController = ProfileMainController(reactor: reactor)

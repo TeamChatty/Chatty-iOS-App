@@ -20,8 +20,12 @@ public final class TemporaryChatRoomController: BaseController {
     super.viewDidLoad()
     if let roomCreatedTime = reactor?.roomViewData.createdTime {
       print("타이머 돌릴게~")
-      temporaryChatReactor.startTimer(from: roomCreatedTime)
+      temporaryChatReactor.action.onNext(.runTimer(roomCreatedTime))
     }
+  }
+  
+  public override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
     customNavigationController?.setCustomNavigationBarHidden(true, animated: false)
   }
   
@@ -31,27 +35,20 @@ public final class TemporaryChatRoomController: BaseController {
     self.reactor = reactor
   }
   
+  deinit {
+    print("deinit - TemporaryChatRoomController")
+  }
   
   public override func handleAppInactive() {
-    temporaryChatReactor.stopTimer()
+    temporaryChatReactor.action.onNext(.stopTimer)
   }
   
   public override func handleAppActive() {
     print("타이머 시도")
     if let roomCreatedTime = reactor?.roomViewData.createdTime {
       print("타이머 돌릴게~")
-      temporaryChatReactor.startTimer(from: roomCreatedTime)
+      temporaryChatReactor.action.onNext(.runTimer(roomCreatedTime))
     }
-  }
-  
-  public override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
-    print("화면 사라진다")
-  }
-  
-  public override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    print("화면 사라진다")
   }
   
   public override func configureUI() {
@@ -65,24 +62,45 @@ public final class TemporaryChatRoomController: BaseController {
 
 extension TemporaryChatRoomController: ReactorKit.View {
   public func bind(reactor: ChatReactor) {
-    temporaryChatReactor.state
-      .map (\.timeInterval)
-      .bind(with: self) { owner, timeInterval in
-        guard let timeInterval else { return }
+    print("바인드 실행됩니다.")
+    reactor.state
+      .map(\.partnerProfile)
+      .bind(with: self) { owner, profile in
+        guard let profile else { return }
+        print("프로필 조회")
+        owner.mainView.chatRoomHeaderBar.profileData.onNext(profile)
       }
       .disposed(by: disposeBag)
     
-    rx.viewDidLoad
+    temporaryChatReactor.state
+      .map (\.timeString)
+      .bind(with: self) { owner, timeString in
+        owner.mainView.updateTimeLabel(timeString)
+      }
+      .disposed(by: disposeBag)
+    
+    temporaryChatReactor.state
+      .map (\.chatRoomStatus)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, state in
+        let bottomSheetView = ChatRoomActivationSheetView().then {
+          $0.title = "1분 남았어요. 채팅을 연장할까요?"
+          $0.subTitle = "무제한으로 소통하는 채팅방이 만들어져요."
+        }
+        let bottomSheetController = CustomBottomSheetController(contentView: bottomSheetView)
+        owner.present(bottomSheetController, animated: false)
+      }
+      .disposed(by: disposeBag)
+    
+    rx.viewIsAppear
       .map { _ in .connectChatServer }
       .bind(to: reactor.action)
       .disposed(by: disposeBag)
     
-    if let date = reactor.roomViewData.createdTime {
-      rx.viewDidLoad
-        .map { _ in .runTimer(date) }
-        .bind(to: temporaryChatReactor.action)
-        .disposed(by: disposeBag)
-    }
+    rx.viewIsAppear
+      .map { _ in .getPartnerProfile(userId: reactor.roomViewData.recieverProfile.userId) }
+      .bind(to: reactor.action)
+      .disposed(by: disposeBag)
     
     reactor.state
       .map(\.socketState)

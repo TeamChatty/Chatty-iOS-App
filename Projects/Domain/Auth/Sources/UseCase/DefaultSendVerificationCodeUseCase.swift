@@ -22,7 +22,7 @@ public struct DefaultSendVerificationCodeUseCase: SendVerificationCodeUseCase {
     self.userProfileRepository = userProfileRepository
   }
   
-  public func execute(mobileNumber: String) -> Single<Void> {
+  public func execute(mobileNumber: String) -> Single<Int> {
     let userProfile = UserProfile(userId: 0, nickname: nil, mobileNumber: mobileNumber, authority: .anonymous, blueCheck: false)
     userProfileRepository.saveUserProfile(userProfile: userProfile)
     return keychainRepository.requestRead(type: .deviceId())

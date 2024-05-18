@@ -55,6 +55,27 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
     }
   }
   
+  public var title: String? {
+    didSet {
+      titleLabel.text = title
+    }
+  }
+  
+  enum ErrorNoticeType {
+    case authentificationError(Int)
+  }
+  
+  public var errorNoticeType: ErrorNoticeType? {
+    didSet {
+      guard let errorNoticeType else { return }
+      switch errorNoticeType {
+      case .authentificationError(let count):
+        let value = count < 5 ? "오늘 \(5 - count)번 더 요청할 수 있어요" : "오늘 요청 횟수를 전부 사용했어요"
+        verificationCodeField.noticeValue = value
+      }
+    }
+  }
+  
   // MARK: - Reactor Property
   private let disposeBag = DisposeBag()
   
@@ -79,6 +100,7 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
 }
 
 extension OnboardingVerificationCodeEntryView {
+  
   private func setupTitleLabel() {
     addSubview(titleLabel)
     titleLabel.snp.makeConstraints {

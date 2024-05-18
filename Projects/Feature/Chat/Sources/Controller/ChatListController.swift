@@ -84,7 +84,7 @@ extension ChatListController: ReactorKit.View {
         } else {
           owner.mainView.removeEmptyView()
         }
-        owner.chatAdapter.applySnapShot(rooms: rooms)
+        owner.chatAdapter.applySnapShot(rooms: rooms, animatingDiffrences: false)
       }
       .disposed(by: disposeBag)
     

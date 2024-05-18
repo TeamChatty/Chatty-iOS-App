@@ -13,6 +13,14 @@ extension Date {
     $0.timeZone = .autoupdatingCurrent
   }
   
+  public static var shared: Date {
+    let now = Date()
+    let timezone = TimeZone.autoupdatingCurrent
+    let secondsFromGMT = timezone.secondsFromGMT(for: now)
+    let localizedDate = now.addingTimeInterval(TimeInterval(secondsFromGMT))
+    return localizedDate
+  }
+  
   public enum DateFormatType {
     case ahhmm
     case yyyyMMddKorean
@@ -29,7 +37,7 @@ extension Date {
   
   public func isToday() -> Bool {
     // 현재 날짜 가져오기
-    let currentDate = Date()
+    let currentDate = Date.shared
     let calendar = Calendar.current
     let today = calendar.startOfDay(for: currentDate)
     let targetDay = calendar.startOfDay(for: self)
@@ -43,7 +51,7 @@ extension Date {
   
   public func toCustomString() -> String {
     let calendar = Calendar.current
-    let currentDate = Date()
+    let currentDate = Date.shared
     let targetDay = calendar.startOfDay(for: self)
     let today = calendar.startOfDay(for: currentDate)
     let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
@@ -116,9 +124,35 @@ extension Date {
   }
   
   public func isDateMoreThanTenMinutesAhead() -> Bool {
-      let currentDate = Date()
-      let tenMinutesAfterCurrentDate = Calendar.current.date(byAdding: .minute, value: 10, to: currentDate)!
-      
-      return self > tenMinutesAfterCurrentDate
+    let currentDate = Date.shared
+    let tenMinutesAfterCurrentDate = Calendar.current.date(byAdding: .second, value: 600, to: currentDate)!
+    print("10분 초과 여부 \(self > tenMinutesAfterCurrentDate)")
+    return self > tenMinutesAfterCurrentDate
+  }
+  
+  public func formatRelativeDate() -> String {
+    let now = Date.shared
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: self, to: now)
+    
+    if let day = components.day, day > 6 {
+      let formatter = DateFormatter()
+      formatter.dateFormat = "yyyy. MM. dd"
+      return formatter.string(from: self)
+    }
+    
+    if let day = components.day, day >= 1 {
+      return "\(day)일 전"
+    }
+    
+    if let hour = components.hour, hour >= 1 {
+      return "\(hour)시간 전"
+    }
+    
+    if let minute = components.minute, minute >= 1 {
+      return "\(minute)분 전"
+    }
+    
+    return "방금 전"
   }
 }

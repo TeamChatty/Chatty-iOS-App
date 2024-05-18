@@ -27,6 +27,7 @@ public protocol UserAPIRepositoryProtocol: AnyObject {
   func join(mobileNumber: String, authenticationNumber: String, deviceId: String, deviceToken: String) -> Single<TokenProtocol>
   
   func getProfile() -> Single<UserProfile>
+  func someoneProfile(userId: Int) -> Single<SomeoneProfile>
   
   func getInterests() -> Single<Interests>
 }

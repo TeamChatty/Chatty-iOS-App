@@ -20,12 +20,12 @@ import RxGesture
 /// - `bind`: RxSwift 이벤트 스트림을 구독하거나 사용자 상호작용에 따라 이벤트를 방출하는 로직을 실행해요.
 ///   `BaseController`의 서브 클래스는 `bind` 메서드를 재정의하여 구체적인 바인딩 로직을 구현할 수 있어요.
 ///
-open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAlertDelegate {
+open class BaseController: UIViewController, UIConfigurable, Bindable {
   private lazy var indicatorView = IndicatorView()
   
   public var disposeBag = DisposeBag()
   
-  public weak var customNavigationController: CustomNavigationController? {
+  public var customNavigationController: CustomNavigationController? {
     return navigationController as? CustomNavigationController
   }
   
@@ -82,11 +82,6 @@ open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAle
     }
   }
   
-  private func addNavigationBarGuide() {
-    guard let customNavigationController else { return }
-    view.addLayoutGuide(customNavigationController.customNavigationBarGuide)
-  }
-  
   // MARK: - UIConfigurable
   open func configureUI() {
     
@@ -110,7 +105,9 @@ open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAle
     title: String? = nil,
     subTitle: String? = nil,
     positiveLabel: String? = "확인",
-    negativeLabel: String? = nil
+    negativeLabel: String? = nil,
+    positiveAction: (() -> Void)? = nil,
+    negativeAction: (() -> Void)? = nil
   ) {
     let alertView = CustomAlertView().then {
       $0.title = title
@@ -122,16 +119,8 @@ open class BaseController: UIViewController, UIConfigurable, Bindable, CustomAle
     if let negativeLabel {
       alertView.addButton(negativeLabel, for: .negative)
     }
-    let alertController = CustomAlertController(alertView: alertView, delegate: self)
+    let alertController = CustomAlertController(alertView: alertView, positiveAction: positiveAction, negativeAction: negativeAction)
     customNavigationController?.present(alertController, animated: false)
-  }
-  
-  open func destructiveAction() {
-    
-  }
-  
-  open func cancelAction() {
-    
   }
   
   open func showLoadingIndicactor() {

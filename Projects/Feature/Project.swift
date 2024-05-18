@@ -17,7 +17,8 @@ let targets: [Target] = [
         .feature(implements: .Live),
         .feature(implements: .Chat),
         .feature(implements: .Profile),
-        .feature(implements: .Feed)
+        .feature(implements: .Feed),
+        .feature(implements: .InAppPurchase)
       ]
     )
   )

@@ -12,24 +12,37 @@ import ReactorKit
 public final class TemporaryChatReactor: Reactor {
   public enum Action {
     case runTimer(Date)
+    case stopTimer
     case timerTick
   }
   
   public enum Mutation {
+    case setCreateTime(Date)
     case setTimer(TimeInterval)
-    case tick
+    case tick(TimeInterval)
   }
   
   public struct State {
-    var timeInterval: TimeInterval?
+    public var createdTime: Date?
+    public var timeInterval : TimeInterval = 600
+    public var timeString: String = "-- : --"
+    public var chatRoomStatus: ChatRoomStatus = .withinTenMinutes
   }
   
   public var initialState: State = .init()
   private var timer: Timer?
   
   deinit {
+    print("Deinit - TemporaryChatReactor")
     timer?.invalidate()
   }
+  
+  public enum ChatRoomStatus {
+    case withinTenMinutes
+    case withinOneMinute
+    case timeExpired
+  }
+  
 }
 
 extension TemporaryChatReactor {
@@ -40,14 +53,25 @@ extension TemporaryChatReactor {
       let timezone = TimeZone.autoupdatingCurrent
       let secondsFromGMT = timezone.secondsFromGMT(for: now)
       let localizedDate = now.addingTimeInterval(TimeInterval(secondsFromGMT))
-      print("채팅방 생성된 날짜: \(date)")
-      print("지금 \(localizedDate)")
       let timeInterval = date.timeIntervalSince(localizedDate)
-      print("채팅방 생성된지 \(timeInterval)")
-      
-      return .just(.setTimer(timeInterval))
+      startTimer(from: date)
+      return .concat([
+        .just(.setCreateTime(date)),
+        .just(.setTimer(timeInterval))
+      ])
     case .timerTick:
-      return .just(.tick)
+      guard let createdDate = currentState.createdTime else {
+        return .empty()
+      }
+      let now = Date()
+      let timezone = TimeZone.autoupdatingCurrent
+      let secondsFromGMT = timezone.secondsFromGMT(for: now)
+      let localizedDate = now.addingTimeInterval(TimeInterval(secondsFromGMT))
+      let timeInterval = createdDate.timeIntervalSince(localizedDate)
+      return .just(.tick(timeInterval))
+    case .stopTimer:
+      timer?.invalidate()
+      return .never()
     }
   }
   
@@ -55,29 +79,41 @@ extension TemporaryChatReactor {
     var newState = state
     switch mutation {
     case .setTimer(let timeInterval):
-      newState.timeInterval = timeInterval
-    case .tick:
-      if let currentTimeInterval = newState.timeInterval {
-        newState.timeInterval = currentTimeInterval - 1
+      newState.timeInterval = currentState.timeInterval - abs(timeInterval)
+    case .tick(let newTimeInterval):
+      let newTimeInterval = 600 - abs(newTimeInterval)
+      let newTimeString = timeIntervalToString(newTimeInterval)
+      newState.timeInterval = newTimeInterval
+      newState.timeString = newTimeString
+      
+      if newTimeInterval <= 0 {
+        newState.chatRoomStatus = .timeExpired
+        stopTimer()
       }
-      print(newState.timeInterval)
+      
+      if newTimeInterval == 60  {
+        newState.chatRoomStatus = .withinOneMinute
+      }
+    case .setCreateTime(let date):
+      newState.createdTime = date
     }
     return newState
   }
   
-  public func startTimer(from date: Date) {
-    self.action.onNext(.runTimer(date))
-    
-    timer?.invalidate()
-    
+  private func startTimer(from date: Date) {
+    stopTimer()
     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-      print("타이머는 돌아가냐?")
       self?.action.onNext(.timerTick)
     }
   }
   
-  public func stopTimer() {
-    print("멈췄다 타이머~")
+  private func stopTimer() {
     timer?.invalidate()
+  }
+  
+  private func timeIntervalToString(_ timeInterval: TimeInterval) -> String {
+    let minutes = Int(timeInterval) / 60
+    let seconds = Int(timeInterval) % 60
+    return String(format: "%02d : %02d", minutes, seconds)
   }
 }

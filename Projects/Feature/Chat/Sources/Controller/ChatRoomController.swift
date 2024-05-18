@@ -33,35 +33,38 @@ public final class ChatRoomController: BaseController {
   }
   
   public override func setNavigationBar() {
+    super.setNavigationBar()
+    customNavigationController?.setCustomNavigationBarHidden(true, animated: false)
     guard let title = reactor?.roomViewData.recieverProfile.name else { return }
-    self.customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
-      titleView: .init(title: title),
-      rightButtons: [.init(image: UIImage(asset: Images._3DotHorizontal)!)],
-      backgroundColor: SystemColor.basicWhite.uiColor,
-      backgroundAlpha: 0.97
-    )
-    
-    customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
-      .subscribe(with: self) { owner, event in
-        switch event {
-        case .notification:
-          let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-          let declaration = UIAlertAction(title: "신고하기", style: .default) { action in
-            
-          }
-          let block = UIAlertAction(title: "차단하기", style: .default) { action in
-            
-          }
-          let cancel = UIAlertAction(title: "취소", style: .cancel)
-          
-          alert.addAction(declaration)
-          alert.addAction(block)
-          alert.addAction(cancel)
-          
-          owner.present(alert, animated: true)
-        }
-      }
-      .disposed(by: disposeBag)
+    mainView.title = title
+    //    self.customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
+    //      titleView: .init(title: title),
+    //      rightButtons: [.init(image: UIImage(asset: Images._3DotHorizontal)!)],
+    //      backgroundColor: SystemColor.basicWhite.uiColor,
+    //      backgroundAlpha: 0.97
+    //    )
+    //
+    //    customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
+    //      .subscribe(with: self) { owner, event in
+    //        switch event {
+    //        case .notification:
+    //          let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    //          let declaration = UIAlertAction(title: "신고하기", style: .default) { action in
+    //
+    //          }
+    //          let block = UIAlertAction(title: "차단하기", style: .default) { action in
+    //
+    //          }
+    //          let cancel = UIAlertAction(title: "취소", style: .cancel)
+    //
+    //          alert.addAction(declaration)
+    //          alert.addAction(block)
+    //          alert.addAction(cancel)
+    //
+    //          owner.present(alert, animated: true)
+    //        }
+    //      }
+    //      .disposed(by: disposeBag)
   }
   
   enum BarTouchEvent: Int, IntCaseIterable {
@@ -108,6 +111,30 @@ extension ChatRoomController: ReactorKit.View {
           }
           let bottomSheetController = CustomBottomSheetController(contentView: bottomSheetView)
           owner.present(bottomSheetController, animated: false)
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    mainView.navigationBarEventRelay
+      .subscribe(with: self) { owner, touchEvent in
+        switch touchEvent {
+        case .back(let action):
+          let _ = owner.customNavigationController?.popViewController(animated: true)
+        case .rightButtons:
+          let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+          let declaration = UIAlertAction(title: "신고하기", style: .default) { action in
+            
+          }
+          let block = UIAlertAction(title: "차단하기", style: .default) { action in
+            
+          }
+          let cancel = UIAlertAction(title: "취소", style: .cancel)
+          
+          alert.addAction(declaration)
+          alert.addAction(block)
+          alert.addAction(cancel)
+          
+          owner.present(alert, animated: true)
         }
       }
       .disposed(by: disposeBag)

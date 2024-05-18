@@ -37,6 +37,11 @@ final class LiveMainController: BaseController {
     super.viewDidLoad()
   }
   
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    customNavigationController?.setCustomNavigationBarHidden(false, animated: false)
+  }
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.reactor?.action.onNext(.viewWillAppear)

@@ -23,6 +23,17 @@ open class BottomLineTextField: BaseView, InputReceivable {
     $0.currentState = .inactive
   }
   
+  public var noticeValue: String? {
+    didSet {
+      noticeLabel.text = noticeValue
+    }
+  }
+  
+  private let noticeLabel: UILabel = UILabel().then {
+    $0.font = SystemFont.caption02.font
+    $0.textColor = SystemColor.systemErrorRed.uiColor
+  }
+  
   private let maxTextLength: Int
   
   // MARK: - InputReceivable
@@ -47,6 +58,12 @@ open class BottomLineTextField: BaseView, InputReceivable {
       $0.top.equalTo(textField.snp.bottom)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(1.5)
+    }
+    
+    addSubview(noticeLabel)
+    noticeLabel.snp.makeConstraints {
+      $0.top.equalTo(bottomLine).offset(8)
+      $0.leading.equalToSuperview()
     }
   }
 }

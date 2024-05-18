@@ -14,7 +14,7 @@ import DomainChatInterface
 
 public final class ChatListView: BaseView {
   public lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
-    $0.contentInset = .init(top: 52, left: 0, bottom: 0, right: 0)
+    $0.contentInset = .init(top: 0, left: 0, bottom: 0, right: 0)
     $0.showsVerticalScrollIndicator = false
     $0.backgroundColor = SystemColor.basicWhite.uiColor
   }

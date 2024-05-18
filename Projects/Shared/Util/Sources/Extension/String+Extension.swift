@@ -29,12 +29,14 @@ public extension String {
   func toDateFromISO8601() -> Date? {
     let dateFormatter = ISO8601DateFormatter()
     dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+    dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
     return dateFormatter.date(from: self)
   }
   
   func toDate() -> Date? {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
     return dateFormatter.date(from: self)
   }
 }

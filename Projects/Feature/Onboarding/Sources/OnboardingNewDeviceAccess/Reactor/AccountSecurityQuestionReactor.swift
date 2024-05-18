@@ -10,22 +10,27 @@ import RxSwift
 import ReactorKit
 import SharedDesignSystem
 import DomainAuth
+import DomainAuthInterface
 
 public final class AccountSecurityQuestionReactor: Reactor {
   private let getAuthCheckProblemUseCase: DefaultGetAuthCheckQuestionUseCase
+  private let getAuthCheckProfileUseCase: DefaultGetAuthCheckProfileUseCase
+  private let postAuthCheckAnswerUseCase: DefaultPostAuthCheckAnswerIUseCase
   
   public enum Action {
+    case getProfileImage
     case getQuestionNickname
     case getQuestionBirth
     case answerSelected(AccountSecurityAnswerType)
-    case answerEntered
+    case answerEntered(type: AuthCheckType, answer: String)
   }
   
   public enum Mutation {
+    case setProfileImage(String?)
     case setQuestion(AccountSecurityQuestionType)
     case setAnswer(AccountSecurityAnswerType)
     case setContinueButton(Bool)
-    case answerEnter
+    case setCorrect(AnswerStatus)
   }
   
   public struct State {
@@ -33,20 +38,28 @@ public final class AccountSecurityQuestionReactor: Reactor {
     var answer: AccountSecurityAnswerType?
     var isCorrect: AnswerStatus? = nil
     var isContinueButtonEnabled: Bool = false
+    var profileImageURL: String?
   }
   
   public let initialState: State = State()
   
-  public init(getAuthCheckProblemUseCase: DefaultGetAuthCheckQuestionUseCase) {
+  public init(getAuthCheckProblemUseCase: DefaultGetAuthCheckQuestionUseCase, getAuthCheckProfileUseCase: DefaultGetAuthCheckProfileUseCase, postAuthCheckAnswerUseCase: DefaultPostAuthCheckAnswerIUseCase) {
     self.getAuthCheckProblemUseCase = getAuthCheckProblemUseCase
+    self.getAuthCheckProfileUseCase = getAuthCheckProfileUseCase
+    self.postAuthCheckAnswerUseCase = postAuthCheckAnswerUseCase
   }
 }
 
 extension AccountSecurityQuestionReactor {
   public func mutate(action: Action) -> Observable<Mutation> {
     switch action {
-    case .answerEntered:
-      return .just(.answerEnter)
+    case .answerEntered(let type, let answer):      
+      return postAuthCheckAnswerUseCase.execute(type: type, answer: answer)
+        .asObservable()
+        .flatMap { bool -> Observable<Mutation> in
+          let isCorrect: AnswerStatus = bool ? .correct : .incorrect(0)
+          return .just(.setCorrect(.correct))
+        }
     case .answerSelected(let answer):
       return .from(
         [
@@ -72,18 +85,20 @@ extension AccountSecurityQuestionReactor {
           }
           return .just(.setQuestion(.nickname(questionItem)))
         }
+    case .getProfileImage:
+      return getAuthCheckProfileUseCase.execute()
+        .asObservable()
+        .flatMap { profileImageURL -> Observable<Mutation> in
+          return .just(.setProfileImage(profileImageURL))
+        }
     }
   }
   
   public func reduce(state: State, mutation: Mutation) -> State {
     var newState = state
     switch mutation {
-    case .answerEnter:
-      if newState.answer == .answer1 {
-        newState.isCorrect = .correct
-      } else {
-        newState.isCorrect = .incorrect(Int.random(in: 1...2))
-      }
+    case .setCorrect(let status):
+      newState.isCorrect = status
     case .setContinueButton(let bool):
       newState.isContinueButtonEnabled = bool
     case .setAnswer(let answer):
@@ -95,11 +110,13 @@ extension AccountSecurityQuestionReactor {
       case .birth(let items):
         newState.questions = .birth(items)
       }
+    case .setProfileImage(let profileImageURL):
+      newState.profileImageURL = profileImageURL
     }
     return newState
   }
   
-  enum AnswerStatus: Equatable {
+  public enum AnswerStatus: Equatable {
     case correct
     case incorrect(Int)
   }

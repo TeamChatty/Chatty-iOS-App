@@ -6,11 +6,7 @@
 //
 
 import Foundation
-
-public enum AuthCheckType {
-  case nickname
-  case birth
-}
+import DomainAuthInterface
 
 public struct QuestionRequestDTO {
   public let checkType: AuthCheckType

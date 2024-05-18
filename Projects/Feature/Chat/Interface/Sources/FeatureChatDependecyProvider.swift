@@ -7,6 +7,7 @@
 
 import Foundation
 import DomainChat
+import DomainUser
 
 public protocol FeatureChatDependecyProvider {
   func makeChatServerConnectUseCase() -> DefaultChatSTOMPConnectUseCase
@@ -15,4 +16,5 @@ public protocol FeatureChatDependecyProvider {
   func makeGetChatMessageStreamUseCase() -> DefaultGetChatMessageStreamUseCase
   func makeChatSendMessageUseCase() -> DefaultChatSendMessageUseCase
   func makeGetChatMessagesUseCase() -> DefaultGetChatMessgesUseCase
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase
 }

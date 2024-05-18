@@ -23,6 +23,8 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
     }
   }
   
+  public var backButtonClosure: (() -> Void)?
+  
   public lazy var titleView: CustomNavigationBarItem? = nil {
     didSet {
       fadeOutView([oldValue])
@@ -70,7 +72,9 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
     
     backButton.rx.controlEvent(.touchUpInside)
       .withUnretained(self)
-      .map { _ in .back }
+      .map { [weak self] _ in
+        return .back(self?.backButtonClosure)
+      }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
   }
@@ -93,7 +97,7 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
   }
   
   private func setRightButtons(_ rightButton: [CustomNavigationBarButton]) {
-
+    
     rightButtonStackView.removeAllArrangedSubViews()
     rightButton.enumerated().forEach { [weak self] index, item in
       guard let self else { return }
@@ -103,8 +107,8 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
         .withUnretained(self)
         .map { _ in
           print("dddd ==>")
-
-            return .rightButtons(.allCases[index])
+          
+          return .rightButtons(.allCases[index])
         }
         .bind(to: self.touchEventRelay)
         .disposed(by: disposeBag)
@@ -138,7 +142,7 @@ public class CustomNavigationBar: BaseView, Touchable, Fadeable {
 
 extension CustomNavigationBar {
   public enum TouchEventType {
-    case back
+    case back((() -> Void)?)
     case rightButtons(RightButton)
   }
   
@@ -155,5 +159,6 @@ extension CustomNavigationBar {
     self.titleAlignment = config.titleAlignment
     self.titleView = config.titleView
     self.rightButtons = config.rightButtons
+    self.backButtonClosure = config.backButtonClosure
   }
 }

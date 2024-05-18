@@ -23,10 +23,14 @@ public final class CustomAlertController: BaseController {
   // MARK: - Delegate
   private weak var delegate: CustomAlertDelegate?
   
+  private let positiveAction: (() -> Void)?
+  private let negativeAction: (() -> Void)?
+  
   // MARK: - Initialize Method
-  public init(alertView: CustomAlertView, delegate: CustomAlertDelegate? = nil) {
+  public init(alertView: CustomAlertView, positiveAction: (() -> Void)? = nil, negativeAction: (() -> Void)? = nil) {
     self.alertView = alertView
-    self.delegate = delegate
+    self.positiveAction = positiveAction
+    self.negativeAction = negativeAction
     super.init()
     modalPresentationStyle = .overCurrentContext
   }
@@ -74,9 +78,13 @@ public final class CustomAlertController: BaseController {
           owner.dismiss(animated: false)
           switch touch {
           case .positive:
-            owner.delegate?.destructiveAction()
+            owner.positiveAction?()
           case .negative:
-            owner.delegate?.cancelAction()
+            guard let action = owner.negativeAction else {
+              owner.dismiss(animated: true)
+              return
+            }
+            owner.negativeAction?()
           }
         }
       }

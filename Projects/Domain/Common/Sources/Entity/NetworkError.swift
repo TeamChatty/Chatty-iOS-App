@@ -24,7 +24,7 @@ public enum ErrorCase: Error {
   case E002AccessTokenExpired
   case E003NonExistentUser
   case E004DisabledUser
-
+  
   // Custom Error
   case E005NaverSMSFailed
   case E006AlreadyExistNickname
@@ -43,7 +43,19 @@ public enum ErrorCase: Error {
   case E021CompleteAllAccountVerificationQuestions
   case E022ForbiddenWordDetected
   case E023MismatchedAccountAndDeviceId
-  
+  case E024NonExistentInterest
+  case E025AlreadyUnlockedProfile
+  case E026InsufficientCandies
+  case E027InsufficientTickets
+  case E028InsufficientPermissions
+  case E029NonExistentSubscription
+  case E030CompleteSignUp
+  case E031NonExistentPost
+  case E032NonExistentComment
+  case E033TimeLimitExceeded
+  case E034AlreadyLiked
+  case E035LikeDoesNotExist
+  case E036PhoneAuthentificationDailyRequestLimitExceeded
   
   // Common Error
   case E097WrongEndpointRequest
@@ -53,8 +65,8 @@ public enum ErrorCase: Error {
   
   public var message: String {
     switch self {
-    
-    // Common Error
+      
+      // Common Error
     case .E000WrongParameter:
       return "잘못된 파라미터"
     case .E001TokenAuthenticationFailed:
@@ -66,7 +78,7 @@ public enum ErrorCase: Error {
     case .E004DisabledUser:
       return "이용 정지된 사용자"
       
-    // Custom Error
+      // Custom Error
     case .E005NaverSMSFailed:
       return "naver에서 sms 전송을 실패했습니다. "
     case .E006AlreadyExistNickname:
@@ -101,8 +113,34 @@ public enum ErrorCase: Error {
       return "금칙어가 존재합니다."
     case .E023MismatchedAccountAndDeviceId:
       return "기존 계정과 기기 번호가 일치하지 않습니다."
-    
-    // Common Error
+    case .E024NonExistentInterest:
+      return "존재하지 않는 관심사입니다."
+    case .E025AlreadyUnlockedProfile:
+      return "이미 프로필 잠금을 해제했습니다."
+    case .E026InsufficientCandies:
+      return "캔디의 개수가 부족합니다."
+    case .E027InsufficientTickets:
+      return "티켓의 개수가 부족합니다."
+    case .E028InsufficientPermissions:
+      return "권한이 없습니다."
+    case .E029NonExistentSubscription:
+      return "존재하지 않는 구독권입니다."
+    case .E030CompleteSignUp:
+      return "회원가입을 완료해주세요."
+    case .E031NonExistentPost:
+      return "존재하지 않는 게시글입니다."
+    case .E032NonExistentComment:
+      return "존재하지 않는 댓글입니다."
+    case .E033TimeLimitExceeded:
+      return "제한 시간을 초과했습니다."
+    case .E034AlreadyLiked:
+      return "이미 좋아요를 눌렀습니다."
+    case .E035LikeDoesNotExist:
+      return "좋아요가 존재하지 않습니다."
+    case .E036PhoneAuthentificationDailyRequestLimitExceeded:
+      return "요청 일일횟수 제한은 5번입니다."
+      
+      // Common Error
     case .E097WrongEndpointRequest:
       return "잘못된 요청"
     case .E098OverCall:
@@ -142,6 +180,19 @@ public enum ErrorCode: String {
   case E021
   case E022
   case E023
+  case E024
+  case E025
+  case E026
+  case E027
+  case E028
+  case E029
+  case E030
+  case E031
+  case E032
+  case E033
+  case E034
+  case E035
+  case E036
   
   // Common Error
   case E097
@@ -162,8 +213,8 @@ public enum ErrorCode: String {
       return .E003NonExistentUser
     case .E004:
       return .E004DisabledUser
-
-    // Custom Error
+      
+      // Custom Error
     case .E005:
       return .E005NaverSMSFailed
     case .E006:
@@ -198,8 +249,34 @@ public enum ErrorCode: String {
       return .E022ForbiddenWordDetected
     case .E023:
       return .E023MismatchedAccountAndDeviceId
+    case .E024:
+      return .E024NonExistentInterest
+    case .E025:
+      return .E025AlreadyUnlockedProfile
+    case .E026:
+      return .E026InsufficientCandies
+    case .E027:
+      return .E027InsufficientTickets
+    case .E028:
+      return .E028InsufficientPermissions
+    case .E029:
+      return .E029NonExistentSubscription
+    case .E030:
+      return .E034AlreadyLiked
+    case .E031:
+      return .E031NonExistentPost
+    case .E032:
+      return .E032NonExistentComment
+    case .E033:
+      return .E033TimeLimitExceeded
+    case .E034:
+      return .E034AlreadyLiked
+    case .E035:
+      return .E035LikeDoesNotExist
+    case .E036:
+      return .E036PhoneAuthentificationDailyRequestLimitExceeded
       
-    // Common Error
+      // Common Error
     case .E097:
       return .E097WrongEndpointRequest
     case .E098:

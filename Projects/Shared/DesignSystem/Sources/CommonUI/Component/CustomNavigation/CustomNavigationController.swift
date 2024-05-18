@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 
@@ -23,15 +24,8 @@ public final class CustomNavigationController: UINavigationController, Bindable,
   
   private var customNavigationBar: CustomNavigationBar = CustomNavigationBar()
   
-  public var customNavigationBarGuide: UILayoutGuide {
-    let guide = UILayoutGuide()
-    NSLayoutConstraint.activate([
-      guide.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      guide.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      guide.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      guide.heightAnchor.constraint(equalToConstant: 52)
-    ])
-    return guide
+  public var customNavigationBarGuide: ConstraintViewDSL {
+    return customNavigationBar.snp
   }
   
   public var customNavigationBarConfig: (any CustomNavigationBarConfigurable)? = nil {
@@ -82,6 +76,7 @@ public final class CustomNavigationController: UINavigationController, Bindable,
     let _ = customNavigationBarConfigStack.popLast()
     if let config = customNavigationBarConfigStack.last {
       setCustomNavigationBar(config)
+      setCustomNavigationBarHidden(false, animated: true)
     }
     setBackButton(viewControllers)
     return vc
@@ -104,9 +99,13 @@ extension CustomNavigationController {
     customNavigationBar.touchEventRelay
       .bind(with: self) { owner, touch in
         switch touch {
-        case .back:
-          let _ = owner.popViewController(animated: true)
-          owner.customDelegate?.popViewController()
+        case .back(let closure):
+          guard let closure else {
+            let _ = owner.popViewController(animated: true)
+            owner.customDelegate?.popViewController()
+            return
+          }
+          closure()
         case .rightButtons(let button):
           owner.navigationBarRightButtonsRelay.accept(button.rawValue)
           print("aaaa ==>")

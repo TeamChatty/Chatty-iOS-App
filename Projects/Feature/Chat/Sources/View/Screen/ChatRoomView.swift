@@ -14,6 +14,19 @@ import DomainChatInterface
 import FeatureChatInterface
 
 public final class ChatRoomView: BaseView, InputReceivable, Touchable {
+  private let navigationContainerView: UIView = UIView().then {
+    $0.backgroundColor = SystemColor.basicWhite.uiColor
+    $0.alpha = 0.95
+  }
+  
+  private lazy var navigationBar: CustomNavigationBar = CustomNavigationBar().then {
+    let button = CustomNavigationBarButton(image: UIImage(asset: Images.vArrowLeft)!)
+    $0.backButton = button
+    $0.rightButtons = [.init(image: UIImage(asset: Images._3DotHorizontal)!)]
+    $0.backgroundColor = SystemColor.basicWhite.uiColor
+    $0.alpha = 0.95
+  }
+  
   public lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
     $0.contentInset = .init(top: 52, left: 0, bottom: 0, right: 0)
     $0.scrollIndicatorInsets = .init(top: 52, left: 0, bottom: 0, right: 0)
@@ -23,28 +36,37 @@ public final class ChatRoomView: BaseView, InputReceivable, Touchable {
     $0.textView.delegate = self
   }
   
+  public var title: String? {
+    didSet {
+      guard let title else { return }
+      navigationBar.titleView = .init(title: title)
+    }
+  }
+  
   public var chatRoomType: ChatRoomType? {
     didSet {
       guard let chatRoomType else { return }
       switch chatRoomType {
       case .temporary(creationTime: let date):
         guard let date else { return }
-        chatInputBar.textView.isUserInteractionEnabled = date.isDateMoreThanTenMinutesAhead()
-        print("터치 비허용")
+        chatInputBar.isEditable = !date.isDateMoreThanTenMinutesAhead()
       case .unlimited:
         print("터치 허용")
-        chatInputBar.textView.isUserInteractionEnabled = true
+        chatInputBar.isEditable = true
       }
     }
   }
   public var inputEventRelay: PublishRelay<MessageContentType> = .init()
   public var touchEventRelay: PublishRelay<TouchEventType> = .init()
+  public lazy var navigationBarEventRelay = navigationBar.touchEventRelay
   
   private let disposeBag = DisposeBag()
   
   public override func configureUI() {
     addSubview(collectionView)
     addSubview(chatInputBar)
+    addSubview(navigationContainerView)
+    addSubview(navigationBar)
     
     chatInputBar.snp.makeConstraints {
       $0.bottom.equalTo(keyboardLayoutGuide.snp.top)
@@ -55,6 +77,25 @@ public final class ChatRoomView: BaseView, InputReceivable, Touchable {
     collectionView.snp.makeConstraints {
       $0.top.horizontalEdges.equalToSuperview()
       $0.bottom.equalTo(chatInputBar.snp.top)
+    }
+    
+    navigationContainerView.snp.makeConstraints {
+      $0.top.equalToSuperview()
+      $0.leading.trailing.equalToSuperview()
+      
+      if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+          let statusBarManager = windowScene.statusBarManager {
+          let height = statusBarManager.statusBarFrame.height
+        $0.height.equalTo(height)
+      } else {
+        $0.height.equalTo(0)
+      }
+    }
+    
+    navigationBar.snp.makeConstraints {
+      $0.top.equalTo(navigationContainerView.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+      $0.height.equalTo(52)
     }
   }
   
@@ -74,9 +115,9 @@ public final class ChatRoomView: BaseView, InputReceivable, Touchable {
         guard let self = self,
               let chatRoomType = self.chatRoomType else { return false }
         switch chatRoomType {
-        case .temporary:
-          print("임시 채팅방입니다")
-          return true
+        case .temporary(let createdTime):
+          guard let createdTime else { return false }
+          return createdTime.isDateMoreThanTenMinutesAhead()
         case .unlimited:
           print("영구 채팅방입니다")
           return false
@@ -139,19 +180,5 @@ extension ChatRoomView: UITextViewDelegate {
   
   private func updateSendButtonIsEnabeld(_ textView: UITextView) {
     chatInputBar.updateSendButtonIsEnabled(textView.hasText)
-  }
-
-  public func textViewDidEndEditing(_ textView: UITextView) {
-    if textView.text.isEmpty {
-      textView.text = "메시지를 입력하세요"
-      textView.textColor = SystemColor.gray500.uiColor
-    }
-  }
-  
-  public func textViewDidBeginEditing(_ textView: UITextView) {
-    if textView.textColor == SystemColor.gray500.uiColor {
-      textView.text = nil
-      textView.textColor = SystemColor.basicBlack.uiColor
-    }
   }
 }

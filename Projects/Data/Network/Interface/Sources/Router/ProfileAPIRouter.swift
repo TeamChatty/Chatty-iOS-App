@@ -24,7 +24,7 @@ public extension ProfileAPIRouter {
   }
   
   var basePath: String {
-    return "/api/v1/users/profile"
+    return "/v1/users/profile"
   }
   
   var path: String {
