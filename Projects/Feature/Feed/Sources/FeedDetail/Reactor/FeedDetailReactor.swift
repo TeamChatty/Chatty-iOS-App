@@ -29,7 +29,6 @@ public final class FeedDetailReactor: Reactor {
     case refresh
     case refreshSuccessWrited(commentId: Int)
     case scrollToNextPage
-//    case tabRepliesButton(commentId: Int)
     
     ///  Feed
     case bookmark(postId: Int, changedState: Bool)
@@ -40,6 +39,12 @@ public final class FeedDetailReactor: Reactor {
     case inputComment(String)
     case sendComment
     
+    /// Reply
+    case tabRepliesButton(parentsId: Int)
+    case closeRepliesButton(parentsId: Int)
+    case tabRepliesPageButton(parentsId: Int)
+    
+    /// Like
     case tabCommentLike(commentId: Int, changedState: Bool)
     case tabReplyLike(parentsId: Int, replyId: Int, changedState: Bool)
 
@@ -61,9 +66,10 @@ public final class FeedDetailReactor: Reactor {
     case setComments(comments: [FeedDetailComment])
     case setCommentsRefresh(comments: [FeedDetailComment])
     case setNextCommentsPage(comments: [FeedDetailComment])
-//    case setReplies(replies: [FeedDetailReply])
     case setCommentInputType(CommentInputType)
     case setInputedText(String)
+    
+    case setReplyUpdateType(ReplyUpdateType?)
     
     /// WriteComment
     case setSavedComment(FeedDetailComment)
@@ -84,10 +90,13 @@ public final class FeedDetailReactor: Reactor {
     var feed: Feed?
     
     var comments: [FeedDetailComment] = []
+    var replys: [FeedDetailReply] = []
     
     var commentInputType: CommentInputType? = nil
     var commentTableState: CommentTableState? = nil
     var inputedText: String = ""
+    
+    var replyUpdateType: ReplyUpdateType? = nil
     
     var blockedId: Int?
     var reportedPostId: Int?
@@ -181,8 +190,6 @@ extension FeedDetailReactor {
           .map { .setNextCommentsPage(comments: $0) },
         .just(.setIsFetchingCommentPage(false)),
       ])
-//    case .tabRepliesButton(commentId: let commentId):
-//      <#code#>
       
       /// Feed
     case .bookmark(let postId, let changedState):
@@ -229,7 +236,12 @@ extension FeedDetailReactor {
           .just(.setTableState),
           .just(.setIsLoading(true)),
           writeCommentUseCase.executeReply(postId: initialState.postId, commentId: commentId, content: currentState.inputedText)
-            .map { .setSavedReply($0) },
+            .withUnretained(self)
+            .flatMap { owner, reply -> Observable<[FeedDetailReply]> in
+              return owner.getCommetUseCase.executeReplies(commentId: reply.parentsId, lastCommentId: 0, size: 10)
+            }
+            .map { .setReplyUpdateType(.loaded(parentsId: commentId, replies: $0)) }
+          ,
           .just(.setIsLoading(false))
         ])
         
@@ -237,6 +249,31 @@ extension FeedDetailReactor {
         return .just(.setIsLoading(false))
       }
       
+      /// Reply
+    case .tabRepliesButton(let parentsId):
+      return .concat([
+        .just(.setReplyUpdateType(nil)),
+        getCommetUseCase.executeReplies(commentId: parentsId, lastCommentId: 0, size: 10)
+          .map { .setReplyUpdateType(.loaded(parentsId: parentsId, replies: $0)) }
+      ])
+    case .closeRepliesButton(let parentsId):
+      return .concat([
+        .just(.setReplyUpdateType(nil)),
+        .just(.setReplyUpdateType(.removedReplies(parentsId: parentsId)))
+      ])
+    case .tabRepliesPageButton(let parentsId):
+      if let index = currentState.comments.firstIndex(where: { $0.commentId == parentsId }),
+         let lastComment = currentState.comments[index].childReplys.last {
+        return .concat([
+          .just(.setReplyUpdateType(nil)),
+          getCommetUseCase.executeReplies(commentId: parentsId, lastCommentId: Int64(lastComment.commentId), size: 10)
+            .map { .setReplyUpdateType(.paged(parentsId: parentsId, replies: $0)) }
+        ])
+      } else {
+        return .concat([])
+      }
+      
+    /// Like
     case .tabCommentLike(commentId: let commentId, changedState: let changedState):
       if let nowState = currentState.comments.firstIndex(where: { $0.commentId == commentId }),
          currentState.comments[nowState].isLike == changedState{
@@ -270,7 +307,7 @@ extension FeedDetailReactor {
     case .reportPost(postId: let postId):
       return .concat([
         .just(.setReportedId(postId: nil)),
-        reportUseCase.executePost(postId: postId)
+        reportUseCase.executeReport(userId: postId)
           .map { _ in Mutation.setReportedId(postId: postId) }
       ])
     }
@@ -325,7 +362,26 @@ extension FeedDetailReactor {
         newState.commentTableState = .commentPaged(addedCount: comments.count)
       }
       
-    // like Comment / Reply
+    /// Reply
+    case .setReplyUpdateType(let type):
+      switch type {
+      case .loaded(let parentsId, let replies):
+        if let index = newState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+          newState.comments[index].childReplys = replies
+        }
+      case .paged(let parentsId, let replies):
+        if let index = newState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+          newState.comments[index].childReplys += replies
+        }
+      case .removedReplies(let parentsId):
+        if let index = newState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+          newState.comments[index].childReplys.removeAll()
+        }
+      default: break
+      }
+      newState.replyUpdateType = type
+
+    /// like Comment / Reply
     case .setCommentLike(let commentId, let changedState):
       if let commentIndex = currentState.comments.firstIndex(where: { $0.commentId == commentId }) {
         let likeCount = newState.comments[commentIndex].likeCount

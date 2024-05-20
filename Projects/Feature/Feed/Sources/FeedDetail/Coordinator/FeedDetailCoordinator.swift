@@ -48,7 +48,7 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
 
 extension FeedDetailCoordinator: FeedDetailControllerDelegate {
   func presentReportModal(userId: Int) {
-    let reactor = FeedReportReactor(userId: userId)
+    let reactor = FeedReportReactor(reportUseCase: featureFeedDependencyProvider.makeReportUseCase(), userId: userId)
     let modal = FeedReportModalController(reactor: reactor)
     modal.delegate = self
     

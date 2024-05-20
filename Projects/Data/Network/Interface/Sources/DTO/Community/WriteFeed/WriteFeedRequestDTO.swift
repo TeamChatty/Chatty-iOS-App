@@ -8,12 +8,10 @@
 import Foundation
 
 public struct WriteFeedRequestDTO: Encodable {
-  public let title: String
   public let content: String
   public let images: [Data]
  
-  public init(title: String, content: String, images: [Data]) {
-    self.title = title
+  public init(content: String, images: [Data]) {
     self.content = content
     self.images = images
   }

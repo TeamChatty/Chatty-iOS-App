@@ -88,6 +88,8 @@ extension FeedTypeTableView: ReactorKit.View {
           owner.touchEventRelay.accept(.popToFeedMain)
         case .myPosts:
           owner.touchEventRelay.accept(.pushToWriteFeed)
+        case .myComments:
+          return
         }
       }
       .disposed(by: disposeBag)
@@ -113,7 +115,7 @@ extension FeedTypeTableView: ReactorKit.View {
         case .loadedEmpty:
           owner.tableView.reloadData()
           owner.tableView.tableFooterView = UIView(frame: .zero)
-          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+//          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
           owner.setupEmptyView(feedListType: owner.reactor?.currentState.feedType)
 
         case .paged:
@@ -130,6 +132,7 @@ extension FeedTypeTableView: ReactorKit.View {
     reactor.state
       .map(\.blockedIndexs)
       .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, blockedIndexs in
         guard let blockedIndexs else { return }
         let indexPaths = blockedIndexs.map { IndexPath(row: $0, section: 0) }
@@ -140,6 +143,7 @@ extension FeedTypeTableView: ReactorKit.View {
     reactor.state
       .map(\.reportedIdIndex)
       .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, reportedIdIndex in
         guard let reportedIdIndex else { return }
         owner.tableView.deleteRows(at: [IndexPath(row: reportedIdIndex, section: 0)], with: .fade)
@@ -282,6 +286,6 @@ extension FeedTypeTableView {
   }
   
   func removeReportedFeed(userId: Int) {
-//    reactor?.action.onNext(.reportBlockUser(userId: userId))
+    reactor?.action.onNext(.reportBlockUser(userId: userId))
   }
 }

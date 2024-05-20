@@ -35,3 +35,9 @@ public struct FeedDetailReply {
     self.likeCount = likeCount
   }
 }
+
+extension FeedDetailReply: Equatable {
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.isOwner == rhs.isOwner && lhs.userId == rhs.userId && lhs.commentId == rhs.commentId && lhs.parentsId == rhs.parentsId && lhs.profileImage == rhs.profileImage && lhs.nickname == rhs.nickname && lhs.content == rhs.content && lhs.createdAt == rhs.createdAt && lhs.isLike == rhs.isLike && lhs.likeCount == rhs.likeCount
+  }
+}

@@ -21,11 +21,16 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
     self.communityAPIService = communityAPIService
   }
   /// Write Post
-  public func writeFeed(title: String, content: String, images: [Data]) -> Observable<WritedFeed> {
-    let requestDTO = WriteFeedRequestDTO(title: title, content: content, images: images)
-    return communityAPIService.request(endPoint: .writePost(requestDTO), responseDTO: WriteFeedResponseDTO.self)
+  public func writeFeed(content: String, images: [Data]) -> Observable<WritedFeed> {
+    let requestDTO = WriteFeedRequestDTO(content: content, images: images)
+        
+    return communityAPIService.requestUplodFeedObs(endPoint: .writePost(requestDTO), responseDTO: WriteFeedResponseDTO.self)
       .asObservable()
       .map { $0.toDomain() }
+    
+//    return communityAPIService.request(endPoint: .writePost(requestDTO), responseDTO: WriteFeedResponseDTO.self)
+//      .asObservable()
+//      .map { $0.toDomain() }
   }
   
   /// Posts Page
@@ -107,6 +112,14 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
       .asObservable()
   }
   
+  public func getMyComments(lastCommentId: Int64, size: Int) -> Observable<[Comment]> {
+    let requestDTO = GetMyCommnetsRequestDTO(lastCommentId: lastCommentId, size: size)
+    
+    return communityAPIService.request(endPoint: .getMyComments(requestDTO), responseDTO: GetCommnetsResponseDTO.self)
+      .map { $0.toDomain() }
+      .asObservable()
+  }
+  
   
   /// Like
   /// Post Id를 반환
@@ -158,8 +171,8 @@ public final class DefaultCommunityAPIRepository: CommunityAPIRepository {
       .map { $0.data.blockedId }
   }
   
-  public func reportPost(postId: Int) -> Observable<Int> {
-    return communityAPIService.request(endPoint: .reportBlock(userId: postId), responseDTO: ReportBlockResponseDTO.self)
+  public func reportUser(userId: Int) -> Observable<Int> {
+    return communityAPIService.request(endPoint: .reportBlock(userId: userId), responseDTO: ReportBlockResponseDTO.self)
       .asObservable()
       .map { $0.data.blockedId }
   }

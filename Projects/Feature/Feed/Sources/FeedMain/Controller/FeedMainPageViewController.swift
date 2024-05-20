@@ -135,11 +135,9 @@ extension FeedMainPageViewController {
     }
   }
   
-  func removeReportedUserPost(userId: Int) {
-    self.dataViewControllers.forEach { vc in
-      guard let vc = vc as? FeedTypeTableView else { return }
-      
-      vc.removeReportedFeed(userId: userId)
-    }
-  }
+//  func removeReportedUserPost(userId: Int) {
+//    if let vc = dataViewControllers[2] as? FeedTypeTableView {
+//      vc.removeReportedFeed(userId: userId)
+//    }
+//  }
 }

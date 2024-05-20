@@ -117,6 +117,11 @@ public final class CommentInputBar: BaseView, InputReceivable, Touchable {
     sendButton.currentState = isEnabled ? .enabled : .disabled
   }
   
+  public func startInputReply() {
+    isEditing = true
+    textView.becomeFirstResponder()
+  }
+  
   public func updateToCanceledState() {
     sendButton.currentState = .disabled
     isEditing = false

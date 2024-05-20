@@ -21,9 +21,11 @@ class FeedImagesButton: BaseControl, Touchable {
   }
   private let firstImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFill
+    $0.clipsToBounds = true
   }
   private let secondImageView: UIImageView = UIImageView().then {
-    $0.contentMode = .scaleAspectFit
+    $0.contentMode = .scaleAspectFill
+    $0.clipsToBounds = true
   }
   private let blurView: UIView = UIView().then {
     $0.backgroundColor = SystemColor.basicBlack.uiColor

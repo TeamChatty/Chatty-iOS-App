@@ -153,9 +153,8 @@ extension FeedDetailController: ReactorKit.View {
           owner.setupFooterView(footerType: .loadingComments)
           
         case .savedReply(let commentId):
-          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == commentId }),
-            let cell = owner.tableView.cellForRow(at: IndexPath(row: index, section: 1)) as? FeedCommentCell {
-            cell.updateReplyStackView()
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == commentId }) {
+            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
           }
         case .commentLoaded:
           owner.tableView.reloadData()
@@ -174,7 +173,7 @@ extension FeedDetailController: ReactorKit.View {
           owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
           owner.setupFooterView(footerType: .loadingComments)
           
-        case .commentPaged(let addedCount):
+        case .commentPaged:
           owner.tableView.insertRows(at: owner.reactor?.newPageIndexPath ?? [], with: .automatic)
           owner.setupFooterView(footerType: .loadingComments)
           
@@ -182,6 +181,28 @@ extension FeedDetailController: ReactorKit.View {
           owner.setupFooterView(footerType: .lastCommentPage)
         case .error:
           return
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.replyUpdateType)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, type in
+        guard let type else { return }
+        switch type {
+        case .loaded(let parentsId, _):
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
+          }
+        case .paged(let parentsId, _):
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
+          }
+        case .removedReplies(let parentsId):
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
+          }
         }
       }
       .disposed(by: disposeBag)
@@ -196,7 +217,8 @@ extension FeedDetailController: ReactorKit.View {
           owner.tableView.reloadSections(IndexSet(integer: 1), with: UITableView.RowAnimation.automatic)
         case .reply(let commentId):
           if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == commentId }) {
-            owner.tableView.scrollToRow(at: IndexPath(row: index, section: 1), at: .middle, animated: true)
+            owner.tableView.scrollToRow(at: IndexPath(row: index, section: 1), at: .top, animated: true)
+            owner.commentInputBar.startInputReply()
           }
         case .cancel:
           owner.commentInputBar.updateToCanceledState()
@@ -308,12 +330,16 @@ extension FeedDetailController: UITableViewDataSource {
             owner.presentAlert(userId: commentId)
           case .commentLike(let commentId, let changedState):
             owner.reactor?.action.onNext(.tabCommentLike(commentId: commentId, changedState: changedState))
-          case .commentReply:
-            print("")
+          case .commentReply(let commentId):
+            owner.reactor?.action.onNext(.startComment(.reply(commentId: commentId)))
           case .replylike(let parentId, let replyId, let changedState):
             owner.reactor?.action.onNext(.tabReplyLike(parentsId: parentId, replyId: replyId, changedState: changedState))
-          case .getReplyPage(let commentId):
-            owner.reactor?.action.onNext(.startComment(.reply(commentId: commentId)))
+          case .getReplies(let commentId):
+            owner.reactor?.action.onNext(.tabRepliesButton(parentsId: commentId))
+          case .getRepliesPage(let commentId):
+            owner.reactor?.action.onNext(.tabRepliesPageButton(parentsId: commentId))
+          case .removeReplies(let commentId):
+            owner.reactor?.action.onNext(.closeRepliesButton(parentsId: commentId))
           }
         }
         .disposed(by: cell.disposeBag)

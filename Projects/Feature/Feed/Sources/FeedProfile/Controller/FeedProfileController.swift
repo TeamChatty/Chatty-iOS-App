@@ -145,9 +145,3 @@ extension FeedProfileController {
     
   }
 }
-
-//extension FeedProfileController {
-//  func removeReportedFeed(userId: Int) {
-//    mainView.removeReportedUserPost(userId: userId)
-//  }
-//}

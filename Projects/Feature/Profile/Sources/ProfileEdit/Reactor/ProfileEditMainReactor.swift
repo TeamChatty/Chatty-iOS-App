@@ -13,6 +13,7 @@ import DomainCommon
 
 final class ProfileEditMainReactor: Reactor {
   private let getUserDataUseCase: GetUserProfileUseCase
+  private let saveProfileImageUseCase: SaveProfileImageUseCase
   
   enum Action {
     case changePage(Int)
@@ -39,8 +40,9 @@ final class ProfileEditMainReactor: Reactor {
   
   var initialState: State
   
-  public init(getUserDataUseCase: GetUserProfileUseCase) {
+  public init(getUserDataUseCase: GetUserProfileUseCase, saveProfileImageUseCase: SaveProfileImageUseCase) {
     self.getUserDataUseCase = getUserDataUseCase
+    self.saveProfileImageUseCase = saveProfileImageUseCase
     self.initialState = State(profileData: getUserDataUseCase.execute())
   }
   
@@ -75,7 +77,7 @@ extension ProfileEditMainReactor {
     case .selectImage(let image):
       return .concat([
         .just(.isLoading(true)),
-        getUserDataUseCase.executeSingle()
+        saveProfileImageUseCase.execute(image: image.toProfileRequestData())
           .asObservable()
           .map { .setProfileData($0) }
           .catch { error -> Observable<Mutation> in
