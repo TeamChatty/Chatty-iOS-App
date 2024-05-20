@@ -21,6 +21,10 @@ public final class ProfileMainCoordinator: BaseCoordinator, ProfileMainCoordinat
     super.init(navigationController: navigationController)
   }
   
+  deinit {
+    self.deinitRootCoordinator()
+  }
+  
   public override func start() {
     let reactor = ProfileMainReactor(getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase())
     let profileMainController = ProfileMainController(reactor: reactor)
@@ -40,6 +44,7 @@ extension ProfileMainCoordinator: ProfileMainControllerDelegate {
       featureProfileDependencyProvider: featureProfileDependencyProvider
     )
     childCoordinators.append(settingCoordinator)
+    settingCoordinator.finishDelegate = self
     settingCoordinator.start()
   }
   

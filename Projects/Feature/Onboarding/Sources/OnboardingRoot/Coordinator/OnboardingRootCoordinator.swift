@@ -29,6 +29,7 @@ public final class OnboardingRootCoordinator: BaseCoordinator {
   }
   
   deinit {
+    self.deinitRootCoordinator()
     print("해제됨: OnboardingRootCoordinator")
   }
 }

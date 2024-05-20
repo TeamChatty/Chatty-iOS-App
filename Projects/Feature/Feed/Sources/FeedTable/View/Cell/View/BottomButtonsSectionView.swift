@@ -18,8 +18,8 @@ final class BottomButtonsSectionView: BaseView, Touchable {
   private let heartAndCommentButtonView: ContentsImageButton = ContentsImageButton()
   private let bookmarkButton: ChangeableImageButton = ChangeableImageButton().then {
     typealias Config = ChangeableImageButton.Configuration
-    let deselectedState = Config(image: Images.saved.image, tintColor: SystemColor.basicBlack.uiColor, isEnabled: true)
-    let selectedState = Config(image: Images.savedSolid.image, tintColor: SystemColor.basicBlack.uiColor, isEnabled: true)
+    let deselectedState = Config(image: Images.saved.image, isEnabled: true)
+    let selectedState = Config(image: Images.savedSolid.image, isEnabled: true)
     $0.setState(deselectedState, for: .disabled)
     $0.setState(selectedState, for: .enabled)
  
@@ -41,8 +41,8 @@ final class BottomButtonsSectionView: BaseView, Touchable {
     heartAndCommentButtonView.touchEventRelay
       .map { event in
         switch event {
-        case .heart:
-          return TouchEventType.favorite
+        case .heart(let changedState):
+          return TouchEventType.favorite(changedState: changedState)
         case .comment:
           return TouchEventType.comment
         }
@@ -51,7 +51,15 @@ final class BottomButtonsSectionView: BaseView, Touchable {
       .disposed(by: disposeBag)
     
     bookmarkButton.touchEventRelay
-      .map { TouchEventType.bookmark }
+      .do(onNext: { [weak self] _ in
+        self?.bookmarkButton.currentState = self?.bookmarkButton.currentState == .enabled ? .disabled : .enabled
+      })
+      .debounce(.seconds(1), scheduler: MainScheduler.asyncInstance)
+      .withUnretained(self)
+      .map { owner, _ in
+        let changedState: Bool = owner.bookmarkButton.currentState == .enabled ? true : false
+        return TouchEventType.bookmark(changedState: changedState)
+      }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
   }
@@ -59,9 +67,9 @@ final class BottomButtonsSectionView: BaseView, Touchable {
 
 extension BottomButtonsSectionView {
   enum TouchEventType {
-    case favorite
+    case favorite(changedState: Bool)
     case comment
-    case bookmark
+    case bookmark(changedState: Bool)
   }
 }
 
@@ -77,13 +85,6 @@ extension BottomButtonsSectionView {
       $0.bottom.equalToSuperview()
     }
     
-    bookmarkButton.touchEventRelay
-      .bind(with: self) { owner, _ in
-        let nowState = owner.bookmarkButton.currentState
-        owner.bookmarkButton.currentState = nowState == .enabled ? .disabled : .enabled
-      }
-      .disposed(by: disposeBag)
-    
     heartAndCommentButtonView.snp.makeConstraints {
       $0.leading.equalToSuperview()
       $0.centerY.equalTo(bookmarkButton)
@@ -94,24 +95,15 @@ extension BottomButtonsSectionView {
 
 extension BottomButtonsSectionView {
   func setData(feedData: Feed) {
-    if feedData.postId == 2 {
-      heartAndCommentButtonView.updateHeartButton(marked: true, heartCount: 10)
-      updateCommentCountLabel(commentCount: 10)
-    }
-//    heartAndCommentButtonView.updateHeartButton(marked: marked, heartCount: heartCount)
-//    heartAndCommentButtonView.updateCommentCountLabel(commentCount: commentCount)
-//    bookmarkButton.currentState = marked ? .enabled : .disabled
-  }
-  
-  func updateHeartButton(marked: Bool, heartCount: Int) {
-    heartAndCommentButtonView.updateHeartButton(marked: marked, heartCount: heartCount)
+    heartAndCommentButtonView.updateHeartButton(marked: feedData.like, heartCount: feedData.likeCount)
+    heartAndCommentButtonView.updateCommentCountLabel(commentCount: feedData.commentCount)
+
+    updateCommentCountLabel(commentCount: feedData.commentCount)
+    
+    bookmarkButton.currentState = feedData.bookmark ? .enabled : .disabled
   }
   
   func updateCommentCountLabel(commentCount: Int) {
     heartAndCommentButtonView.updateCommentCountLabel(commentCount: commentCount)
-  }
-  
-  func updateBookMarkButton(marked: Bool) {
-    bookmarkButton.currentState = marked ? .enabled : .disabled
   }
 }

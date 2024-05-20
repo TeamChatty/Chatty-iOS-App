@@ -57,6 +57,9 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   }
   
   public func showOnboardingFlow() {
+    childCoordinators.removeAll()
+    navigationController.viewControllers.removeAll()
+    
     let onboardingCoordinator = OnboardingRootCoordinator(
       navigationController: navigationController,
       dependencyProvider: appDependencyProvider.makeFeatureOnboardingDependencyProvider()
@@ -81,11 +84,13 @@ public final class AppCoordinator: BaseCoordinator, AppFlowDelegate {
   }
   
   public func showMainFlow() {
+    childCoordinators.removeAll()
+    navigationController.viewControllers.removeAll()
+    
     navigationController.setCustomNavigationBarHidden(true, animated: false)
     let mainCoordinator = MainTabBarCoordinator(navigationController, appDependencyProvider: appDependencyProvider)
     mainCoordinator.start()
     
-    childCoordinators.removeAll()
     childCoordinators.append(mainCoordinator)
     window.rootViewController = navigationController
     window.makeKeyAndVisible()

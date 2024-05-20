@@ -41,6 +41,7 @@ final class ProfileMainCashItemsView: BaseView, Touchable {
       $0.top.equalTo(possessionItemsButton.snp.bottom).offset(12)
       $0.height.equalTo(60)
       $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.bottom.equalToSuperview().inset(30)
     }
   }
   

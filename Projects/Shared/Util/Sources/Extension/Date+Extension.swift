@@ -108,7 +108,7 @@ extension Date {
     let currentYear = currentDate[0]
     let currentMonth = currentDate[1]
     let currentDay = currentDate[2]
-    print("string - \(string) / currentYear - \(currentYear), birthYear - \(birthYear)")
+    
     if currentMonth > birthMonth {
       return currentYear - birthYear
     } else if currentMonth == birthMonth && currentDay >= birthDay {

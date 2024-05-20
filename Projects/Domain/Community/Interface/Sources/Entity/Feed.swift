@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Feed {
+public struct Feed: Equatable {
   public let postId: Int
   public let content: String
   public let viewCount: Int
@@ -17,12 +17,13 @@ public struct Feed {
   public let imageUrl: String?
   public let postImages: [String]
   public let owner: Bool
-
+  
   public var likeCount: Int
   public var commentCount: Int
   public var like: Bool
-  
-  public init(postId: Int, content: String, viewCount: Int, createdAt: String, userId: Int, nickname: String, imageUrl: String?, postImages: [String], likeCount: Int, commentCount: Int, like: Bool, owner: Bool) {
+  public var bookmark: Bool
+
+  public init(postId: Int, content: String, viewCount: Int, createdAt: String, userId: Int, nickname: String, imageUrl: String?, postImages: [String], owner: Bool, likeCount: Int, commentCount: Int, like: Bool, bookmark: Bool) {
     self.postId = postId
     self.content = content
     self.viewCount = viewCount
@@ -31,9 +32,15 @@ public struct Feed {
     self.nickname = nickname
     self.imageUrl = imageUrl
     self.postImages = postImages
+    self.owner = owner
     self.likeCount = likeCount
     self.commentCount = commentCount
     self.like = like
-    self.owner = owner
+    self.bookmark = bookmark
+  }
+  
+  
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.postId == rhs.postId && lhs.content == rhs.content && lhs.viewCount == rhs.viewCount && lhs.createdAt == rhs.createdAt && lhs.userId == rhs.userId && lhs.nickname == rhs.nickname && lhs.imageUrl == rhs.imageUrl && lhs.postImages == rhs.postImages && lhs.owner == rhs.owner && lhs.likeCount == rhs.likeCount && lhs.commentCount == rhs.commentCount && lhs.like == rhs.like && lhs.bookmark == rhs.bookmark
   }
 }

@@ -24,12 +24,8 @@ public final class SettingCoordinator: BaseCoordinator, SettingCoordinatorProtoc
     super.init(navigationController: navigationController)
   }
   
-  deinit {
-    print("해제됨: SettingCoordinator")
-  }
-  
   public override func start() {
-    let reactor = SettingReactor()
+    let reactor = SettingReactor(logoutUseCase: featureProfileDependencyProvider.makeLogoutUseCase())
     let settingController = SettingController(reactor: reactor)
     settingController.delegate = self
     navigationController.pushViewController(settingController, animated: true)
@@ -38,7 +34,7 @@ public final class SettingCoordinator: BaseCoordinator, SettingCoordinatorProtoc
 
 extension SettingCoordinator: SettingControllerDelegate {
   func pushNotificationView() {
-    let reactor = SettingNotificationReactor()
+    let reactor = SettingNotificationReactor(getNotificationCheckedData: featureProfileDependencyProvider.makeGetNotificationCheckedData(), saveNotificationBoolean: featureProfileDependencyProvider.makeSaveNotificationBoolean())
     let settingNotificationcontroller = SettingNotificationController(reactor: reactor)
 //    settingNotificationcontroller.delegate = self
     navigationController.pushViewController(settingNotificationcontroller, animated: true)
@@ -52,18 +48,19 @@ extension SettingCoordinator: SettingControllerDelegate {
   }
   
   func pushAccountRemoveView() {
-    let reactor = SettingRemoveAccountReactor()
-    let settingRemoveAccountController = SettingRemoveAccountController(reactor: reactor)
+    let reactor = SettingLeaveAccountReactor(leaveAccountUseCase: featureProfileDependencyProvider.makeLeaveAccountUseCase())
+    let settingRemoveAccountController = SettingLeaveAccountController(reactor: reactor)
     settingRemoveAccountController.delegate = self
     navigationController.pushViewController(settingRemoveAccountController, animated: true)
   }
   
   func logoutSwitchToOnboading() {
+    print("logout - 1 ==>")
     appFlowControl.delegete?.showOnboardingFlow()
   }
 }
 
-extension SettingCoordinator: SettingRemoveAccountControllerDelegate {
+extension SettingCoordinator: SettingLeaveAccountControllerDelegate {
   func pushToSettingNotificationView() {
     DispatchQueue.main.async {
       _ = self.navigationController.popViewController(animated: true)

@@ -22,9 +22,9 @@ public struct FeedResponseDTO: Decodable {
   public let commentCount: Int
   public let like: Bool
   public let owner: Bool
-
+  public let bookmark: Bool
   
   public func toDomain() -> Feed { 
-    return Feed(postId: postId, content: content, viewCount: viewCount, createdAt: createdAt, userId: userId, nickname: nickname, imageUrl: imageUrl, postImages: postImages, likeCount: likeCount, commentCount: commentCount, like: like, owner: owner)
+    return Feed(postId: postId, content: content, viewCount: viewCount, createdAt: createdAt, userId: userId, nickname: nickname, imageUrl: imageUrl, postImages: postImages, owner: owner, likeCount: likeCount, commentCount: commentCount, like: like, bookmark: bookmark)
   }
 }

@@ -98,8 +98,6 @@ extension OnboardingProfileController: ReactorKit.View {
       }
       .disposed(by: disposeBag)
     
-    
-    
     reactor.state
       .map(\.isSuccessSave)
       .distinctUntilChanged()
@@ -111,7 +109,6 @@ extension OnboardingProfileController: ReactorKit.View {
             owner.delegate?.pushToNextView(reactor.currentState)
             owner.reactor?.action.onNext(.didPushed)
           } else {
-            print("뭔데 쉬벌")
             owner.delegate?.switchToMainTab()
           }
         }

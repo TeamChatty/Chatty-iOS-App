@@ -11,6 +11,7 @@ import Shared
 import SharedDesignSystem
 import SharedUtil
 import FeatureFeedInterface
+import DomainCommunityInterface
 
 import RxSwift
 public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
@@ -20,23 +21,32 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   
   private var madalNavigationController: UINavigationController?
   
-  private let featureProfileDependencyProvider: FeatureFeedDependencyProvider
+  private let featureFeedDependencyProvider: FeatureFeedDependencyProvider
 
   public init(navigationController: CustomNavigationController, featureProfileDependencyProvider: FeatureFeedDependencyProvider) {
-    self.featureProfileDependencyProvider = featureProfileDependencyProvider
+    self.featureFeedDependencyProvider = featureProfileDependencyProvider
     super.init(navigationController: navigationController)
   }
   
   deinit {
-    print("해제됨: FeedMainCoordinator")
+    self.deinitRootCoordinator()
   }
   
   let disposeBag = DisposeBag()
+  
   public override func start() {
     let reactor = FeedMainReactor()
     let dataViewControllers: [UIViewController] = [
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .lastest)),
-      FeedTypeTableView(reactor: FeedTypeTableReactor(getFeedsPageUseCase: featureProfileDependencyProvider.makeGetFeedsPageUseCase(), feedType: .recommend)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureFeedDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
+        feedType: .recent)),
+      FeedTypeTableView(reactor: FeedTypeTableReactor(
+        getFeedsPageUseCase: featureFeedDependencyProvider.makeGetFeedsPageUseCase(),
+        setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+        reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
+        feedType: .topLiked)),
     ]
     let feedMainPageViewController = FeedMainPageViewController(dataViewControllers: dataViewControllers)
     
@@ -47,12 +57,22 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
 }
 
 extension FeedMainCoordinator: FeedMainControllerDelegate {
+  func pushToDetailView(postId: Int) {
+    let feedDetailCoordinator = FeedDetailCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
+    
+    feedDetailCoordinator.finishDelegate = self
+    childCoordinators.append(feedDetailCoordinator)
+    
+    feedDetailCoordinator.start(postId: postId)
+  }
+  
+  
   func pushToNotificationView() {
     print("push - NotificationView")
   }
   
   func pushToFeedProfileView() {
-    let feedProfileCoordinator = FeedProfileCoordinator(navigationController: navigationController, featureProfileDependencyProvider: featureProfileDependencyProvider)
+    let feedProfileCoordinator = FeedProfileCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
     
     childCoordinators.append(feedProfileCoordinator)
     feedProfileCoordinator.finishDelegate = self
@@ -61,13 +81,25 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
   
   func presentFeedWriteModal() {
    
-    let reactor = FeedWriteReactor(writefeedUseCase: featureProfileDependencyProvider.makeWriteFeedUseCase())
+    let reactor = FeedWriteReactor(writefeedUseCase: featureFeedDependencyProvider.makeWriteFeedUseCase())
     let modal = FeedWriteModal(reactor: reactor)
     modal.delegate = self
     
     madalNavigationController = UINavigationController(rootViewController: modal)
     if let madalNavigationController {
       madalNavigationController.modalPresentationStyle = .fullScreen
+      navigationController.present(madalNavigationController, animated: true)
+    }
+  }
+  
+  func presentReportModal(userId: Int) {
+    let reactor = FeedReportReactor(userId: userId)
+    let modal = FeedReportModalController(reactor: reactor)
+    modal.delegate = self
+    
+    madalNavigationController = UINavigationController(rootViewController: modal)
+    if let madalNavigationController {
+      madalNavigationController.modalPresentationStyle = .pageSheet
       navigationController.present(madalNavigationController, animated: true)
     }
   }
@@ -93,6 +125,9 @@ extension FeedMainCoordinator: FeedWriteModalDelegate {
   
   func successWrited(postId: Int) {
     navigationController.dismiss(animated: true)
+    if let vc = navigationController.viewControllers.last as? FeedMainController {
+      vc.refreshRecentFeeds(postId: postId)
+    }
   }
 }
 
@@ -122,6 +157,19 @@ extension FeedMainCoordinator: PHPickerViewControllerDelegate {
           }
         }
       }
+    }
+  }
+}
+
+extension FeedMainCoordinator: FeedReportModalControllerDelegate {
+  func dismissModal() {
+    navigationController.dismiss(animated: true)
+  }
+  
+  func successReport(userId: Int) {
+    navigationController.dismiss(animated: true)
+    if let vc = navigationController.viewControllers.last as? FeedMainController {
+      vc.removeReportedFeed(userId: userId)
     }
   }
 }

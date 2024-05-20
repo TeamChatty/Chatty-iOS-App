@@ -11,13 +11,32 @@ import DomainCommunity
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
   
+  func makeGetFeedUseCase() -> DefaultGetFeedUseCase {
+    return DefaultGetFeedUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
   func makeGetFeedsPageUseCase() -> DefaultGetFeedsPageUseCase {
     return DefaultGetFeedsPageUseCase(
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }
+  
   func makeWriteFeedUseCase() -> DefaultWriteFeedUseCase {
     return DefaultWriteFeedUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
+  func makeSetBookmarkAndLikeUseCase() -> DefaultSetBookmarkAndLikeUseCase {
+    return DefaultSetBookmarkAndLikeUseCase(
+      communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
+  func makeReportUseCase() -> DefaultReportUseCase {
+    return DefaultReportUseCase(
       communityAPIRepository: makeCommunityAPIRepository()
     )
   }

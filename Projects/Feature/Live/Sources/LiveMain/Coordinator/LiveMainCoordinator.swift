@@ -27,7 +27,7 @@ public final class LiveMainCoordinator: BaseCoordinator {
   }
   
   deinit {
-    print("해제됨: LiveMainCoordinator")
+    self.deinitRootCoordinator()
   }
   
   public override func start() {
@@ -37,6 +37,7 @@ public final class LiveMainCoordinator: BaseCoordinator {
     let liveController = LiveMainController(reactor: reactor)
     liveController.delegate = self
     navigationController.pushViewController(liveController, animated: false)
+
   }
 }
 

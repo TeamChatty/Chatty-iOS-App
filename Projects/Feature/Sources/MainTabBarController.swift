@@ -20,6 +20,10 @@ public final class MainTabBarController: UITabBarController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  deinit {
+    print("해제됨: MainTabBarController")
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -42,5 +46,11 @@ public final class MainTabBarController: UITabBarController {
     }
     
     viewControllers = items
+  }
+  
+  func removeTabControllers() {
+    tabNavigationControllers[MainTabBarItemType.chat]?.navigationController?.viewControllers.removeAll()
+    tabNavigationControllers.removeAll()
+    self.viewControllers?.removeAll()
   }
 }

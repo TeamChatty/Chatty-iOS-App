@@ -9,5 +9,5 @@ import Foundation
 import RxSwift
 
 public protocol GetFeedsPageUseCase {
-  func execute(lastPostId: Int, size: Int) -> Observable<[Feed]>
+  func execute(feedType: FeedPageType,lastPostId: Int, size: Int) -> Observable<[Feed]>
 }

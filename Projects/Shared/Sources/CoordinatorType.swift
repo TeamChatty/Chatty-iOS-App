@@ -54,6 +54,7 @@ public enum ProfileType {
 public enum FeedType {
   case main
   case profile
+  case detail
 }
 
 public enum SettingType {

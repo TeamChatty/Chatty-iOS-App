@@ -141,4 +141,28 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
     return interestAPIService.request(endPoint: .interests, responseDTO: InterestsResponseDTO.self)
       .map { $0.toDomain() }
   }
+  
+  public func getNotiReceiveBoolean() -> Observable<NotificationReceiveCheck> {
+    return profileAPIService.request(endPoint: .notiReceive, responseDTO: NotificationReceiveResponseDTO.self)
+      .asObservable()
+      .map { $0.toDomain() }
+  }
+  
+  public func saveNotiChattingReceive(agree: Bool) -> Observable<Void> {
+    return profileAPIService.request(endPoint: .notiChatting(agree: agree), responseDTO: NotificationReceiveResponseDTO.self)
+      .asObservable()
+      .map { _ in Void() }
+  }
+  
+  public func saveNotiFeedReceive(agree: Bool) -> Observable<Void> {
+    return profileAPIService.request(endPoint: .notiFeed(agree: agree), responseDTO: NotificationReceiveResponseDTO.self)
+      .asObservable()
+      .map { _ in Void() }
+  }
+  
+  public func saveNotiMarketingReceive(agree: Bool) -> Observable<Void> {
+    return profileAPIService.request(endPoint: .notiMarketing(agree: agree), responseDTO: NotificationReceiveResponseDTO.self)
+      .asObservable()
+      .map { _ in Void() }
+  }
 }

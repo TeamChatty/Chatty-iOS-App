@@ -29,7 +29,7 @@ public final class OnboardingProfileCoordinator: BaseCoordinator {
       saveProfileDataUseCase: dependencyProvider.makeSaveProfileDataUseCase(),
       getInterestsUseCase: dependencyProvider.makeGetAllInterestsUseCase(),
       profileType: .gender, 
-      profileData: .init(nickName: dependencyProvider.makeGetProfileDataUseCase().execute().nickname ?? "", gender: .none, birth: Date(), interest: [], mbti: .init())
+      profileData: .init(nickName: dependencyProvider.makeGetProfileDataUseCase().execute().nickname ?? "", gender: .none, birth: nil, interest: [], mbti: .init())
     )
     let onboardingProfileController = OnboardingProfileController(reactor: onboardingProfileReactor)
     onboardingProfileController.delegate = self

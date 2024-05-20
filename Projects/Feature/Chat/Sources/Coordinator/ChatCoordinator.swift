@@ -26,6 +26,10 @@ public final class ChatCoordinator: BaseCoordinator, ChatCoordinatorDelegate {
     super.init(navigationController: navigationController)
   }
   
+  deinit {
+    self.childCoordinators.removeAll()
+  }
+  
   public override func start() {
     let chatListController = ChatListController(reactor: ChatListReactor(
       chatServerConnectUseCase:dependencyProvider.makeChatServerConnectUseCase(),

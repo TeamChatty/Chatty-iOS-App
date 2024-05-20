@@ -74,12 +74,21 @@ extension ProfileMainProblemServicesView {
 
 extension ProfileMainProblemServicesView {
   private func setupButtons() {
+    let view = UIView()
+    view.backgroundColor = SystemColor.gray100.uiColor
+    addSubview(view)
     addSubview(problemNotice)
     addSubview(problemFrequentlyQuestion)
     addSubview(problemContactService)
     
+    view.snp.makeConstraints {
+      $0.top.equalToSuperview()
+      $0.height.equalTo(8)
+      $0.horizontalEdges.equalToSuperview()
+    }
+    
     problemNotice.snp.makeConstraints {
-      $0.top.equalToSuperview().inset(15)
+      $0.top.equalTo(view.snp.bottom).offset(15)
       $0.height.equalTo(54)
       $0.horizontalEdges.equalToSuperview()
     }
@@ -94,6 +103,7 @@ extension ProfileMainProblemServicesView {
       $0.top.equalTo(problemFrequentlyQuestion.snp.bottom)
       $0.height.equalTo(54)
       $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalToSuperview()
     }
   }
 }

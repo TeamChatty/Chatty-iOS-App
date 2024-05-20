@@ -53,6 +53,11 @@ extension BaseCoordinator {
       }
     }
   }
+  
+  public func deinitRootCoordinator() {
+    childCoordinators.removeAll()
+    navigationController.viewControllers.removeAll()
+  }
 }
 
 extension BaseCoordinator: CustomNavigationDelegate {

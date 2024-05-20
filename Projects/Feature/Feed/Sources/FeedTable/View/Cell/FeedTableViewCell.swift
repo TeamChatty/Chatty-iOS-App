@@ -110,10 +110,10 @@ final class FeedTableViewCell: UITableViewCell, Touchable {
         switch event {
         case .comment:
           return TouchEventType.showDetail(postId: owner.feed?.postId ?? 0)
-        case .bookmark:
-          return TouchEventType.bookmark(postId: owner.feed?.postId ?? 0)
-        case .favorite:
-          return TouchEventType.favorite(postId: owner.feed?.postId ?? 0)
+        case .bookmark(let changedState):
+          return TouchEventType.bookmark(postId: owner.feed?.postId ?? 0, changedState: changedState)
+        case .favorite(let changedState):
+          return TouchEventType.favorite(postId: owner.feed?.postId ?? 0, changedState: changedState)
         }
       }
       .bind(to: touchEventRelay)
@@ -125,8 +125,8 @@ extension FeedTableViewCell {
   enum TouchEventType {
     case showDetail(postId: Int)
     case report(userId: Int)
-    case bookmark(postId: Int)
-    case favorite(postId: Int)
+    case bookmark(postId: Int, changedState: Bool)
+    case favorite(postId: Int, changedState: Bool)
   }
 }
 
@@ -134,21 +134,6 @@ extension FeedTableViewCell {
 extension FeedTableViewCell {
   func setData(feedData: Feed) {
     feed = feedData
-  }
-  
-  /// 북마크 버튼 update
-  func updateBookmarkButton(marked: Bool) {
-    bottomSectionView.updateBookMarkButton(marked: marked)
-  }
-  
-  /// 좋아요 버튼 update
-  func updateHeartButton(marked: Bool, heartCount: Int) {
-    bottomSectionView.updateHeartButton(marked: marked, heartCount: heartCount)
-  }
-  
-  /// 코멘트 버튼 라벨 update
-  func updateCommentButton(commentCount: Int) {
-    bottomSectionView.updateCommentCountLabel(commentCount: commentCount)
   }
 }
 

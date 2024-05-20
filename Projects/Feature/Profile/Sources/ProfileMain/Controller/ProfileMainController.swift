@@ -48,6 +48,7 @@ final class ProfileMainController: BaseController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     reactor?.action.onNext(.viewWillAppear)
+    tabBarController?.tabBar.isHidden = false
   }
   
   // MARK: - Initialize Method
