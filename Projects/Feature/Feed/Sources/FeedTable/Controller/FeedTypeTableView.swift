@@ -41,6 +41,7 @@ final class FeedTypeTableView: UIViewController {
     case pushToWriteFeed
     case popToFeedMain
     case presentReportModal(userId: Int)
+    case presentStartChatModal(receiverId: Int)
   }
   
   // MARK: - Initialize Method
@@ -189,6 +190,9 @@ extension FeedTypeTableView: UITableViewDataSource {
           owner.reactor?.action.onNext(.bookmark(postId: postId, changedState: changedState))
         case .favorite(let postId, let changedState):
           owner.reactor?.action.onNext(.favorite(postId: postId, changedState: changedState))
+          
+        case .tabProfileImage(let receiverId):
+          owner.touchEventRelay.accept(.presentStartChatModal(receiverId: receiverId))
         }
       }
       .disposed(by: cell.disposeBag)

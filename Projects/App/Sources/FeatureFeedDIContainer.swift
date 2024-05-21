@@ -7,6 +7,10 @@
 
 import Foundation
 import FeatureFeedInterface
+import DomainChatInterface
+import DomainChat
+import DomainUserInterface
+import DomainUser
 import DomainCommunity
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
@@ -64,6 +68,17 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
   func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase {
     return DefaultGetMyCommentsUseCase(
       communityAPIRepository: makeCommunityAPIRepository()
+    )
+  }
+  
+  func makeCreatChatRoomUseCase() -> DefaultCreatChatRoomUseCase {
+    return DefaultCreatChatRoomUseCase(chatAPIRepository: makeChatAPIRepository())
+  }
+  
+  
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase {
+    return DefaultGetSomeoneProfileUseCase(
+      userAPIRepository: makeUserAPIRepository()
     )
   }
 }

@@ -20,6 +20,8 @@ protocol FeedMainControllerDelegate: AnyObject {
   func pushToFeedProfileView()
   func presentFeedWriteModal()
   func presentReportModal(userId: Int)
+  
+  func presentStartChatModal(receiverId: Int)
 }
 
 final class FeedMainController: BaseController {
@@ -112,6 +114,8 @@ extension FeedMainController: ReactorKit.View {
           owner.delegate?.presentFeedWriteModal()
         case .pushToDetailView(postId: let postId):
           owner.delegate?.pushToDetailView(postId: postId)
+        case .presentStartChatModal(let receiverId):
+          owner.delegate?.presentStartChatModal(receiverId: receiverId)
         case .none:
           return
         }

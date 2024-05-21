@@ -12,6 +12,7 @@ import SharedDesignSystem
 import SharedUtil
 import FeatureFeedInterface
 import DomainCommunityInterface
+import DomainChatInterface
 
 import RxSwift
 public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
@@ -56,7 +57,24 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   }
 }
 
+extension FeedMainCoordinator: FeedChatModalControllerDelegate {
+  func startChatting(chatRoom: ChatRoom) {
+    navigationController.dismiss(animated: true)
+    
+    /// Start Mehod
+  }
+}
+
 extension FeedMainCoordinator: FeedMainControllerDelegate {
+  func presentStartChatModal(receiverId: Int) {
+    let reactor = FeedChatModalReactor(getSomeoneProfileUseCase: featureFeedDependencyProvider.makeGetSomeoneProfileUseCase(), creatChatRoomUseCase: featureFeedDependencyProvider.makeCreatChatRoomUseCase(), someoneId: receiverId)
+    let modal = FeedChatModalController(reactor: reactor)
+    modal.delegate = self
+    
+    navigationController.present(modal, animated: true)
+  }
+    
+  
   func pushToDetailView(postId: Int) {
     let feedDetailCoordinator = FeedDetailCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
     

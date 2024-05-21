@@ -1,6 +1,8 @@
 // This is for Tuist
 import Foundation
 import DomainCommunity
+import DomainChat
+import DomainUser
 
 public protocol FeatureFeedDependencyProvider {
   func makeGetFeedsPageUseCase() -> DefaultGetFeedsPageUseCase
@@ -15,4 +17,7 @@ public protocol FeatureFeedDependencyProvider {
   func makeWriteCommentUseCase() -> DefaultWriteCommentUseCase
   
   func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase
+  
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase
+  func makeCreatChatRoomUseCase() -> DefaultCreatChatRoomUseCase
 }

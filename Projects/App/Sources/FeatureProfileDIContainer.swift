@@ -105,4 +105,10 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
       keychainRepository: makeKeychainRepository(),
       userProfileRepository: makeUserProfileRepository())
   }
+  
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase {
+    return DefaultGetSomeoneProfileUseCase(
+      userAPIRepository: makeUserAPIRepository()
+    )
+  }
 }

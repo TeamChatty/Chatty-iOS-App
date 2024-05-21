@@ -19,4 +19,6 @@ public protocol FeatureProfileDependencyProvider {
   
   func makeLogoutUseCase() -> DefaultLogoutUseCase
   func makeLeaveAccountUseCase() -> DefaultLeaveAccountUseCase
+  
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase
 }

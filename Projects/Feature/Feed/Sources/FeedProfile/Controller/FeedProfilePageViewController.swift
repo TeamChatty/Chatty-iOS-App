@@ -63,6 +63,8 @@ final class FeedProfilePageViewController: UIPageViewController {
               return TouchEventType.presentReportModal(userId: userId)
             case .pushToDetailView(postId: let postId):
               return TouchEventType.pushToDetailView(postId: postId)
+            case .presentStartChatModal(let receiverId):
+              return TouchEventType.presentStartChatModal(receiverId: receiverId)
             }
           }
           .bind(to: touchEventRelay)
@@ -96,6 +98,7 @@ extension FeedProfilePageViewController {
     case pushToWriteFeed
     case popToFeedMain
     case presentReportModal(userId: Int)
+    case presentStartChatModal(receiverId: Int)
   }
 }
 

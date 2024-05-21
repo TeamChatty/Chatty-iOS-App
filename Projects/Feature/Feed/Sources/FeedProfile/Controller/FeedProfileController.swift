@@ -18,6 +18,8 @@ protocol FeedProfileControllerDelegate: AnyObject {
   func popToFeedMain()
   func presentFeedWriteModal()
   func presentReportModal(userId: Int)
+  
+  func presentStartChatModal(receiverId: Int)
 }
 
 final class FeedProfileController: BaseController {
@@ -88,6 +90,8 @@ extension FeedProfileController: ReactorKit.View {
           owner.delegate?.presentReportModal(userId: userId)
         case .pushToDetailView(postId: let postId):
           owner.delegate?.pushToDetailView(postId: postId)
+        case .presentStartChatModal(let receiverId):
+          owner.delegate?.presentStartChatModal(receiverId: receiverId)
         }
       }
       .disposed(by: disposeBag)

@@ -17,6 +17,7 @@ import DomainCommunityInterface
 
 protocol FeedDetailControllerDelegate: AnyObject {
   func presentReportModal(userId: Int)
+  func presentStartChatModal(receiverId: Int)
 }
 
 final class FeedDetailController: BaseController {
@@ -312,6 +313,8 @@ extension FeedDetailController: UITableViewDataSource {
             owner.reactor?.action.onNext(.bookmark(postId: postId, changedState: changedState))
           case .favorite(let postId, let changedState):
             owner.reactor?.action.onNext(.favorite(postId: postId, changedState: changedState))
+          case .tabProfileImage(receiverId: let receiverId):
+            owner.delegate?.presentStartChatModal(receiverId: receiverId)
           }
         }
         .disposed(by: cell.disposeBag)
