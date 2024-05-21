@@ -63,7 +63,7 @@ extension FeedDetailCoordinator: FeedChatModalControllerDelegate {
 
 extension FeedDetailCoordinator: FeedDetailControllerDelegate {
   func presentStartChatModal(receiverId: Int) {
-    let reactor = FeedChatModalReactor(getSomeoneProfileUseCase: featureFeedDependencyProvider.makeGetSomeoneProfileUseCase(), creatChatRoomUseCase: featureFeedDependencyProvider.makeCreatChatRoomUseCase(), someoneId: receiverId)
+    let reactor = FeedChatModalReactor(getSomeoneProfileUseCase: featureFeedDependencyProvider.makeGetSomeoneProfileUseCaseTemp(), creatChatRoomUseCase: featureFeedDependencyProvider.makeCreatChatRoomUseCase(), someoneId: receiverId)
     let modal = FeedChatModalController(reactor: reactor)
     modal.delegate = self
     
