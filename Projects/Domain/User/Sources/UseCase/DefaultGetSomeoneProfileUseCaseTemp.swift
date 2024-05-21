@@ -9,7 +9,8 @@ import Foundation
 import RxSwift
 import DomainUserInterface
 
-public final class DefaultGetSomeoneProfileUseCase: GetSomeoneProfileUseCase {
+/// 같은 UseCase가 있어 임시로 추가했습니다.
+public final class DefaultGetSomeoneProfileUseCaseTemp: GetSomeoneProfileUseCase {
   private let userAPIRepository: any UserAPIRepositoryProtocol
   
   public init(userAPIRepository: any UserAPIRepositoryProtocol) {

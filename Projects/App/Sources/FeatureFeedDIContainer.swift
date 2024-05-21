@@ -76,8 +76,8 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
   }
   
   
-  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase {
-    return DefaultGetSomeoneProfileUseCase(
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCaseTemp {
+    return DefaultGetSomeoneProfileUseCaseTemp(
       userAPIRepository: makeUserAPIRepository()
     )
   }

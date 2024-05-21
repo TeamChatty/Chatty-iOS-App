@@ -18,6 +18,6 @@ public protocol FeatureFeedDependencyProvider {
   
   func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase
   
-  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCaseTemp
   func makeCreatChatRoomUseCase() -> DefaultCreatChatRoomUseCase
 }
