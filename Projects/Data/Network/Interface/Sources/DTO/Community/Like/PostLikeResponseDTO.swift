@@ -21,5 +21,8 @@ public struct PostLikeResponseDTO: CommonResponseDTO {
     public var userId: Int
     public var writerId: Int
   }
+<<<<<<< HEAD
   
+=======
+>>>>>>> feature/feature-feed-MyProfle-Detail_IOS-51
 }

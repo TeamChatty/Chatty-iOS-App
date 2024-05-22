@@ -63,16 +63,25 @@ final class FeedProfilePageViewController: UIPageViewController {
               return TouchEventType.presentReportModal(userId: userId)
             case .pushToDetailView(postId: let postId):
               return TouchEventType.pushToDetailView(postId: postId)
+            case .presentStartChatModal(let receiverId):
+              return TouchEventType.presentStartChatModal(receiverId: receiverId)
             }
           }
           .bind(to: touchEventRelay)
           .disposed(by: disposeBag)
       default:
-        guard let vc = vc as? FeedTypeTableView else {
+        guard let vc = vc as? FeedMyCommentTableViewController else {
           return
         }
         vc.touchEventRelay
-          .map { _ in TouchEventType.popToFeedMain }
+          .map { event in
+            switch event {
+            case .pushToDetailView(let postId):
+              return TouchEventType.pushToDetailView(postId: postId)
+            case .popToFeedMain:
+              return TouchEventType.popToFeedMain
+            }
+          }
           .bind(to: touchEventRelay)
           .disposed(by: disposeBag)
       }
@@ -89,6 +98,7 @@ extension FeedProfilePageViewController {
     case pushToWriteFeed
     case popToFeedMain
     case presentReportModal(userId: Int)
+    case presentStartChatModal(receiverId: Int)
   }
 }
 
@@ -151,13 +161,11 @@ extension FeedProfilePageViewController {
     vc.reactor?.action.onNext(.refresh)
   }
   
-  func removeReportedUserPost(userId: Int) {
-    self.dataViewControllers.forEach { vc in
-      guard let vc = vc as? FeedTypeTableView else { return }
-      
-      vc.removeReportedFeed(userId: userId)
-    }
-  }
+//  func removeReportedUserPost(userId: Int) {
+//    if let vc = dataViewControllers[2] as? FeedTypeTableView {
+//      vc.removeReportedFeed(userId: userId)
+//    }
+//  }
 }
 
 

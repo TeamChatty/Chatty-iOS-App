@@ -31,7 +31,7 @@ public extension ProfileAPIRouter {
   var basePath: String {
     switch self {
     case .profile, .profileUnlock:
-      return "/api/v1/users/profile"
+      return "/v1/users/profile"
     case .notiReceive, .notiMarketing, .notiFeed, .notiChatting:
       return "v1/notification-receive"
     }

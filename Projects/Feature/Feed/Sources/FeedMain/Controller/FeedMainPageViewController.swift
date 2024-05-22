@@ -37,6 +37,7 @@ final class FeedMainPageViewController: UIPageViewController {
     case pushToDetailView(postId: Int)
     case presentReportModal(Int)
     case pushToWriteFeed
+    case presentStartChatModal(receiverId: Int)
     case none
   }
   
@@ -68,6 +69,9 @@ final class FeedMainPageViewController: UIPageViewController {
             return TouchEventType.presentReportModal(userId)
           case .pushToDetailView(postId: let postId):
             return TouchEventType.pushToDetailView(postId: postId)
+            
+          case .presentStartChatModal(let receiverId):
+            return TouchEventType.presentStartChatModal(receiverId: receiverId)
           }
         }
         .bind(to: touchEventRelay)
@@ -135,11 +139,9 @@ extension FeedMainPageViewController {
     }
   }
   
-  func removeReportedUserPost(userId: Int) {
-    self.dataViewControllers.forEach { vc in
-      guard let vc = vc as? FeedTypeTableView else { return }
-      
-      vc.removeReportedFeed(userId: userId)
-    }
-  }
+//  func removeReportedUserPost(userId: Int) {
+//    if let vc = dataViewControllers[2] as? FeedTypeTableView {
+//      vc.removeReportedFeed(userId: userId)
+//    }
+//  }
 }

@@ -12,6 +12,7 @@ import SharedDesignSystem
 import SharedUtil
 import FeatureFeedInterface
 import DomainCommunityInterface
+import DomainChatInterface
 
 import RxSwift
 public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProtocol {
@@ -56,7 +57,24 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   }
 }
 
+extension FeedMainCoordinator: FeedChatModalControllerDelegate {
+  func startChatting(chatRoom: ChatRoom) {
+    navigationController.dismiss(animated: true)
+    
+    /// Start Mehod
+  }
+}
+
 extension FeedMainCoordinator: FeedMainControllerDelegate {
+  func presentStartChatModal(receiverId: Int) {
+    let reactor = FeedChatModalReactor(getSomeoneProfileUseCase: featureFeedDependencyProvider.makeGetSomeoneProfileUseCaseTemp(), creatChatRoomUseCase: featureFeedDependencyProvider.makeCreatChatRoomUseCase(), someoneId: receiverId)
+    let modal = FeedChatModalController(reactor: reactor)
+    modal.delegate = self
+    
+    navigationController.present(modal, animated: true)
+  }
+    
+  
   func pushToDetailView(postId: Int) {
     let feedDetailCoordinator = FeedDetailCoordinator(navigationController: navigationController, featureFeedDependencyProvider: featureFeedDependencyProvider)
     
@@ -93,7 +111,7 @@ extension FeedMainCoordinator: FeedMainControllerDelegate {
   }
   
   func presentReportModal(userId: Int) {
-    let reactor = FeedReportReactor(userId: userId)
+    let reactor = FeedReportReactor(reportUseCase: featureFeedDependencyProvider.makeReportUseCase(), userId: userId)
     let modal = FeedReportModalController(reactor: reactor)
     modal.delegate = self
     
@@ -168,8 +186,8 @@ extension FeedMainCoordinator: FeedReportModalControllerDelegate {
   
   func successReport(userId: Int) {
     navigationController.dismiss(animated: true)
-    if let vc = navigationController.viewControllers.last as? FeedMainController {
-      vc.removeReportedFeed(userId: userId)
-    }
+//    if let vc = navigationController.viewControllers.last as? FeedMainController {
+//      vc.removeReportedFeed(userId: userId)
+//    }
   }
 }

@@ -36,4 +36,14 @@ public struct DefaultChatAPIRepository: ChatAPIRepositoryProtocol {
     return chatAPIService.request(endPoint: .getChatRoom(roomId: roomId), responseDTO: ChatRoomResponseDTO.self)
       .map { $0.toDomain() }
   }
+  
+  public func createChatRoom(receiverId: Int) -> Single<ChatRoom> {
+    return chatAPIService.request(endPoint: .createChatRoom(senderId: 0, receiverId: receiverId), responseDTO: ChatRoomResponseDTO.self)
+      .map { $0.toDomain() }
+  }
+  
+  public func creatChatRoom(receiverId: Int) -> Single<ChatRoom> {
+    return chatAPIService.request(endPoint: .createChatRoom(senderId: 0, receiverId: receiverId), responseDTO: ChatRoomResponseDTO.self)
+      .map { $0.toDomain() }
+  }
 }

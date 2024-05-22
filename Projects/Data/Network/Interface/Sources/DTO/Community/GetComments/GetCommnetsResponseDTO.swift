@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DomainCommunityInterface
 
 public struct GetCommnetsResponseDTO: CommonResponseDTO {
   public typealias Data = [CommentResponseDTO]
@@ -13,4 +14,8 @@ public struct GetCommnetsResponseDTO: CommonResponseDTO {
   public var status: String
   public var message: String
   public var data: [CommentResponseDTO]
+  
+  public func toDomain() -> [Comment] {
+    return data.map { $0.toDomain() }
+  }
 }

@@ -33,6 +33,8 @@ public enum SystemFont {
   /// C3_Regular / 12
   case caption03
   
+  case custom(type: Pretendard, size: Int)
+  
   public var font: UIFont {
     switch self {
     case .headLine01:
@@ -59,6 +61,8 @@ public enum SystemFont {
       Font.Pretendard(.Regular).of(size: 13)
     case .caption03:
       Font.Pretendard(.Regular).of(size: 12)
+    case .custom(let type, let size):
+      Font.Pretendard(type).of(size: CGFloat(size))
     }
   }
 }

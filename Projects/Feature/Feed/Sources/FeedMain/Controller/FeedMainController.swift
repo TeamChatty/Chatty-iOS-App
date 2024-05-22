@@ -20,6 +20,8 @@ protocol FeedMainControllerDelegate: AnyObject {
   func pushToFeedProfileView()
   func presentFeedWriteModal()
   func presentReportModal(userId: Int)
+  
+  func presentStartChatModal(receiverId: Int)
 }
 
 final class FeedMainController: BaseController {
@@ -45,6 +47,7 @@ final class FeedMainController: BaseController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    tabBarController?.tabBar.isHidden = false
   }
   
   // MARK: - Initialize Method
@@ -107,17 +110,20 @@ extension FeedMainController: ReactorKit.View {
           owner.reactor?.action.onNext(.changePage(index))
         case .presentReportModal(userId: let userId):
           owner.delegate?.presentReportModal(userId: userId)
-        case .none:
-          return
         case .pushToWriteFeed:
           owner.delegate?.presentFeedWriteModal()
         case .pushToDetailView(postId: let postId):
           owner.delegate?.pushToDetailView(postId: postId)
+        case .presentStartChatModal(let receiverId):
+          owner.delegate?.presentStartChatModal(receiverId: receiverId)
+        case .none:
+          return
         }
       }
       .disposed(by: disposeBag)
     
     writeFeedButton.touchEventRelay
+      .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, _ in
         owner.delegate?.presentFeedWriteModal()
       }
@@ -125,6 +131,7 @@ extension FeedMainController: ReactorKit.View {
     
     reactor.state
       .map(\.pageIndex)
+      .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, index in
         owner.segumentButtonView.setIndex(index)
         owner.mainView.setPageIndex(index)
@@ -177,9 +184,5 @@ extension FeedMainController {
 extension FeedMainController {
   func refreshRecentFeeds(postId: Int) {
     mainView.refreshRecentFeeds(postId: postId)
-  }
-  
-  func removeReportedFeed(userId: Int) {
-    mainView.removeReportedUserPost(userId: userId)
   }
 }
