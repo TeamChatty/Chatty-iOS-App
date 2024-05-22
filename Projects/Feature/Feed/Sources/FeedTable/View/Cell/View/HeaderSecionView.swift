@@ -109,7 +109,7 @@ extension HeaderSecionView {
 
 extension HeaderSecionView {
   func setData(feedData: Feed) {
-    profileImageView.imageView.setImageKF(urlString: feedData.imageUrl)
+    profileImageView.imageView.setProfileImageKF(urlString: feedData.imageUrl, gender: .male, scale: .s36)
     
     if feedData.owner {
       profileImageView.isEnabled = false

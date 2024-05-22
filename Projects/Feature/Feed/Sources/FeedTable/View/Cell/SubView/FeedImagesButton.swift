@@ -47,6 +47,11 @@ class FeedImagesButton: BaseControl, Touchable {
       .map { _ in Void() }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
+    
+    blurLabel.rx.tapGesture()
+      .map { _ in Void() }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
   }
 }
 extension FeedImagesButton {
@@ -87,6 +92,9 @@ extension FeedImagesButton {
   private func setupView3(imagesCount: Int) {
     blurView.layer.opacity = 0.45
     blurLabel.text = "+ \(imagesCount)"
+    secondImageView.isUserInteractionEnabled = true
+    blurView.isUserInteractionEnabled = true
+    blurLabel.isUserInteractionEnabled = true
     
     addSubview(blurView)
     addSubview(blurLabel)
