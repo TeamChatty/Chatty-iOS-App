@@ -57,6 +57,8 @@ public final class DefaultWriteCommentUseCase: WriteCommentUseCase {
           likeCount: reply.likeCount
         )
       }
+      .observe(on: MainScheduler.instance)
+      .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
 
   }
 }

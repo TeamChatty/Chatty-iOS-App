@@ -148,38 +148,29 @@ extension FeedDetailController: ReactorKit.View {
       .bind(with: self) { owner, type in
         guard let type else { return }
         switch type {
-        case .savedcomment:
-          owner.tableView.reloadData()
-          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-          owner.setupFooterView(footerType: .loadingComments)
-          
-        case .savedReply(let commentId):
-          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == commentId }) {
-            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
-          }
         case .commentLoaded:
           owner.tableView.reloadData()
           owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-          owner.setupFooterView(footerType: .loadingComments)
+          owner.setupFooterView(tableType: type)
           
         case .commentLoadedLastPage:
           owner.tableView.reloadData()
           owner.tableView.tableFooterView = UIView(frame: .zero)
           owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-          owner.setupFooterView(footerType: .lastCommentPage)
+          owner.setupFooterView(tableType: type)
 
         case .commentLoadedEmpty:
           owner.tableView.reloadData()
           owner.tableView.tableFooterView = UIView(frame: .zero)
           owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-          owner.setupFooterView(footerType: .loadingComments)
-          
+          owner.setupFooterView(tableType: type)
+
         case .commentPaged:
           owner.tableView.insertRows(at: owner.reactor?.newPageIndexPath ?? [], with: .automatic)
-          owner.setupFooterView(footerType: .loadingComments)
-          
+          owner.setupFooterView(tableType: type)
+
         case .commentlastPage:
-          owner.setupFooterView(footerType: .lastCommentPage)
+          owner.setupFooterView(tableType: type)
         case .error:
           return
         }
@@ -192,6 +183,16 @@ extension FeedDetailController: ReactorKit.View {
       .bind(with: self) { owner, type in
         guard let type else { return }
         switch type {
+        case .replySavedUpdateView(let parentsId):
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
+            owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
+          }
+        case .replySavedUpdateCount(let parentsId, let updatedChildCount):
+          if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }),
+             let cell = owner.tableView.cellForRow(at: .init(row: index, section: 1)) as? FeedCommentCell {
+            cell.updateChildCount(count: updatedChildCount)
+          }
+          
         case .loaded(let parentsId, _):
           if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
             owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
@@ -204,6 +205,7 @@ extension FeedDetailController: ReactorKit.View {
           if let index = owner.reactor?.currentState.comments.firstIndex(where: { $0.commentId == parentsId }) {
             owner.tableView.reloadRows(at: [IndexPath(row: index, section: 1)], with: .automatic)
           }
+     
         }
       }
       .disposed(by: disposeBag)
@@ -375,7 +377,7 @@ extension FeedDetailController: UITableViewDelegate {
     
     if distanceFromBottom < height && reactor.currentState.isFetchingComment == false {
       switch reactor.currentState.commentTableState {
-      case .savedcomment, .commentLoaded, .commentPaged:
+      case .commentLoaded, .commentPaged:
         reactor.action.onNext(.scrollToNextPage)
       default:
         return
@@ -422,15 +424,23 @@ extension FeedDetailController {
     tableView.refreshControl = refreshControl
   }
   
-  private func setupFooterView(footerType: CommentFooterType) {
+  private func setupFooterView(tableType: CommentTableState) {
     loadingFooterView.stopAnimating()
-    switch footerType {
-    case .loadingComments:
+    
+    switch tableType {
+    case .commentLoaded:
       loadingFooterView.startAnimating()
       tableView.tableFooterView = loadingFooterView
-    case .emptyComments:
+    case .commentLoadedLastPage:
+      tableView.tableFooterView = UIView(frame: .zero)
+    case .commentLoadedEmpty:
       tableView.tableFooterView = emptyFooterView
-    case .lastCommentPage:
+    case .commentPaged:
+      loadingFooterView.startAnimating()
+      tableView.tableFooterView = loadingFooterView
+    case .commentlastPage:
+      tableView.tableFooterView = UIView(frame: .zero)
+    case .error:
       tableView.tableFooterView = UIView(frame: .zero)
     }
   }

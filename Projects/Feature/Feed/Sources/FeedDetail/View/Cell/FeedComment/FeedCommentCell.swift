@@ -221,4 +221,10 @@ extension FeedCommentCell {
       
     }
   }
+  
+  func updateChildCount(count: Int) {
+    if replyButton.currentState == .enabled {
+      replyButton.title = "답글 \(count)개 보기"
+    }
+  }
 }

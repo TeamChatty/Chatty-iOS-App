@@ -72,8 +72,8 @@ public final class FeedDetailReactor: Reactor {
     case setReplyUpdateType(ReplyUpdateType?)
     
     /// WriteComment
-    case setSavedComment(FeedDetailComment)
-    case setSavedReply(FeedDetailReply)
+    case setReloadCommentsforSaved([FeedDetailComment])
+    case setReloadReplyforSaved(FeedDetailReply)
     
     case setBlockedId(userId: Int?)
     case setReportedId(postId: Int?)
@@ -228,22 +228,37 @@ extension FeedDetailReactor {
           .just(.setTableState),
           .just(.setIsLoading(true)),
           writeCommentUseCase.executeComment(postId: initialState.postId, content: currentState.inputedText)
-            .map { .setSavedComment($0) },
-          .just(.setIsLoading(false))
-        ])
-      case .reply(let commentId):
-        return .concat([
-          .just(.setTableState),
-          .just(.setIsLoading(true)),
-          writeCommentUseCase.executeReply(postId: initialState.postId, commentId: commentId, content: currentState.inputedText)
             .withUnretained(self)
-            .flatMap { owner, reply -> Observable<[FeedDetailReply]> in
-              return owner.getCommetUseCase.executeReplies(commentId: reply.parentsId, lastCommentId: 0, size: 10)
+            .flatMap { owner, _ -> Observable<[FeedDetailComment]> in
+              return owner.getCommetUseCase.executeComments(postId: owner.initialState.postId, lastCommentId: Int64.max, size: 10)
             }
-            .map { .setReplyUpdateType(.loaded(parentsId: commentId, replies: $0)) }
-          ,
+            .map { .setReloadCommentsforSaved($0) },
+          
           .just(.setIsLoading(false))
         ])
+        
+      case .reply(let commentId):
+        guard let index = currentState.comments.firstIndex(where: { $0.commentId == commentId}) else { return .concat([])}
+        
+        let parentsComment = currentState.comments[index]
+        
+        if parentsComment.childReplys.isEmpty && parentsComment.childCount < 10 {
+          return .concat([
+            .just(.setReplyUpdateType(nil)),
+            getCommetUseCase.executeReplies(commentId: commentId, lastCommentId: 0, size: 10)
+              .map { .setReplyUpdateType(.loaded(parentsId: commentId, replies: $0)) }
+          ])
+        } else {
+          return .concat([
+            .just(.setReplyUpdateType(nil)),
+            .just(.setIsLoading(true)),
+            writeCommentUseCase.executeReply(postId: initialState.postId, commentId: commentId, content: currentState.inputedText)
+              .map { .setReloadReplyforSaved($0) }
+            ,
+            .just(.setIsLoading(false))
+          ])
+        }
+        
         
       default:
         return .just(.setIsLoading(false))
@@ -411,18 +426,51 @@ extension FeedDetailReactor {
     case .setInputedText(let text):
       newState.inputedText = text
       
-    case .setSavedComment(let comment):
-      newState.comments.insert(comment, at: 0)
-      newState.commentTableState = .savedcomment
+    case .setReloadCommentsforSaved(let comments):
+      newState.comments = comments
+      
+      if comments.isEmpty {
+        newState.commentTableState = .commentLoadedEmpty
+      } else if comments.count == currentState.feed?.commentCount {
+        newState.commentTableState = .commentLoadedLastPage
+      } else if comments.count < 10 {
+        newState.commentTableState = .commentLoadedLastPage
+      } else {
+        newState.commentTableState = .commentLoaded
+      }
       newState.feed?.commentCount += 1
       newState.commentInputType = .cancel
       
-    case .setSavedReply(let reply):
+    case .setReloadReplyforSaved(let reply):
       if let index = newState.comments.firstIndex(where: { $0.commentId == reply.parentsId}) {
-        newState.comments[index].childCount += 1
-        newState.comments[index].childReplys.insert(reply, at: 0)
+
+        let parentsComment = newState.comments[index]
         
-        newState.commentTableState = .savedReply(parentsId: reply.parentsId)
+        /// 1. 닫혀 있을 시 (리스트가 없을 시)
+        if parentsComment.childReplys.isEmpty {
+            newState.replyUpdateType = .replySavedUpdateCount(parentsId: reply.parentsId, updatedChildCount: parentsComment.childCount + 1)
+          
+          
+        /// 2. 열려 있을 시 (리스트가 있을 시)
+        } else {
+          
+          /// 2-1  대댓글이 추가되어야 될 시 (리스트가 전부 불러와졌을 경우)
+          if parentsComment.childReplys.count < 10 {
+            newState.comments[index].childReplys.append(reply)
+            newState.replyUpdateType = .replySavedUpdateView(parentsId: reply.parentsId)
+            
+          /// 2-2  대댓글이 추가되어야 될 시 (현재까지 전부 불러와져 있을 경우)
+          } else if parentsComment.childReplys.count == parentsComment.childCount {
+            newState.comments[index].childReplys.append(reply)
+            newState.replyUpdateType = .replySavedUpdateView(parentsId: reply.parentsId)
+            
+          /// 2-3 ChildCount만 추가될 시
+          } else {
+            newState.replyUpdateType = .replySavedUpdateCount(parentsId: reply.parentsId, updatedChildCount: parentsComment.childCount + 1)
+          }
+        }
+        
+        newState.comments[index].childCount += 1
         newState.commentInputType = .cancel
       }
 
