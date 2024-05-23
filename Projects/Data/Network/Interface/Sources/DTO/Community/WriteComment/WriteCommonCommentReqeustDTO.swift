@@ -9,4 +9,8 @@ import Foundation
 
 public struct WriteCommonCommentReqeustDTO: Encodable {
   let content: String
+  
+  public init(content: String) {
+    self.content = content
+  }
 }
