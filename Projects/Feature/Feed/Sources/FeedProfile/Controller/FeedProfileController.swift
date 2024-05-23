@@ -18,6 +18,8 @@ protocol FeedProfileControllerDelegate: AnyObject {
   func popToFeedMain()
   func presentFeedWriteModal()
   func presentReportModal(userId: Int)
+  
+  func presentStartChatModal(receiverId: Int)
 }
 
 final class FeedProfileController: BaseController {
@@ -38,6 +40,7 @@ final class FeedProfileController: BaseController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    tabBarController?.tabBar.isHidden = false
   }
   
   // MARK: - Initialize Method
@@ -87,6 +90,8 @@ extension FeedProfileController: ReactorKit.View {
           owner.delegate?.presentReportModal(userId: userId)
         case .pushToDetailView(postId: let postId):
           owner.delegate?.pushToDetailView(postId: postId)
+        case .presentStartChatModal(let receiverId):
+          owner.delegate?.presentStartChatModal(receiverId: receiverId)
         }
       }
       .disposed(by: disposeBag)
@@ -127,7 +132,6 @@ extension FeedProfileController: ReactorKit.View {
 
 extension FeedProfileController {
   private func setView() {
-    tabBarController?.tabBar.isHidden = false
     self.view.addSubview(segumentButtonView)
     self.addChild(mainView)
     self.view.addSubview(mainView.view)
@@ -143,11 +147,5 @@ extension FeedProfileController {
       $0.horizontalEdges.bottom.equalTo(self.view.safeAreaLayoutGuide)
     }
     
-  }
-}
-
-extension FeedProfileController {
-  func removeReportedFeed(userId: Int) {
-    mainView.removeReportedUserPost(userId: userId)
   }
 }
