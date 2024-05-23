@@ -12,6 +12,7 @@ import SharedDesignSystem
 
 import FeatureFeedInterface
 import DomainCommunityInterface
+import DomainChatInterface
 
 public protocol FeedDetailCoordinatorProtocol {
   func start(postId: Int)
@@ -33,7 +34,10 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
     let reactor = FeedDetailReactor(
       getFeedUseCase: featureFeedDependencyProvider.makeGetFeedUseCase(),
       setBookmarkAndLikeUseCase: featureFeedDependencyProvider.makeSetBookmarkAndLikeUseCase(),
+      setCommentLikeUseCase: featureFeedDependencyProvider.makeSetCommentLikeUseCase(),
       reportUseCase: featureFeedDependencyProvider.makeReportUseCase(),
+      getCommetUseCase: featureFeedDependencyProvider.makeGetCommetUseCase(),
+      writeCommentUseCase: featureFeedDependencyProvider.makeWriteCommentUseCase(),
       postId: postId)
    
     let feedDetailController = FeedDetailController(reactor: reactor)
@@ -43,9 +47,31 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
   }
 }
 
+
+extension FeedDetailCoordinator: FeedChatModalControllerDelegate {
+  func dismiss() {
+    navigationController.dismiss(animated: true)
+  }
+  
+  func startChatting(chatRoom: ChatRoom) {
+    navigationController.dismiss(animated: true)
+    
+    /// Start Mehod
+  }
+}
+
+
 extension FeedDetailCoordinator: FeedDetailControllerDelegate {
+  func presentStartChatModal(receiverId: Int) {
+    let reactor = FeedChatModalReactor(getSomeoneProfileUseCase: featureFeedDependencyProvider.makeGetSomeoneProfileUseCaseTemp(), creatChatRoomUseCase: featureFeedDependencyProvider.makeCreatChatRoomUseCase(), someoneId: receiverId)
+    let modal = FeedChatModalController(reactor: reactor)
+    modal.delegate = self
+    
+    navigationController.present(modal, animated: true)
+  }
+  
   func presentReportModal(userId: Int) {
-    let reactor = FeedReportReactor(userId: userId)
+    let reactor = FeedReportReactor(reportUseCase: featureFeedDependencyProvider.makeReportUseCase(), userId: userId)
     let modal = FeedReportModalController(reactor: reactor)
     modal.delegate = self
     
