@@ -24,12 +24,16 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   /// Comment
   case writeComment(requestIds: PostRequestId, requestDTO: WriteCommonCommentReqeustDTO)
   case writeCommentReply(requestIds: CommentRequestIds, requestDTO: WriteCommonCommentReqeustDTO)
-  case getComment(PostRequestId)
-  case getCommentReplies(CommentRequestIds)
+  case getComments(GetCommnetsRequestDTO)
+  case getCommentReplies(GetRepliesRequestDTO)
+  case getMyComments(GetMyCommnetsRequestDTO)
   
   /// Like
   case postLike(PostRequestId)
   case postLikeDelete(PostRequestId)
+  
+  case commentLike(commentId: Int)
+  case commentLikeDelete(commentId: Int)
   
   /// Bookmark
   case postBookmark(PostRequestId)
@@ -37,12 +41,13 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   
   /// Report
   case reportBlock(userId: Int)
-  case reportPost
+  case reportUser(userId: Int)
 }
 
 public extension CommunityAPIRouter {
   var baseURL: URL {
-    return URL(string: Environment.baseURL + basePath)!
+    let url = URL(string: Environment.baseURL + basePath)!
+    return url
   }
   
   var basePath: String {
@@ -57,14 +62,23 @@ public extension CommunityAPIRouter {
     case .getMyPosts(let requestDTO):
       return "/v1/my-posts?lastPostId=\(requestDTO.lastPostId)&size=\(requestDTO.size)"
 
-    case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete:
+    case .postLike, .postLikeDelete, .postBookmark, .postBookmarkDelete, .commentLike, .commentLikeDelete:
       return "/v1"
+      
+    /// Comment / Reply
+    case .getComments(let requestDTO):
+      return "/v2/post/\(requestDTO.postId)/comments?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
+    case .getCommentReplies(let requestDTO):
+      return "/v2/comment-replies/\(requestDTO.commentId)?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
+      
+    case .getMyComments(let requestDTO):
+      return "/v1/my-comments?lastCommentId=\(requestDTO.lastCommentId)&size=\(requestDTO.size)"
       
     /// Report
     case .reportBlock(userId: let userId):
       return "/v1/block/\(userId)"
-    case .reportPost:
-      return "/v1/block"
+    case .reportUser(let userId):
+      return "/v1/report/\(userId)"
     default:
       return "/v1/post"
     }
@@ -75,7 +89,7 @@ public extension CommunityAPIRouter {
     /// Write Post
     case .writePost:
       return ""
-    
+     
     /// Posts Page
     case .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts:
       return ""
@@ -89,10 +103,8 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/comment"
     case .writeCommentReply(let requestIds, _):
       return "/\(requestIds.postId)/comment/\(requestIds.commentId)/comment-reply"
-    case .getComment(let requestId):
-      return "/\(requestId.postId)/comments"
-    case .getCommentReplies(let requestIds):
-      return "/\(requestIds.postId)/comment/\(requestIds.commentId)/comment-replies"
+    case .getComments, .getCommentReplies, .getMyComments:
+      return ""
     
     /// Like
     case .postLike(postId: let requestId):
@@ -100,7 +112,11 @@ public extension CommunityAPIRouter {
     case .postLikeDelete(postId: let requestId):
       return "/\(requestId.postId)/like"
 
-      
+    case .commentLike(commentId: let commentId):
+      return "/comment-like/\(commentId)"
+    case .commentLikeDelete(commentId: let commentId):
+      return "/comment-like/\(commentId)"
+
     /// Bookmark
     case .postBookmark(let requestId):
       return "/\(requestId.postId)/bookmark"
@@ -108,25 +124,25 @@ public extension CommunityAPIRouter {
       return "/\(requestId.postId)/bookmark"
       
     /// Report
-    case .reportBlock, .reportPost:
+    case .reportBlock, .reportUser:
       return ""
     }
   }
   
   var method: Moya.Method {
     switch self {
-    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComment, .getCommentReplies:
+    case .getPost, .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts, .getComments, .getCommentReplies, .getMyComments:
       return .get
-    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportPost:
+    case .writePost, .writeComment, .writeCommentReply , .postLike, .postBookmark, .reportBlock, .reportUser, .commentLike:
       return .post
-    case .postLikeDelete, .postBookmarkDelete:
+    case .postLikeDelete, .postBookmarkDelete, .commentLikeDelete:
       return .delete
     }
   }
   
   var task: Moya.Task {
     switch self {
-    case .getPost, .getComment, .getCommentReplies:
+    case .getPost, .getComments, .getCommentReplies, .getMyComments:
       return .requestPlain
 
     case .getPosts, .getTopLikedPosts, .getMyBookmarkPosts, .getMyPosts:
@@ -135,20 +151,28 @@ public extension CommunityAPIRouter {
     case .postLike, .postBookmark, .postLikeDelete, .postBookmarkDelete:
       return .requestPlain
       
-    case .reportBlock, .reportPost:
+    case .reportBlock, .reportUser:
       return .requestPlain
 
     case .writePost(let requestDTO):
-      if requestDTO.images.isEmpty {
-        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
-        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
-        return .uploadMultipart([titleData, dataData])
-      } else {
+      var multipartFormDatas: [MultipartFormData] = []
+      let contentData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
+      
+      multipartFormDatas.append(contentData)
+      
+      if requestDTO.images.isEmpty == false {
+        for (index, image) in requestDTO.images.enumerated() {
+          let imageData = MultipartFormData(provider: .data(image), name: "images", fileName: "image_\(index)", mimeType: "image/jpeg")
+
+          multipartFormDatas.append(imageData)
+        }
         
-        let titleData = MultipartFormData(provider: .data(requestDTO.title.data(using: .utf8)!), name: "title")
-        let dataData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")
-        return .uploadMultipart([titleData, dataData])
       }
+      return .uploadMultipart(multipartFormDatas)
+
+      
+    case .commentLike, .commentLikeDelete:
+      return .requestPlain
      
     case .writeComment(_ , let requestDTO):
       return .requestJSONEncodable(requestDTO)
@@ -175,23 +199,3 @@ public extension CommunityAPIRouter {
     }
   }
 }
-
-
-//func createMultiImageMultiPartBody(boundary : String,imageDataArray : [Data]) -> Data {
-//  var body = Data()
-//  
-//  let mimetype = "image/jpg"
-//  
-//  for imageData in imageDataArray {
-//    body.append("--\(boundary)\r\n".data(using: String.Encoding.utf8)!)
-//    body.append("Content-Disposition: form-data; name=\"externalImages\"; filename=\"\(Date().timeIntervalSince1970).jpg\"\r\n".data(using: String.Encoding.utf8)!)
-//    
-//    body.append("Content-Type: \(mimetype)\r\n\r\n".data(using: String.Encoding.utf8)!)
-//    body.append(imageData)
-//    body.append("\r\n".data(using: String.Encoding.utf8)!)
-//    
-//  }
-//  // Just take this line out of the images loop
-//  body.append("--\(boundary)--\r\n".data(using: String.Encoding.utf8)!)
-//  return body
-//}

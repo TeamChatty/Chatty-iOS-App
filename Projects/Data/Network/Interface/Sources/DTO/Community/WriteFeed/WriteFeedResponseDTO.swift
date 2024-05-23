@@ -34,3 +34,4 @@ public struct WritedFeedResponseDTO: Decodable {
     return WritedFeed(postId: self.postId, content: self.content, userId: self.userId, nickname: self.nickname, profileImage: self.profileImage, postImages: self.postImages, viewCount: self.viewCount)
   }
 }
+

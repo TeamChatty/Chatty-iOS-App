@@ -9,7 +9,7 @@ import UIKit
 
 extension UIImage {
   public func toProfileRequestData() -> Data {
-    guard let imageData = self.jpegData(compressionQuality: 0.5) else {
+    guard let imageData = self.jpegData(compressionQuality: 0.1) else {
       return Data()
     }
     return imageData

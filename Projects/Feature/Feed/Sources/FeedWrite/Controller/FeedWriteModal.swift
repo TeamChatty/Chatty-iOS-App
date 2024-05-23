@@ -105,6 +105,7 @@ extension FeedWriteModal: ReactorKit.View {
     reactor.state
       .map(\.isSaveSuccessPostId)
       .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, postId in
         guard let postId else { return }
         owner.mainView.removeButton()

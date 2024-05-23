@@ -10,8 +10,10 @@ import SharedDesignSystem
 import DomainUser
 import DomainUserInterface
 import DomainCommon
+import DomainCommunityInterface
 
 final class FeedReportReactor: Reactor {
+  private let reportUseCase: ReportUseCase
   
   enum Action {
     case selectCase(ReportCase)
@@ -40,7 +42,8 @@ final class FeedReportReactor: Reactor {
   
   var initialState: State
   
-  public init(userId: Int) {
+  public init(reportUseCase: ReportUseCase, userId: Int) {
+    self.reportUseCase = reportUseCase
     self.initialState = State(
       userId: userId,
       addressArray: ReportCase.allCases.enumerated().map { index, name in
@@ -67,7 +70,12 @@ extension FeedReportReactor {
     case .tabChangeButton:
       return .concat([
         .just(.isLoading(true)),
-       
+        reportUseCase.executeReport(userId: initialState.userId)
+          .map { _ in .setIsSaveSuccess }
+          .catch { _ -> Observable<Mutation> in
+            return .just(.setIsSaveSuccess)
+          }
+        ,
         .just(.isLoading(false))
       ])
       

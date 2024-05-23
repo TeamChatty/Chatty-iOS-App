@@ -65,7 +65,7 @@ extension SettingNotificationReactor {
       ])
     case .toggleChattingNoti(let bool):
       return saveNotificationBoolean.execute(type: .chatting, agree: bool)
-        .map { _ in .setNotificationState(type: .chatting)}
+        .map { _ in .setNotificationState(type: .chat)}
         .catch { error -> Observable<Mutation> in
           return error.toMutation()
         }

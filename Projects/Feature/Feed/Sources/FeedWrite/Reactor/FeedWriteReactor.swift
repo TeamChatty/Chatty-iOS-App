@@ -99,7 +99,7 @@ extension FeedWriteReactor {
       let content = currentState.inputedNicknameText
       return .concat([
         .just(.isLoading(true)),
-        writefeedUseCase.execute(title: "1", content: content, images: images)
+        writefeedUseCase.execute(content: content, images: images)
           .map { post in
             return .setIsSaveSuccess(postId: post.postId)
           }

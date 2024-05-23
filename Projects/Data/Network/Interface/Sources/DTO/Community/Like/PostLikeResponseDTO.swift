@@ -21,5 +21,4 @@ public struct PostLikeResponseDTO: CommonResponseDTO {
     public var userId: Int
     public var writerId: Int
   }
-  
 }

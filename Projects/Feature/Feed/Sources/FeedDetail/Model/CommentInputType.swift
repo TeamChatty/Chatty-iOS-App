@@ -7,7 +7,8 @@
 
 import Foundation
 
-enum CommentType {
+public enum CommentInputType: Equatable {
   case comment
-  case reply
+  case reply(commentId: Int)
+  case cancel
 }

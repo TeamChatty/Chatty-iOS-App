@@ -73,12 +73,13 @@ final class OnboardingAccountOwnerCheckView: BaseView, Touchable {
   
   public var profileImageURL: String? {
     didSet {
-      if let profileImageURL,
-         let source = URL(string: profileImageURL) {
-        profileImageView.kf.setImage(with: source)
-      } else {
-        profileImageView.image = UIImage(asset: Images.boyGray)
-      }
+      profileImageView.setProfileImageKF(urlString: profileImageURL, gender: .male, scale: .s140)
+//      if let profileImageURL,
+//         let source = URL(string: profileImageURL) {
+//        profileImageView.kf.setImage(with: source)
+//      } else {
+//        profileImageView.image = UIImage(asset: Images.boyGray)
+//      }
     }
   }
   

@@ -28,9 +28,10 @@ final class ProfileMainView: BaseView, Touchable {
     $0.backgroundColor = .white
   }
   
-  private let profileCashsItemView: ProfileMainCashItemsView = ProfileMainCashItemsView().then {
-    $0.backgroundColor = .white
-  }
+  /// 인앱결제 추가 이후 사용
+//  private let profileCashsItemView: ProfileMainCashItemsView = ProfileMainCashItemsView().then {
+//    $0.backgroundColor = .white
+//  }
   
   private let problemServicesView: ProfileMainProblemServicesView = ProfileMainProblemServicesView().then {
     $0.backgroundColor = .white
@@ -55,17 +56,17 @@ final class ProfileMainView: BaseView, Touchable {
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
-    profileCashsItemView.touchEventRelay
-      .map { event in
-        switch event {
-        case .possessionItems:
-          return TouchEventType.possessionItems
-        case .membership:
-          return TouchEventType.membership
-        }
-      }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
+//    profileCashsItemView.touchEventRelay
+//      .map { event in
+//        switch event {
+//        case .possessionItems:
+//          return TouchEventType.possessionItems
+//        case .membership:
+//          return TouchEventType.membership
+//        }
+//      }
+//      .bind(to: touchEventRelay)
+//      .disposed(by: disposeBag)
     
     problemServicesView.touchEventRelay
       .map { event in
@@ -121,10 +122,10 @@ extension ProfileMainView {
       $0.width.equalToSuperview()
     }
     
-    stackView.addArrangedSubview(profileCashsItemView)
-    profileCashsItemView.snp.makeConstraints {
-      $0.width.equalToSuperview()
-    }
+//    stackView.addArrangedSubview(profileCashsItemView)
+//    profileCashsItemView.snp.makeConstraints {
+//      $0.width.equalToSuperview()
+//    }
     
     stackView.addArrangedSubview(problemServicesView)
     problemServicesView.snp.makeConstraints {
@@ -145,6 +146,6 @@ extension ProfileMainView {
   }
   
   func setCashItemCount(candyCount: Int, ticketCount: Int) {
-    self.profileCashsItemView.setCashItemsData(candyCount: candyCount, ticketCount: ticketCount)
+//    self.profileCashsItemView.setCashItemsData(candyCount: candyCount, ticketCount: ticketCount)
   }
 }
