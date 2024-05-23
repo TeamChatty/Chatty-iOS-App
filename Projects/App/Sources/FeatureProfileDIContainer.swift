@@ -19,6 +19,13 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
     )
   }
   
+  func makeSaveProfileImageUseCase() -> DefaultSaveProfileImageUseCase {
+    return DefaultSaveProfileImageUseCase(
+      userAPIRepository: makeUserAPIRepository(),
+      userProfileRepository: makeUserProfileRepository()
+    )
+  }
+  
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),
@@ -97,5 +104,17 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
     return DefaultLeaveAccountUseCase(
       keychainRepository: makeKeychainRepository(),
       userProfileRepository: makeUserProfileRepository())
+  }
+  
+  func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase {
+    return DefaultGetSomeoneProfileUseCase(
+      userAPIRepository: makeUserAPIRepository()
+    )
+  }
+  
+  func makeGetSomeoneProfileUseCaseTemp() -> DefaultGetSomeoneProfileUseCaseTemp {
+    return DefaultGetSomeoneProfileUseCaseTemp(
+      userAPIRepository: makeUserAPIRepository()
+    )
   }
 }
