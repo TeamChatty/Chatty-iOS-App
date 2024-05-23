@@ -16,18 +16,12 @@ import DomainCommunityInterface
 
 final class HeaderSecionView: BaseView, Touchable {
   // MARK: - View Property
-  private let profileImageView: ChangeableImageButton = ChangeableImageButton().then {
-    $0.imageView.contentMode = .scaleAspectFit
+  private let profileImageView: UIImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
     $0.layer.cornerRadius = 36 / 2
     $0.clipsToBounds = true
     $0.backgroundColor = .gray
   }
-//  private let profileImageView2: UIImageView = UIImageView().then {
-//    $0.contentMode = .scaleAspectFit
-//    $0.layer.cornerRadius = 36 / 2
-//    $0.clipsToBounds = true
-//    $0.backgroundColor = .gray
-//  }
   private let nicknameLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicBlack.uiColor
     $0.font = SystemFont.body02.font
@@ -58,11 +52,6 @@ final class HeaderSecionView: BaseView, Touchable {
   
   // MARK: - UIBindable
   override func bind() {
-    profileImageView.touchEventRelay
-      .map { TouchEventType.profileImage }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
     reportButton.touchEventRelay
       .map { TouchEventType.report }
       .bind(to: touchEventRelay)
@@ -73,7 +62,6 @@ final class HeaderSecionView: BaseView, Touchable {
 extension HeaderSecionView {
   enum TouchEventType {
     case report
-    case profileImage
   }
 }
 
@@ -109,14 +97,7 @@ extension HeaderSecionView {
 
 extension HeaderSecionView {
   func setData(feedData: Feed) {
-    profileImageView.imageView.setProfileImageKF(urlString: feedData.imageUrl, gender: .male, scale: .s36)
-    
-    if feedData.owner {
-      profileImageView.isEnabled = false
-    } else {
-      profileImageView.isEnabled = true
-    }
-    
+    profileImageView.setImageKF(urlString: feedData.imageUrl)
     nicknameLabel.text = feedData.nickname
     timeLabel.text = feedData.createdAt.toTimeDifference()
     

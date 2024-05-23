@@ -21,11 +21,9 @@ class FeedImagesButton: BaseControl, Touchable {
   }
   private let firstImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFill
-    $0.clipsToBounds = true
   }
   private let secondImageView: UIImageView = UIImageView().then {
-    $0.contentMode = .scaleAspectFill
-    $0.clipsToBounds = true
+    $0.contentMode = .scaleAspectFit
   }
   private let blurView: UIView = UIView().then {
     $0.backgroundColor = SystemColor.basicBlack.uiColor
@@ -44,11 +42,6 @@ class FeedImagesButton: BaseControl, Touchable {
   // MARK: - UIBindable
   open override func bind() {
     self.rx.controlEvent(.touchUpInside)
-      .map { _ in Void() }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
-    
-    blurLabel.rx.tapGesture()
       .map { _ in Void() }
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
@@ -92,9 +85,6 @@ extension FeedImagesButton {
   private func setupView3(imagesCount: Int) {
     blurView.layer.opacity = 0.45
     blurLabel.text = "+ \(imagesCount)"
-    secondImageView.isUserInteractionEnabled = true
-    blurView.isUserInteractionEnabled = true
-    blurLabel.isUserInteractionEnabled = true
     
     addSubview(blurView)
     addSubview(blurLabel)

@@ -82,8 +82,6 @@ final class FeedDetailCell: UITableViewCell, Touchable {
         switch event {
         case .report:
           return TouchEventType.report(userId: owner.feed?.userId ?? 0)
-        case .profileImage:
-          return TouchEventType.tabProfileImage(receiverId: owner.feed?.userId ?? 0)
         }
       }
       .bind(to: touchEventRelay)
@@ -124,7 +122,6 @@ extension FeedDetailCell {
     case comment
     case bookmark(postId: Int, changedState: Bool)
     case favorite(postId: Int, changedState: Bool)
-    case tabProfileImage(receiverId: Int)
   }
 }
 

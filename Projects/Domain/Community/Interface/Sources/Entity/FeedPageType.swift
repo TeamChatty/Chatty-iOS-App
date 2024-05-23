@@ -12,5 +12,4 @@ public enum FeedPageType {
   case topLiked
   case myBookmark
   case myPosts
-  case myComments
 }

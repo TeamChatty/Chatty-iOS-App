@@ -27,8 +27,6 @@ public final class DefaultGetFeedsPageUseCase: GetFeedsPageUseCase {
       return communityAPIRepository.getMyBookmarkPosts(lastBookmarkId: lastPostId, size: size)
     case .myPosts:
       return communityAPIRepository.getMyPosts(lastPostId: lastPostId, size: size)
-    case .myComments:
-      return .just([])
     }
   }
 }

@@ -14,9 +14,8 @@ import DomainLiveInterface
 
 final class LiveMainView: BaseView {
   // MARK: - View Property
-  /// 인앱결제 추가 이후 재 수정
-//  private let membershipButton: MatchMembershipButton = MatchMembershipButton()
-//  private let cashItemButtonView: MatchCashItemButton = MatchCashItemButton()
+  private let membershipButton: MatchMembershipButton = MatchMembershipButton()
+  private let cashItemButtonView: MatchCashItemButton = MatchCashItemButton()
   
   private let matchBoxView: MatchBoxView = MatchBoxView()
   
@@ -35,15 +34,15 @@ final class LiveMainView: BaseView {
   }
   
   override func bind() {
-//    membershipButton.touchEventRelay
-//      .map { _ in TouchEventType.membership }
-//      .bind(to: self.touchEventRelay)
-//      .disposed(by: disposeBag)
-//    
-//    cashItemButtonView.touchEventRelay
-//      .map { _ in TouchEventType.cashItem }
-//      .bind(to: self.touchEventRelay)
-//      .disposed(by: disposeBag)
+    membershipButton.touchEventRelay
+      .map { _ in TouchEventType.membership }
+      .bind(to: self.touchEventRelay)
+      .disposed(by: disposeBag)
+    
+    cashItemButtonView.touchEventRelay
+      .map { _ in TouchEventType.cashItem }
+      .bind(to: self.touchEventRelay)
+      .disposed(by: disposeBag)
     
     matchBoxView.touchEventRelay
       .map { event -> TouchEventType in
@@ -73,23 +72,23 @@ extension LiveMainView: Touchable {
 
 extension LiveMainView {
   private func setMembershipButton() {
-//    addSubview(membershipButton)
-//    membershipButton.snp.makeConstraints {
-//      $0.top.equalToSuperview().inset(52)
-//      $0.leading.equalToSuperview().inset(20)
-//      $0.height.equalTo(36)
-//      $0.width.equalTo(48)
-//    }
+    addSubview(membershipButton)
+    membershipButton.snp.makeConstraints {
+      $0.top.equalToSuperview().inset(52)
+      $0.leading.equalToSuperview().inset(20)
+      $0.height.equalTo(36)
+      $0.width.equalTo(48)
+    }
     
   }
   
   private func setItemButtonView() {
-//    addSubview(cashItemButtonView)
-//    cashItemButtonView.snp.makeConstraints {
-//      $0.leading.equalTo(membershipButton.snp.trailing).offset(12)
-//      $0.centerY.equalTo(membershipButton.snp.centerY)
-//      $0.height.equalTo(36)
-//    }
+    addSubview(cashItemButtonView)
+    cashItemButtonView.snp.makeConstraints {
+      $0.leading.equalTo(membershipButton.snp.trailing).offset(12)
+      $0.centerY.equalTo(membershipButton.snp.centerY)
+      $0.height.equalTo(36)
+    }
   }
   
   private func setMatchBoxView() {

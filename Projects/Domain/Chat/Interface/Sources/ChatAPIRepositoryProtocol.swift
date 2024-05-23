@@ -13,6 +13,4 @@ public protocol ChatAPIRepositoryProtocol {
   func saveChatMessage(with message: ChatMessage) -> Single<Void>
   func fetchChatRooms() -> Single<[ChatRoom]>
   func fetchChatRoom(roomId: Int) -> Single<ChatRoom>
-  
-  func creatChatRoom(receiverId: Int) -> Single<ChatRoom>
 }

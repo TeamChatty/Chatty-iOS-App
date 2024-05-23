@@ -19,13 +19,6 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
     )
   }
   
-  func makeSaveProfileImageUseCase() -> DefaultSaveProfileImageUseCase {
-    return DefaultSaveProfileImageUseCase(
-      userAPIRepository: makeUserAPIRepository(),
-      userProfileRepository: makeUserProfileRepository()
-    )
-  }
-  
   func makeSaveProfileNicknameUseCase() -> DefaultSaveProfileNicknameUseCase {
     return DefaultSaveProfileNicknameUseCase(
       userAPIRepository: makeUserAPIRepository(),
@@ -105,13 +98,4 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
       keychainRepository: makeKeychainRepository(),
       userProfileRepository: makeUserProfileRepository())
   }
-<<<<<<< HEAD
-=======
-  
-  func makeGetSomeoneProfileUseCaseTemp() -> DefaultGetSomeoneProfileUseCaseTemp {
-    return DefaultGetSomeoneProfileUseCaseTemp(
-      userAPIRepository: makeUserAPIRepository()
-    )
-  }
->>>>>>> feature/feature-feed-MyProfle-Detail_IOS-51
 }

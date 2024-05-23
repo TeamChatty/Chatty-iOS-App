@@ -46,7 +46,6 @@ final class FeedReportModalController: BaseController {
   weak var delegate: FeedReportModalControllerDelegate?
   
   public override func configureUI() {
-    self.navigationController?.navigationBar.isHidden = true
     view.addSubview(mainView)
     
     mainView.snp.makeConstraints {
@@ -105,7 +104,7 @@ extension FeedReportModalController: ReactorKit.View {
       .observe(on: MainScheduler.asyncInstance)
       .bind(with: self) { owner, result in
         if result {
-          owner.delegate?.successReport(userId: owner.reactor?.initialState.userId ?? 0)
+          owner.delegate?.successReport(userId: owner.reactor?.currentState.userId ?? 0)
         }
       }
       .disposed(by: disposeBag)

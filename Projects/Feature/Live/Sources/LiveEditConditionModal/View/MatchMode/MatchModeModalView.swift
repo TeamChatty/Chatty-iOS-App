@@ -34,10 +34,9 @@ final class MatchModeModalView: BaseView {
     $0.setButtonType(.nomalMode)
   }
   
-  /// 인앱 결제 추가 이후 재사용
-//  private let fastModeButton: MatchModeButton = MatchModeButton().then {
-//    $0.setButtonType(.fastMode)
-//  }
+  private let fastModeButton: MatchModeButton = MatchModeButton().then {
+    $0.setButtonType(.fastMode)
+  }
 
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()
@@ -69,10 +68,10 @@ final class MatchModeModalView: BaseView {
       .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
     
-//    fastModeButton.touchEventRelay
-//      .map { _ in TouchEventType.matchMode(.fastMode) }
-//      .bind(to: touchEventRelay)
-//      .disposed(by: disposeBag)
+    fastModeButton.touchEventRelay
+      .map { _ in TouchEventType.matchMode(.fastMode) }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
   }
 }
 
@@ -123,27 +122,20 @@ extension MatchModeModalView {
     let viewSize = (CGRect.appFrame.width - 60) / 2
     
     addSubview(nomalModeButton)
-//    addSubview(fastModeButton)
+    addSubview(fastModeButton)
     
     nomalModeButton.snp.makeConstraints {
       $0.top.equalTo(profileAuthenticationView.snp.bottom).offset(20)
-      $0.horizontalEdges.equalToSuperview().inset(20)
-      $0.height.equalTo(viewSize)
+      $0.leading.equalToSuperview().inset(20)
+      $0.width.height.equalTo(viewSize)
       $0.bottom.equalToSuperview().inset(46)
     }
     
-//    nomalModeButton.snp.makeConstraints {
-//      $0.top.equalTo(profileAuthenticationView.snp.bottom).offset(20)
-//      $0.leading.equalToSuperview().inset(20)
-//      $0.width.height.equalTo(viewSize)
-//      $0.bottom.equalToSuperview().inset(46)
-//    }
-//    
-//    fastModeButton.snp.makeConstraints {
-//      $0.top.equalTo(nomalModeButton.snp.top)
-//      $0.trailing.equalToSuperview().inset(20)
-//      $0.height.width.equalTo(viewSize)
-//      $0.bottom.equalToSuperview().inset(46)
-//    }
+    fastModeButton.snp.makeConstraints {
+      $0.top.equalTo(nomalModeButton.snp.top)
+      $0.trailing.equalToSuperview().inset(20)
+      $0.height.width.equalTo(viewSize)
+      $0.bottom.equalToSuperview().inset(46)
+    }
   }
 }

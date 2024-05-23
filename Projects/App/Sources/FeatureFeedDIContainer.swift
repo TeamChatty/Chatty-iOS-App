@@ -7,10 +7,6 @@
 
 import Foundation
 import FeatureFeedInterface
-import DomainChatInterface
-import DomainChat
-import DomainUserInterface
-import DomainUser
 import DomainCommunity
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
@@ -39,46 +35,9 @@ final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependency
     )
   }
   
-  func makeSetCommentLikeUseCase() -> DefaultSetCommentLikeUseCase {
-    return DefaultSetCommentLikeUseCase(
-      communityAPIRepository: makeCommunityAPIRepository()
-    )
-  }
-  
   func makeReportUseCase() -> DefaultReportUseCase {
     return DefaultReportUseCase(
       communityAPIRepository: makeCommunityAPIRepository()
-    )
-  }
-  
-  func makeGetCommetUseCase() -> DefaultGetCommetUseCase {
-    return DefaultGetCommetUseCase(
-      communityAPIRepository: makeCommunityAPIRepository(),
-      userProfileRepository: makeUserProfileRepository()
-    )
-  }
-  
-  func makeWriteCommentUseCase() -> DefaultWriteCommentUseCase {
-    return DefaultWriteCommentUseCase(
-      communityAPIRepository: makeCommunityAPIRepository(),
-      userProfileRepository: makeUserProfileRepository()
-    )
-  }
-  
-  func makeGetMyCommentsUseCase() -> DefaultGetMyCommentsUseCase {
-    return DefaultGetMyCommentsUseCase(
-      communityAPIRepository: makeCommunityAPIRepository()
-    )
-  }
-  
-  func makeCreatChatRoomUseCase() -> DefaultCreatChatRoomUseCase {
-    return DefaultCreatChatRoomUseCase(chatAPIRepository: makeChatAPIRepository())
-  }
-  
-  
-  func makeGetSomeoneProfileUseCaseTemp() -> DefaultGetSomeoneProfileUseCaseTemp {
-    return DefaultGetSomeoneProfileUseCaseTemp(
-      userAPIRepository: makeUserAPIRepository()
     )
   }
 }

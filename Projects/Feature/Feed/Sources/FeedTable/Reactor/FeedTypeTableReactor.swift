@@ -112,19 +112,18 @@ extension FeedTypeTableReactor {
       return .concat([
         .just(.setTableState),
         .just(.setIsLoading(true)),
-        getFeedsPageUseCase.execute(feedType: initialState.feedType, lastPostId: Int.max, size: 11)
+        getFeedsPageUseCase.execute(feedType: currentState.feedType, lastPostId: Int.max, size: 10)
           .map { .setList($0) }
           .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
             return error.toMutation()
           },
         .just(.setIsLoading(false)),
       ])
-    case .scrollToNextPage:
-      let lastPostId = currentState.feeds.last?.postId ?? Int.max
+    case .refresh:
       return .concat([
         .just(.setTableState),
         .just(.isReloading(true)),
-        getFeedsPageUseCase.execute(feedType: initialState.feedType, lastPostId: Int.max, size: 11)
+        getFeedsPageUseCase.execute(feedType: currentState.feedType, lastPostId: Int.max, size: 10)
           .map { .setListRefresh($0) }
           .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
             return error.toMutation()
@@ -135,8 +134,8 @@ extension FeedTypeTableReactor {
       return .concat([
         .just(.setTableState),
         .just(.setIsLoading(true)),
-        getFeedsPageUseCase.execute(feedType: initialState.feedType, lastPostId: postId, size: 11)
-          .map { .setListRefresh($0) }
+        getFeedsPageUseCase.execute(feedType: currentState.feedType, lastPostId: postId, size: 10)
+          .map { .setList($0) }
           .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
             return error.toMutation()
           },
@@ -148,7 +147,7 @@ extension FeedTypeTableReactor {
       return .concat([
         .just(.setTableState),
         .just(.setIsFetchingPage(true)),
-        getFeedsPageUseCase.execute(feedType: initialState.feedType, lastPostId: lastPostId, size: 11)
+        getFeedsPageUseCase.execute(feedType: currentState.feedType, lastPostId: lastPostId, size: 10)
           .map { .setNextPage(feeds: $0) }
           .catch { error -> Observable<FeedTypeTableReactor.Mutation> in
             return error.toMutation()
@@ -193,7 +192,7 @@ extension FeedTypeTableReactor {
     case .reportPost(postId: let postId):
       return .concat([
         .just(.setReportedId(postId: nil)),
-        reportUseCase.executeReport(userId: postId)
+        reportUseCase.executePost(postId: postId)
           .map { _ in Mutation.setReportedId(postId: postId) }
       ])
     }
@@ -208,7 +207,7 @@ extension FeedTypeTableReactor {
       
       if feeds.isEmpty {
         newState.tableState = .loadedEmpty
-      } else if feeds.count < 11 {
+      } else if feeds.count < 10 {
         newState.tableState = .loadedLastPage
       } else {
         newState.tableState = .loaded
@@ -219,7 +218,7 @@ extension FeedTypeTableReactor {
       
       if feeds.isEmpty {
         newState.tableState = .loadedEmpty
-      } else if feeds.count < 11 {
+      } else if feeds.count < 10 {
         newState.tableState = .loadedLastPage
       }  else {
         newState.tableState = .loaded
@@ -228,7 +227,7 @@ extension FeedTypeTableReactor {
     case .setNextPage(feeds: let feeds):
       newState.feeds += feeds
       
-      if feeds.count < 11 {
+      if feeds.count < 10 {
         newState.tableState = .lastPage
       } else {
         newState.tableState = .paged(addedCount: feeds.count)

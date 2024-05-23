@@ -29,7 +29,7 @@ public final class ProfileEditMainCoordinator: BaseCoordinator, ProfileEditMainC
   }
   
   public override func start() {
-    let reactor = ProfileEditMainReactor(getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase(), saveProfileImageUseCase: featureProfileDependencyProvider.makeSaveProfileImageUseCase())
+    let reactor = ProfileEditMainReactor(getUserDataUseCase: featureProfileDependencyProvider.makeGetProfileDataUseCase())
     let profileEditMainController = ProfileEditMainController(reactor: reactor)
     profileEditMainController.delegate = self
     navigationController.pushViewController(profileEditMainController, animated: true)

@@ -13,16 +13,17 @@ import Then
 
 open class IconTitleButton: BaseControl, Touchable, Highlightable {
   // MARK: - View Property
-  public let iconImageView: UIImageView = UIImageView().then {
+  private let iconImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
   }
   
-  public let titleLabel: UILabel = UILabel().then {
+  private let titleLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicBlack.uiColor
     $0.font = SystemFont.body02.font
     $0.textAlignment = .left
   }
-
+  
+  // MARK: - Stored Property
  
   
   // MARK: - Rx Property

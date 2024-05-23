@@ -28,6 +28,7 @@ public protocol UserAPIRepositoryProtocol: AnyObject {
   
   func getProfile() -> Single<UserProfile>
   func someoneProfile(userId: Int) -> Single<SomeoneProfile>
+  
   func getInterests() -> Single<Interests>
   
   func getNotiReceiveBoolean() -> Observable<NotificationReceiveCheck>
