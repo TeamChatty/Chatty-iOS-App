@@ -13,7 +13,7 @@ import SnapKit
 
 public final class ChangeableImageButton: UIControl, Touchable, Highlightable {
   // MARK: - View Property
-  private let imageView: UIImageView = UIImageView()
+  public let imageView: UIImageView = UIImageView()
   
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()

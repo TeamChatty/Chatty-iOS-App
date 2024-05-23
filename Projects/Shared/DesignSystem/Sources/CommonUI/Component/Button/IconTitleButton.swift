@@ -13,18 +13,15 @@ import Then
 
 open class IconTitleButton: BaseControl, Touchable, Highlightable {
   // MARK: - View Property
-  private let iconImageView: UIImageView = UIImageView().then {
+  public let iconImageView: UIImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
   }
   
-  private let titleLabel: UILabel = UILabel().then {
+  public let titleLabel: UILabel = UILabel().then {
     $0.textColor = SystemColor.basicBlack.uiColor
     $0.font = SystemFont.body02.font
     $0.textAlignment = .left
   }
-  
-  // MARK: - Stored Property
- 
   
   // MARK: - Rx Property
   public let touchEventRelay: PublishRelay<Void> = .init()
