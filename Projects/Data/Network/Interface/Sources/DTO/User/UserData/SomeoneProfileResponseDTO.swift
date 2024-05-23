@@ -20,7 +20,7 @@ public struct SomeoneProfileResponseDTO: CommonResponseDTO {
     let nickname, birth, mbti: String
     let gender: Gender
     let authority: Authority
-    let interests: [String]
+    let interests: [InterestsDTO]
     let address, imageURL, job, introduce, school: String?
     let blueCheck, unlock: Bool
     
@@ -41,9 +41,7 @@ public struct SomeoneProfileResponseDTO: CommonResponseDTO {
       mbti: data.mbti,
       address: data.address,
       imageUrl: data.imageURL,
-      interests: data.interests.enumerated().map({ index, item in
-          .init(id: index, name: item)
-      }),
+      interests: data.interests.map { Interest(id: $0.id, name: $0.name)},
       job: data.job,
       introduce: data.introduce,
       school: data.school,

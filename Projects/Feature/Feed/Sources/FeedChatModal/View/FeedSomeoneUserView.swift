@@ -59,12 +59,12 @@ final class FeedSomeoneUserView: BaseView {
 extension FeedSomeoneUserView {
   func updateSomeoneProfile(profile: SomeoneProfile) {
     self.profileImageView.setProfileImageKF(
-      urlString: profile.profile.imageUrl,
-      gender: profile.profile.gender == .male ? .male : .female,
+      urlString: profile.imageUrl,
+      gender: profile.gender == .male ? .male : .female,
       scale: .s44
     )
-    self.nicknameLable.text = profile.profile.nickname
-    self.bluecheckImageView.currentState = profile.profile.blueCheck ? .enabled : .disabled
+    self.nicknameLable.text = profile.nickname
+    self.bluecheckImageView.currentState = profile.blueCheck ? .enabled : .disabled
   }
 }
 

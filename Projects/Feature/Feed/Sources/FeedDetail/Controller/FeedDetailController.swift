@@ -79,14 +79,16 @@ final class FeedDetailController: BaseController {
     alertView.addButton("확인", for: .positive)
     alertView.addButton("취소", for: .negative)
     
-    let alertController = CustomAlertController(alertView: alertView, delegate: self)
+    let alertController = CustomAlertController(
+      alertView: alertView,
+      positiveAction: { [weak self] in
+        self?.reactor?.action.onNext(.startComment(.cancel))
+        self?.tableView.endEditing(true)
+      }
+    )
     navigationController?.present(alertController, animated: false)
   }
   
-  public override func destructiveAction() {
-    reactor?.action.onNext(.startComment(.cancel))
-    tableView.endEditing(true)
-  }
 }
 
 extension FeedDetailController: ReactorKit.View {
