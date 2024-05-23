@@ -63,17 +63,21 @@ public final class TemporaryChatRoomHeaderBar: BaseView, Touchable {
     
     profileData
       .bind(with: self) { owner, profile in
-        if let profileImageURLstring = profile.imageUrl,
-          let profileImageURL = URL(string: profileImageURLstring) {
-          owner.profileImageView.kf.setImage(with: profileImageURL)
-        } else {
-          switch profile.gender {
-          case .male:
-            owner.profileImageView.image = UIImage(asset: Images.boyGray)
-          case .female:
-            owner.profileImageView.image = UIImage(asset: Images.girlGray)
-          }
-        }
+        owner.profileImageView.setProfileImageKF(
+          urlString: profile.imageUrl,
+          gender: profile.gender == .male ? .male : .female,
+          scale: .s48)
+//        if let profileImageURLstring = profile.imageUrl,
+//          let profileImageURL = URL(string: profileImageURLstring) {
+//          owner.profileImageView.kf.setImage(with: profileImageURL)
+//        } else {
+//          switch profile.gender {
+//          case .male:
+//            owner.profileImageView.image = UIImage(asset: Images.boyGray)
+//          case .female:
+//            owner.profileImageView.image = UIImage(asset: Images.girlGray)
+//          }
+//        }
       }
       .disposed(by: disposeBag)
     
