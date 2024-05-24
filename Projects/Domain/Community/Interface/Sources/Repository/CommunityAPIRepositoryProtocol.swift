@@ -41,5 +41,5 @@ public protocol CommunityAPIRepositoryProtocol: AnyObject {
   
   /// Report
   func reportBlockUser(userId: Int) -> Observable<Int>
-  func reportUser(userId: Int) -> Observable<Int>
+  func reportUser(userId: Int, content: String) -> Observable<Int>
 }

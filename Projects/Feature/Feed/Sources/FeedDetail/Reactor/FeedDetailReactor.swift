@@ -76,7 +76,7 @@ public final class FeedDetailReactor: Reactor {
     case setReloadReplyforSaved(FeedDetailReply)
     
     case setBlockedId(userId: Int?)
-    case setReportedId(postId: Int?)
+    case setReportedId(userId: Int?)
     
     case setTableState
     case setIsFetchingCommentPage(Bool)
@@ -320,11 +320,7 @@ extension FeedDetailReactor {
           .map { _ in .setBlockedId(userId: userId) }
       ])
     case .reportPost(postId: let postId):
-      return .concat([
-        .just(.setReportedId(postId: nil)),
-        reportUseCase.executeReport(userId: postId)
-          .map { _ in Mutation.setReportedId(postId: postId) }
-      ])
+      return .concat([])
     }
   }
   
@@ -477,8 +473,8 @@ extension FeedDetailReactor {
     /// Report
     case .setBlockedId(userId: let userId):
       newState.blockedId = userId
-    case .setReportedId(postId: let postId):
-      newState.reportedPostId = postId
+    case .setReportedId(userId: let userId):
+      newState.reportedPostId = userId
       
     case .setError(let error):
       newState.errorState = error
