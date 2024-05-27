@@ -7,13 +7,25 @@
 
 import Foundation
 import FeatureFeedInterface
+import FeatureFeed
+import FeatureChatInterface
+import FeatureChat
 import DomainChatInterface
 import DomainChat
 import DomainUserInterface
 import DomainUser
 import DomainCommunity
+import SharedDesignSystem
+
 
 final class FeatureFeedDIContainer: RepositoryDIcontainer, FeatureFeedDependencyProvider {
+  
+  func getChatCoordinatorDelegate(navigationController: CustomNavigationController) -> ChatCoordinatorDelegate {
+     return ChatCoordinator(
+       navigationController: navigationController,
+       dependencyProvider: AppDIContainer.shared.makeFeatureChatDependencyProvider()
+     )
+   }
   
   func makeGetFeedUseCase() -> DefaultGetFeedUseCase {
     return DefaultGetFeedUseCase(

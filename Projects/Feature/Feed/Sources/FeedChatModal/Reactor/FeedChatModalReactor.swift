@@ -35,6 +35,7 @@ final class FeedChatModalReactor: Reactor {
     
     var someoneProfile: SomeoneProfile? = nil
     var createdChatRoom: ChatRoom? = nil
+    var isSuccessCreatedChatRoom: Bool = false
     
     var isLoading: Bool = false
     var errorState: ErrorType? = nil
@@ -50,9 +51,12 @@ final class FeedChatModalReactor: Reactor {
   
   public enum ErrorType: Error {
     case unknownError
+    case alreadyExistChatRoom
     
     var description: String {
       switch self {
+      case .alreadyExistChatRoom:
+            return "이미 채팅방이 개설된 유저입니다."
       case .unknownError:
         return "문제가 생겼어요. 다시 시도해주세요."
       }
@@ -93,6 +97,7 @@ extension FeedChatModalReactor {
    
     case .setCreatedChatRoom(let chatRoom):
       newState.createdChatRoom = chatRoom
+      newState.isSuccessCreatedChatRoom = true
       
     case .isLoading(let bool):
       newState.isLoading = bool
@@ -111,6 +116,8 @@ extension Error {
         return .just(.setError(.unknownError))
       }
       switch error.errorCase {
+      case.E012AlreadyExistChatRoom:
+        return .just(.setError(.alreadyExistChatRoom))
       default:
         return .just(.setError(.unknownError))
       }

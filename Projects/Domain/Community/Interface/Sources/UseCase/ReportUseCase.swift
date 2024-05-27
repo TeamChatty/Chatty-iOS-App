@@ -10,5 +10,5 @@ import RxSwift
 
 public protocol ReportUseCase {
   func executeBlock(userId: Int) -> Observable<Int>
-  func executeReport(userId: Int) -> Observable<Int>
+  func executeReport(userId: Int, content: String) -> Observable<Int>
 }

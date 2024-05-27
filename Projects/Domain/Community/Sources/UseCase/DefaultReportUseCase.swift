@@ -20,7 +20,7 @@ public final class DefaultReportUseCase: ReportUseCase {
     return communityAPIRepository.reportBlockUser(userId: userId)
   }
   
-  public func executeReport(userId: Int) -> Observable<Int> {
-    return communityAPIRepository.reportUser(userId: userId)
+  public func executeReport(userId: Int, content: String) -> Observable<Int> {
+    return communityAPIRepository.reportUser(userId: userId, content: content)
   }
 }
