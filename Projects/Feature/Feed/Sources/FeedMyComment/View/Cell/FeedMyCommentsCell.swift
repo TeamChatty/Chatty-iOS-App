@@ -66,7 +66,7 @@ final class FeedMyCommentsCell: UITableViewCell, Touchable {
         }
       }
       .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
+      .disposed(by: cellDisposeBag)
   }
 }
 
