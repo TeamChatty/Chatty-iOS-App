@@ -52,4 +52,13 @@ public final class ChatCoordinator: BaseCoordinator, ChatCoordinatorDelegate {
     temporaryChatRoomController.hidesBottomBarWhenPushed = true
     navigationController.pushViewController(temporaryChatRoomController, animated: true)
   }
+  
+  public func pushToChatRoomFromFeed(roomData: ChatRoom) {
+    let roomViewData = ChatRoomViewData(roomId: roomData.roomId, recieverProfile: .init(userId: roomData.partnerId, name: roomData.partnerNickname, profileImageURL: roomData.partnerImageURL), chatRoomActiveStatus: .unlimited, createdTime: roomData.chatRoomCreatedTime)
+    
+    let chatRoomController = ChatRoomController(reactor: ChatReactor(chatServerConnectUseCase: dependencyProvider.makeChatServerConnectUseCase(), chatSendMessageUseCase: dependencyProvider.makeChatSendMessageUseCase(), chatRoomSubscribeUseCase: dependencyProvider.makeChatRoomSubscribeUseCase(), getChatMessageStreamUseCase: dependencyProvider.makeGetChatMessageStreamUseCase(), getChatMessagesUseCase: dependencyProvider.makeGetChatMessagesUseCase(), getSomeoneProfileUseCase: dependencyProvider.makeGetSomeoneProfileUseCase(), roomViewData: roomViewData))
+    
+    chatRoomController.hidesBottomBarWhenPushed = true
+    navigationController.pushViewController(chatRoomController, animated: true)
+  }
 }

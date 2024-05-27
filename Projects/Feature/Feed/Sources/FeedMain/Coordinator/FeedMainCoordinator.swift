@@ -10,6 +10,8 @@ import PhotosUI
 import Shared
 import SharedDesignSystem
 import SharedUtil
+
+import FeatureChatInterface
 import FeatureFeedInterface
 import DomainCommunityInterface
 import DomainChatInterface
@@ -22,9 +24,9 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
   
   private var madalNavigationController: UINavigationController?
   
-  private let featureFeedDependencyProvider: FeatureFeedDependencyProvider
+  private let featureFeedDependencyProvider: any FeatureFeedDependencyProvider
 
-  public init(navigationController: CustomNavigationController, featureProfileDependencyProvider: FeatureFeedDependencyProvider) {
+  public init(navigationController: CustomNavigationController, featureProfileDependencyProvider: any FeatureFeedDependencyProvider) {
     self.featureFeedDependencyProvider = featureProfileDependencyProvider
     super.init(navigationController: navigationController)
   }
@@ -59,9 +61,16 @@ public final class FeedMainCoordinator: BaseCoordinator, FeedMainCoordinatorProt
 
 extension FeedMainCoordinator: FeedChatModalControllerDelegate {
   func startChatting(chatRoom: ChatRoom) {
-    navigationController.dismiss(animated: true)
-    
-    /// Start Mehod
+    DispatchQueue.main.async {
+      let chatCoordinatorDelegate = self.featureFeedDependencyProvider.getChatCoordinatorDelegate(navigationController: self.navigationController)
+      if let chatCoordinator = chatCoordinatorDelegate as? Coordinator,
+         let chatCoordinatorDelegate = chatCoordinator as? ChatCoordinatorDelegate {
+        
+        self.addChildCoordinator(chatCoordinator)
+        self.navigationController.dismiss(animated: false)
+        chatCoordinatorDelegate.pushToChatRoomFromFeed(roomData: chatRoom)
+      }
+    }
   }
 }
 

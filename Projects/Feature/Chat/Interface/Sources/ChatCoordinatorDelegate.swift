@@ -12,4 +12,5 @@ import DomainChatInterface
 public protocol ChatCoordinatorDelegate: AnyObject {
   func pushToChatRoom(roomViewData: ChatRoomViewData)
   func pushToTemporaryChatRoom(roomData: ChatRoom)
+  func pushToChatRoomFromFeed(roomData: ChatRoom)
 }

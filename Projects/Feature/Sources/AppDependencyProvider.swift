@@ -6,21 +6,23 @@
 //
 
 import Foundation
-import FeatureOnboardingInterface
-import FeatureChatInterface
 import DomainAuth
 import DomainUser
+
+import FeatureOnboardingInterface
+import FeatureChatInterface
 import FeatureLive
 import FeatureProfileInterface
 import FeatureFeedInterface
+import FeatureFeed
 import SharedDesignSystem
 
 public protocol AppDependencyProvider {
   func makeFeatureOnboardingDependencyProvider() -> FeatureOnboardingDependencyProvider
   func makeFeatureLiveDependencyProvider() -> any FeatureLiveDependencyProvider
   func makeFeatureProfileDependencyProvider() -> FeatureProfileDependencyProvider
-  func makeFeatureChatDependencyProvider() -> FeatureChatDependecyProvider
-  func makeFeatureFeedDependencyProvider() -> FeatureFeedDependencyProvider
+  func makeFeatureChatDependencyProvider() -> any FeatureChatDependecyProvider
+  func makeFeatureFeedDependencyProvider() -> any FeatureFeedDependencyProvider
   
   func makeValiateAccessTokenUseCase() -> DefaultValidateAccessTokenUseCase
   func makeGetAccessTokenUseCase() -> DefaultGetAccessTokenUseCase

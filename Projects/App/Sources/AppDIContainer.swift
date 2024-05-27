@@ -10,6 +10,7 @@ import Feature
 import FeatureOnboardingInterface
 import FeatureLiveInterface
 import FeatureFeedInterface
+import FeatureFeed
 import FeatureLive
 import FeatureProfileInterface
 import FeatureChatInterface
@@ -33,7 +34,7 @@ final class AppDIContainer: RepositoryDIcontainer, AppDependencyProvider {
     return FeatureLiveDIcontainer()
   }
   
-  func makeFeatureFeedDependencyProvider() -> FeatureFeedDependencyProvider {
+  func makeFeatureFeedDependencyProvider() -> any FeatureFeedDependencyProvider {
     return FeatureFeedDIContainer()
   }
   

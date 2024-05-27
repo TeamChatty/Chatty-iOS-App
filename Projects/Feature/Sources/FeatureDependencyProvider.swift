@@ -11,11 +11,12 @@ import FeatureLive
 import FeatureChatInterface
 import FeatureProfileInterface
 import FeatureFeedInterface
+import FeatureFeed
 
 public protocol FeatureDependencyProvider {
   func makeFeatureOnboardingDependencyProvider() -> FeatureOnboardingDependencyProvider
   func makeFeatureLiveDependencyProvider() -> any FeatureLiveDependencyProvider
   func makeFeatureProfileDependencyProvider() -> FeatureProfileDependencyProvider
   func makeFeatureChatDependencyProvider() -> FeatureChatDependecyProvider
-  func makeFeatureFeedDependencyProvider() -> FeatureFeedDependencyProvider
+  func makeFeatureFeedDependencyProvider() -> any FeatureFeedDependencyProvider
 }
