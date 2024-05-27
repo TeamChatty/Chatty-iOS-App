@@ -15,11 +15,10 @@ import SharedDesignSystem
 import ReactorKit
 
 import DomainChatInterface
-import DomainChat
-
+ 
 protocol FeedChatModalControllerDelegate: AnyObject {
   func dismiss()
-  func startChatting(chatRoom: ChatRoom)
+  func successMatching(room: ChatRoom)
 }
 
 final class FeedChatModalController: BaseController {
@@ -86,12 +85,13 @@ extension FeedChatModalController: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
-      .map(\.createdChatRoom)
-      .observe(on: MainScheduler.asyncInstance)
-      .bind(with: self) { owner, createdChatRoom in
-        guard let createdChatRoom else { return }
-        owner.delegate?.startChatting(chatRoom: createdChatRoom)
-        
+      .map(\.isSuccessCreatedChatRoom)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, bool in
+        guard let reactor = owner.reactor else { return }
+        if bool {
+          owner.delegate?.successMatching(room: reactor.currentState.createdChatRoom!)
+        }
       }
       .disposed(by: disposeBag)
     

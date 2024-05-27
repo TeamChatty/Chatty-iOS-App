@@ -11,6 +11,7 @@ import PhotosUI
 import Shared
 import SharedDesignSystem
 import SharedUtil
+import FeatureChatInterface
 import FeatureFeedInterface
 import DomainChatInterface
 
@@ -23,9 +24,9 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
   
   private var madalNavigationController: UINavigationController?
   
-  private let featureFeedDependencyProvider: FeatureFeedDependencyProvider
+  private let featureFeedDependencyProvider: any FeatureFeedDependencyProvider
 
-  public init(navigationController: CustomNavigationController, featureFeedDependencyProvider: FeatureFeedDependencyProvider) {
+  public init(navigationController: CustomNavigationController, featureFeedDependencyProvider: any FeatureFeedDependencyProvider) {
     self.featureFeedDependencyProvider = featureFeedDependencyProvider
     super.init(navigationController: navigationController)
   }
@@ -62,10 +63,19 @@ public final class FeedProfileCoordinator: BaseCoordinator, FeedMainCoordinatorP
 
 
 extension FeedProfileCoordinator: FeedChatModalControllerDelegate {
-  func startChatting(chatRoom: ChatRoom) {
-    navigationController.dismiss(animated: true)
-    
-    /// Start Mehod
+  func successMatching(room: ChatRoom) {
+    print("successMatching - Matching")
+   
+    DispatchQueue.main.async {
+      let chatCoordinatorDelegate = self.featureFeedDependencyProvider.getChatCoordinatorDelegate2(navigationController: self.navigationController)
+      if let chatCoordinator = chatCoordinatorDelegate as? Coordinator,
+         let chatCoordinatorDelegate = chatCoordinator as? ChatCoordinatorDelegate {
+        
+        self.addChildCoordinator(chatCoordinator)
+        self.navigationController.dismiss(animated: false)
+        chatCoordinatorDelegate.pushToChatRoomFromFeed(roomData: room)
+      }
+    }
   }
 }
 

@@ -41,7 +41,7 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   
   /// Report
   case reportBlock(userId: Int)
-  case reportUser(userId: Int)
+  case reportUser(userId: Int, content: ReportUserRequestDTO)
 }
 
 public extension CommunityAPIRouter {
@@ -77,7 +77,7 @@ public extension CommunityAPIRouter {
     /// Report
     case .reportBlock(userId: let userId):
       return "/v1/block/\(userId)"
-    case .reportUser(let userId):
+    case .reportUser(let userId, _):
       return "/v1/report/\(userId)"
     default:
       return "/v1/post"
@@ -151,9 +151,13 @@ public extension CommunityAPIRouter {
     case .postLike, .postBookmark, .postLikeDelete, .postBookmarkDelete:
       return .requestPlain
       
-    case .reportBlock, .reportUser:
+    case .reportBlock:
       return .requestPlain
 
+    case .reportUser( _, let content):
+      return .requestJSONEncodable(content)
+      
+      
     case .writePost(let requestDTO):
       var multipartFormDatas: [MultipartFormData] = []
       let contentData = MultipartFormData(provider: .data(requestDTO.content.data(using: .utf8)!), name: "content")

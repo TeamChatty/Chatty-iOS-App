@@ -10,6 +10,7 @@ import Foundation
 import Shared
 import SharedDesignSystem
 
+import FeatureChatInterface
 import FeatureFeedInterface
 import DomainCommunityInterface
 import DomainChatInterface
@@ -23,9 +24,9 @@ public final class FeedDetailCoordinator: BaseCoordinator, FeedDetailCoordinator
     .feed(.detail)
   }
     
-  private let featureFeedDependencyProvider: FeatureFeedDependencyProvider
+  private let featureFeedDependencyProvider: any FeatureFeedDependencyProvider
   
-  public init(navigationController: CustomNavigationController, featureFeedDependencyProvider: FeatureFeedDependencyProvider) {
+  public init(navigationController: CustomNavigationController, featureFeedDependencyProvider: any FeatureFeedDependencyProvider) {
     self.featureFeedDependencyProvider = featureFeedDependencyProvider
     super.init(navigationController: navigationController)
   }
@@ -53,10 +54,19 @@ extension FeedDetailCoordinator: FeedChatModalControllerDelegate {
     navigationController.dismiss(animated: true)
   }
   
-  func startChatting(chatRoom: ChatRoom) {
-    navigationController.dismiss(animated: true)
-    
-    /// Start Mehod
+  func successMatching(room: ChatRoom) {
+    print("successMatching - Matching")
+   
+    DispatchQueue.main.async {
+      let chatCoordinatorDelegate = self.featureFeedDependencyProvider.getChatCoordinatorDelegate2(navigationController: self.navigationController)
+      if let chatCoordinator = chatCoordinatorDelegate as? Coordinator,
+         let chatCoordinatorDelegate = chatCoordinator as? ChatCoordinatorDelegate {
+        
+        self.addChildCoordinator(chatCoordinator)
+        self.navigationController.dismiss(animated: false)
+        chatCoordinatorDelegate.pushToChatRoomFromFeed(roomData: room)
+      }
+    }
   }
 }
 
@@ -88,6 +98,6 @@ extension FeedDetailCoordinator: FeedReportModalControllerDelegate {
   }
   
   func successReport(userId: Int) {
-    
+    navigationController.dismiss(animated: true)
   }
 }

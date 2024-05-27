@@ -5,7 +5,7 @@
 //  Created by HUNHIE LEE on 2/12/24.
 //
 
-import Foundation
+import UIKit
 import Shared
 import SharedDesignSystem
 import FeatureChatInterface
@@ -51,5 +51,14 @@ public final class ChatCoordinator: BaseCoordinator, ChatCoordinatorDelegate {
     let temporaryChatRoomController = TemporaryChatRoomController(reactor: ChatReactor(chatServerConnectUseCase: dependencyProvider.makeChatServerConnectUseCase(), chatSendMessageUseCase: dependencyProvider.makeChatSendMessageUseCase(), chatRoomSubscribeUseCase: dependencyProvider.makeChatRoomSubscribeUseCase(), getChatMessageStreamUseCase: dependencyProvider.makeGetChatMessageStreamUseCase(), getChatMessagesUseCase: dependencyProvider.makeGetChatMessagesUseCase(), getSomeoneProfileUseCase: dependencyProvider.makeGetSomeoneProfileUseCase(), roomViewData: roomViewData), temporaryChatReactor: TemporaryChatReactor())
     temporaryChatRoomController.hidesBottomBarWhenPushed = true
     navigationController.pushViewController(temporaryChatRoomController, animated: true)
+  }
+  
+  public func pushToChatRoomFromFeed(roomData: ChatRoom) {
+    let roomViewData = ChatRoomViewData(roomId: roomData.roomId, recieverProfile: .init(userId: roomData.partnerId, name: roomData.partnerNickname, profileImageURL: roomData.partnerImageURL), chatRoomActiveStatus: .unlimited, createdTime: roomData.chatRoomCreatedTime)
+    
+    let chatRoomController = ChatRoomController(reactor: ChatReactor(chatServerConnectUseCase: dependencyProvider.makeChatServerConnectUseCase(), chatSendMessageUseCase: dependencyProvider.makeChatSendMessageUseCase(), chatRoomSubscribeUseCase: dependencyProvider.makeChatRoomSubscribeUseCase(), getChatMessageStreamUseCase: dependencyProvider.makeGetChatMessageStreamUseCase(), getChatMessagesUseCase: dependencyProvider.makeGetChatMessagesUseCase(), getSomeoneProfileUseCase: dependencyProvider.makeGetSomeoneProfileUseCase(), roomViewData: roomViewData))
+    
+    chatRoomController.hidesBottomBarWhenPushed = true
+    navigationController.pushViewController(chatRoomController, animated: true)
   }
 }

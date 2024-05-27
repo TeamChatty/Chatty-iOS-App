@@ -29,7 +29,7 @@ public extension String {
   func toDateFromISO8601() -> Date? {
     let dateFormatter = ISO8601DateFormatter()
     dateFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
-    dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+    dateFormatter.timeZone = TimeZone.autoupdatingCurrent
     return dateFormatter.date(from: self)
   }
   
@@ -43,7 +43,7 @@ public extension String {
   func toTimeDifference() -> String {
     guard let standardTime = self.toDateFromISO8601() else { return "" }
     
-    let component = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from:  standardTime, to: Date.now)
+    let component = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from:  standardTime, to: Date.shared)
     
     if let year = component.year,
        let month = component.month,
