@@ -190,11 +190,7 @@ extension FeedTypeTableReactor {
           .map { _ in .setBlockedId(userId: userId) }
       ])
     case .reportPost(postId: let postId):
-      return .concat([
-        .just(.setReportedId(postId: nil)),
-        reportUseCase.executeReport(userId: postId)
-          .map { _ in Mutation.setReportedId(postId: postId) }
-      ])
+      return .concat([])
     }
   }
   

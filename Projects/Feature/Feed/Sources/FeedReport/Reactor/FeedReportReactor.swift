@@ -70,7 +70,7 @@ extension FeedReportReactor {
     case .tabChangeButton:
       return .concat([
         .just(.isLoading(true)),
-        reportUseCase.executeReport(userId: initialState.userId)
+        reportUseCase.executeReport(userId: initialState.userId, content: currentState.selectedAddress?.stringKR ?? "")
           .map { _ in .setIsSaveSuccess }
           .catch { _ -> Observable<Mutation> in
             return .just(.setIsSaveSuccess)

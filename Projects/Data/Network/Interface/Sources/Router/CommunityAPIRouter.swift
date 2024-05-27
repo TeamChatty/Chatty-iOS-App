@@ -41,7 +41,7 @@ public enum CommunityAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   
   /// Report
   case reportBlock(userId: Int)
-  case reportUser(userId: Int)
+  case reportUser(userId: Int, content: ReportUserRequestDTO)
 }
 
 public extension CommunityAPIRouter {
