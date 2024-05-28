@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: chatty-lab/Chatty-iOS-ignored
-          path: /
+          path: /*
           token: ${{ secrets.ACTION_TOKEN }}
           
       - name: Move files from Firebase to Resources
