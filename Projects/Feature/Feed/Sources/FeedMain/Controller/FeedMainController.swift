@@ -68,6 +68,7 @@ final class FeedMainController: BaseController {
     setView()
   }
   
+  /// notification 주석
   override func setNavigationBar() {
     let feedProfileButton = CustomNavigationBarButton(image: Images.feedProfile.image)
     let bellButton = CustomNavigationBarButton(image: Images.bell.image)
@@ -75,13 +76,13 @@ final class FeedMainController: BaseController {
     customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
       titleView: .init(title: "피드"),
       titleAlignment: .leading,
-      rightButtons: [feedProfileButton, bellButton]
+      rightButtons: [feedProfileButton/*, bellButton*/]
     )
     customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
       .bind(with: self) { owner, event in
         switch event {
-        case .notification:
-          owner.delegate?.pushToNotificationView()
+//        case .notification:
+//          owner.delegate?.pushToNotificationView()
         case .feedProfile:
           owner.delegate?.pushToFeedProfileView()
         }
@@ -91,7 +92,7 @@ final class FeedMainController: BaseController {
   
   enum BarTouchEvent: Int, IntCaseIterable {
     case feedProfile
-    case notification
+//    case notification
   }
 }
 
