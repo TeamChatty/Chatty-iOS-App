@@ -165,4 +165,10 @@ public final class DefaultUserAPIRepository: UserAPIRepository {
       .asObservable()
       .map { _ in Void() }
   }
+  
+  public func leaveAccount() -> Observable<Void> {
+    return userAPIService.request(endPoint: .leaveAccount, responseDTO: SaveUserProfileResponseDTO.self)
+      .asObservable()
+      .map { _ in Void() }
+  }
 }

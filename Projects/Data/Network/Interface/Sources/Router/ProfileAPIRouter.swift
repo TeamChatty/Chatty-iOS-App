@@ -33,7 +33,7 @@ public extension ProfileAPIRouter {
     case .profile, .profileUnlock:
       return "/v1/users/profile"
     case .notiReceive, .notiMarketing, .notiFeed, .notiChatting:
-      return "v1/notification-receive"
+      return "/v1/notification-receive"
     }
     
   }

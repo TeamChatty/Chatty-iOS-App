@@ -35,4 +35,6 @@ public protocol UserAPIRepositoryProtocol: AnyObject {
   func saveNotiChattingReceive(agree: Bool) -> Observable<Void>
   func saveNotiFeedReceive(agree: Bool) -> Observable<Void>
   func saveNotiMarketingReceive(agree: Bool) -> Observable<Void>
+  
+  func leaveAccount() -> Observable<Void>
 }

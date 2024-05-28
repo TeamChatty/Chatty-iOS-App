@@ -103,7 +103,9 @@ final class FeatureProfileDIContainer: RepositoryDIcontainer, FeatureProfileDepe
   func makeLeaveAccountUseCase() -> DefaultLeaveAccountUseCase {
     return DefaultLeaveAccountUseCase(
       keychainRepository: makeKeychainRepository(),
-      userProfileRepository: makeUserProfileRepository())
+      userProfileRepository: makeUserProfileRepository(),
+      userAPIRepository: makeUserAPIRepository()
+    )
   }
   
   func makeGetSomeoneProfileUseCase() -> DefaultGetSomeoneProfileUseCase {

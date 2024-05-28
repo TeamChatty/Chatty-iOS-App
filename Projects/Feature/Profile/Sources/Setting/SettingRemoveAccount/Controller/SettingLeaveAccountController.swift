@@ -73,15 +73,15 @@ final class SettingLeaveAccountController: BaseController {
     alertView.addButton("취소", for: .negative)
     
     let alertController = CustomAlertController(
-      alertView: alertView) { [weak self] in
-        guard let destructiveActionType = self?.destructiveActionType else { return }
-        switch destructiveActionType {
-        case .leaveAccount:
-          self?.reactor?.action.onNext(.TabremoveAccount)
-        case .switchToMain:
-          self?.delegate?.successRemoveAccount()
-        }
-      }
+      alertView: alertView, positiveAction: { [weak self] in
+          guard let destructiveActionType = self?.destructiveActionType else { return }
+          switch destructiveActionType {
+          case .leaveAccount:
+            self?.reactor?.action.onNext(.TabremoveAccount)
+          case .switchToMain:
+            self?.delegate?.successRemoveAccount()
+          }
+      })
     customNavigationController?.present(alertController, animated: false)
   }
   
@@ -95,7 +95,7 @@ final class SettingLeaveAccountController: BaseController {
     alertView.addButton("확인", for: .positive)
     
     let alertController = CustomAlertController(
-      alertView: alertView) { [weak self] in
+      alertView: alertView, positiveAction: { [weak self] in
         guard let destructiveActionType = self?.destructiveActionType else { return }
         switch destructiveActionType {
         case .leaveAccount:
@@ -103,7 +103,7 @@ final class SettingLeaveAccountController: BaseController {
         case .switchToMain:
           self?.delegate?.successRemoveAccount()
         }
-      }
+      })
     customNavigationController?.present(alertController, animated: false)
   }
   
