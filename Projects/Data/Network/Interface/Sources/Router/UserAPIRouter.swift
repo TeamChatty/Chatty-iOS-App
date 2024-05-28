@@ -26,6 +26,9 @@ public enum UserAPIRouter: RouterProtocol, AccessTokenAuthorizable {
   case join(request: UserSignRequestDTO)
   
   case profile
+  
+  ///  계정삭제
+  case leaveAccount
 }
 
 public extension UserAPIRouter  {
@@ -70,6 +73,9 @@ public extension UserAPIRouter  {
     
     case .profile:
       return "/my/profile"
+      
+    case .leaveAccount:
+      return "/cancel-membership"
     }
   }
   
@@ -81,6 +87,8 @@ public extension UserAPIRouter  {
       return .post
     case .profile:
       return .get
+    case .leaveAccount:
+      return .delete
     }
   }
   
@@ -128,6 +136,9 @@ public extension UserAPIRouter  {
       
     case .profile:
       return .requestPlain
+      
+    case .leaveAccount:
+      return .requestPlain
     }
   }
   
@@ -141,12 +152,14 @@ public extension UserAPIRouter  {
       return RequestHeader.getHeader([.json])
     case .profile:
       return .none
+    case .leaveAccount:
+      return .none
     }
   }
   
   var authorizationType: Moya.AuthorizationType? {
     switch self {
-    case .nickname, .mbti, .image, .gender, .deviceToken, .birth, .school, .job, .introduce, .interests, .address, .profile:
+    case .nickname, .mbti, .image, .gender, .deviceToken, .birth, .school, .job, .introduce, .interests, .address, .profile, .leaveAccount:
       return .bearer
     default:
       return .none
