@@ -68,17 +68,18 @@ final class ProfileMainController: BaseController {
     setView()
   }
   
+  /// notification 주석
   override func setNavigationBar() {
     let bellButton = CustomNavigationBarButton(image: Images.bell.image)
     let settingButton = CustomNavigationBarButton(image: Images.setting.image)
     customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
-      rightButtons: [bellButton, settingButton]
+      rightButtons: [/*bellButton,*/ settingButton]
     )
     customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
       .bind(with: self) { owner, event in
         switch event {
-        case .notification:
-          owner.delegate?.pushNotificationView()
+//        case .notification:
+//          owner.delegate?.pushNotificationView()
         case .setting:
           owner.delegate?.pushSettingView()
         }
@@ -87,7 +88,7 @@ final class ProfileMainController: BaseController {
   }
   
   enum BarTouchEvent: Int, IntCaseIterable {
-    case notification
+//    case notification
     case setting
   }
 }

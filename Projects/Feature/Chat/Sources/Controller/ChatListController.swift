@@ -43,19 +43,20 @@ public final class ChatListController: BaseController {
     chatAdapter.delegate = self
   }
   
+  /// notification 주석
   public override func setNavigationBar() {
     let headerView = CustomNavigationBarItem(title: "채팅")
     let bellButton = CustomNavigationBarButton(image: UIImage(asset: Images.bell)!)
-    customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(titleView: headerView, titleAlignment: .leading, rightButtons: [bellButton])
+    customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(titleView: headerView, titleAlignment: .leading/*, rightButtons: [bellButton]*/)
     
-    customNavigationController?.navigationBarEvents(of: NavigationBar.self)
-      .subscribe(with: self, onNext: { owner, bar in
-        switch bar {
-        case .alarm:
-          print("push noti")
-        }
-      })
-      .disposed(by: disposeBag)
+//    customNavigationController?.navigationBarEvents(of: NavigationBar.self)
+//      .subscribe(with: self, onNext: { owner, bar in
+//        switch bar {
+//        case .alarm:
+//          print("push noti")
+//        }
+//      })
+//      .disposed(by: disposeBag)
   }
   
   enum NavigationBar: Int, IntCaseIterable {

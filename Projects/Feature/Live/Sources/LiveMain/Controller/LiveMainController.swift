@@ -64,23 +64,24 @@ final class LiveMainController: BaseController {
     setView()
   }
   
+  /// notification 주석
   override func setNavigationBar() {
     let titleView = CustomNavigationBarItem(title: "실시간")
     let bellButton = CustomNavigationBarButton(image: Images.bell.image)
     
     customNavigationController?.customNavigationBarConfig = CustomNavigationBarConfiguration(
       titleView: titleView,
-      titleAlignment: .leading,
-      rightButtons: [bellButton]
+      titleAlignment: .leading
+//      rightButtons: [bellButton]
     )
-    customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
-      .bind(with: self) { owner, event in
-        switch event {
-        case .notification:
-          print("push noti")
-        }
-      }
-      .disposed(by: disposeBag)
+//    customNavigationController?.navigationBarEvents(of: BarTouchEvent.self)
+//      .bind(with: self) { owner, event in
+//        switch event {
+//        case .notification:
+//          print("push noti")
+//        }
+//      }
+//      .disposed(by: disposeBag)
   }
   
   enum BarTouchEvent: Int, IntCaseIterable {
