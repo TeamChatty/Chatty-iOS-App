@@ -32,6 +32,7 @@ final class SettingNotificationReactor: Reactor {
   
   struct State {
     var state: NotificationReceiveCheck = .init(marketingNotification: true, chattingNotification: true, feedNotification: true)
+    var isFetched: Bool = false
     
     var errorType: ErrorType? = nil
     var isLoading: Bool = false
@@ -55,13 +56,13 @@ extension SettingNotificationReactor {
     switch action {
     case .viewDidLoad:
       return .concat([
-        .just(.setIsLoadind(false)),
+        .just(.setIsLoadind(true)),
         getNotificationCheckedData.execute()
           .map { state in .setAllState(state) }
           .catch { error -> Observable<Mutation> in
             return error.toMutation()
           },
-        .just(.setIsLoadind(true))
+        .just(.setIsLoadind(false))
       ])
     case .toggleChattingNoti(let bool):
       return saveNotificationBoolean.execute(type: .chatting, agree: bool)
@@ -89,6 +90,7 @@ extension SettingNotificationReactor {
     switch mutation {
     case .setAllState(let state):
       newState.state = state
+      newState.isFetched = true
     case .setError(let error):
       newState.errorType = error
     case .setIsLoadind(let bool):

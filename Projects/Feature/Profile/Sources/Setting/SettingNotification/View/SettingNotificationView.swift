@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import DomainUserInterface
 import SharedDesignSystem
 import SnapKit
 import Then
@@ -94,5 +95,13 @@ extension SettingNotificationView {
     }
   }
   
+}
+
+extension SettingNotificationView {
+  func updateState(state :NotificationReceiveCheck) {
+    marketingNotiSwitch.setSwitch(state.marketingNotification)
+    chatNotiSwitch.setSwitch(state.chattingNotification)
+    feedNotiSwitch.setSwitch(state.feedNotification)
+  }
 }
 

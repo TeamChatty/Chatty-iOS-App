@@ -74,6 +74,17 @@ extension SettingNotificationController: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
+      .map(\.isFetched)
+      .distinctUntilChanged()
+      .observe(on: MainScheduler.asyncInstance)
+      .bind(with: self) { owner, isFetched in
+        if isFetched {
+          owner.mainView.updateState(state: owner.reactor!.currentState.state)
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
       .map(\.isLoading)
       .distinctUntilChanged()
       .observe(on: MainScheduler.asyncInstance)
