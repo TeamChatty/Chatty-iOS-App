@@ -17,7 +17,8 @@ let project = Project.makeModule(
       implements: .Feed,
       factory: .init(
         dependencies: [
-          .feature(interface: .Feed)
+          .feature(interface: .Feed),
+          .feature(interface: .Chat)
         ]
       )
     ),
