@@ -22,6 +22,7 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
   private let getUserProfileUseCase: GetUserProfileUseCase
   
   public enum Action {
+    case viewDidAppear
     case phoneNumberEntered(String)
     case sendSMS
     case sendVerificationCode(String)
@@ -36,6 +37,8 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     case setSendVerificationCodeState(AsyncState<Void>)
     case setError(ErrorType?)
     case setSendCount(Int)
+    case setTestAccessVerificationCode(String)
+    case setIsViewDidAppear(Bool)
   }
   
   public struct State {
@@ -44,6 +47,9 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     var sendSMSState: AsyncState<Void> = .idle
     var sendVerificationCodeState: AsyncState<Void> = .idle
     var verificationCode: String = ""
+    var testVerificationCode: String? = nil
+    var isViewDidAppear: Bool = false
+    
     var sendCount: Int = 0
     var errorState: ErrorType? = nil
   }
@@ -56,6 +62,16 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     self.getDeviceIdUseCase = getDeviceIdUseCase
     self.signUseCase = signUseCase
     self.getUserProfileUseCase = getUserProfileUseCase
+  }
+  
+  var isTestAccess: Bool {
+    for i in 1...3 {
+      let testNumber = "0100000000\(i)"
+      if testNumber == self.currentState.phoneNumber {
+        return true
+      }
+    }
+    return false
   }
 }
 
@@ -73,7 +89,8 @@ extension OnboardingPhoneAuthenticationReactor {
           .flatMap { count -> Observable<Mutation> in
             return .concat([
               .just(.setSendSMSState(.success(.sendSms))),
-              .just(.setSendCount(count))
+              .just(.setSendCount(count.limitNumber)),
+              .just(.setTestAccessVerificationCode(count.authNumber))
             ])
           }
           .catch { error -> Observable<Mutation> in
@@ -99,6 +116,11 @@ extension OnboardingPhoneAuthenticationReactor {
       }
     case .sendVerificationCodeWithout:
       return processLogin(mobileNumber: self.currentState.phoneNumber, authenticationNumber: currentState.verificationCode)
+    case .viewDidAppear:
+      return .concat([
+        .just(.setIsViewDidAppear(false)),
+        .just(.setIsViewDidAppear(true))
+      ])
     }
   }
   
@@ -119,6 +141,12 @@ extension OnboardingPhoneAuthenticationReactor {
       newState.verificationCode = code
     case .setSendCount(let count):
       newState.sendCount = count
+    case .setTestAccessVerificationCode(let verificationCode):
+      if isTestAccess {
+        newState.testVerificationCode = verificationCode
+      }
+    case .setIsViewDidAppear(let bool):
+      newState.isViewDidAppear = bool
     }
     return newState
   }

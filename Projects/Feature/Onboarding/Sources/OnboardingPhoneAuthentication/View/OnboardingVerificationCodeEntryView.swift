@@ -154,3 +154,10 @@ extension OnboardingVerificationCodeEntryView {
     subTitleLabel.attributedText = attributedString
   }
 }
+
+extension OnboardingVerificationCodeEntryView {
+  func setVerificationCode(code: String) {
+    verificationCodeField.textField.text = code
+    verificationCodeField.inputEventRelay.accept(code)
+  }
+}

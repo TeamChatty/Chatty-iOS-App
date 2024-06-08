@@ -12,6 +12,7 @@ import RxSwift
 import Moya
 import DomainCommon
 import DomainAuthInterface
+import DomainAuth
 
 public struct DefaultAuthAPIRepository: AuthAPIRepository {
   public func getAuthCheckProfileImageURL(mobileNumber: String) -> Single<String?> {
@@ -31,7 +32,7 @@ public struct DefaultAuthAPIRepository: AuthAPIRepository {
       .map { $0.toDomain() }
   }
   
-  public func sendVerificationCode(mobileNumber: String, deviceId: String) -> Single<Int> {
+  public func sendVerificationCode(mobileNumber: String, deviceId: String) -> Single<AuthNumber> {
     let request = MobileRequestDTO(mobileNumber: mobileNumber, deviceId: deviceId)
     return authAPIService.request(endPoint: .mobile(request), responseDTO: MobileResponseDTO.self)
       .map { $0.toDomain() }

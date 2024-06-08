@@ -89,6 +89,7 @@ extension MoyaPlugin {
       return
     }
     var log = "------------------- onFail: 네트워크 오류 -------------------"
+    log.append("url <-- \(target.baseURL)\n")
     log.append("<-- \(error.errorCode) \(target)\n")
     log.append("\(error.failureReason ?? error.errorDescription ?? "unknown error")\n")
     log.append("<-- END HTTP")
