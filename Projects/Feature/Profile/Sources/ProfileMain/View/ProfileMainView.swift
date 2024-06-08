@@ -33,9 +33,10 @@ final class ProfileMainView: BaseView, Touchable {
 //    $0.backgroundColor = .white
 //  }
   
-  private let problemServicesView: ProfileMainProblemServicesView = ProfileMainProblemServicesView().then {
-    $0.backgroundColor = .white
-  }
+  /// 세부사항 추가 시 사용
+//  private let problemServicesView: ProfileMainProblemServicesView = ProfileMainProblemServicesView().then {
+//    $0.backgroundColor = .white
+//  }
 
   // MARK: - Rx Property
   private let disposeBag = DisposeBag()
@@ -68,19 +69,19 @@ final class ProfileMainView: BaseView, Touchable {
 //      .bind(to: touchEventRelay)
 //      .disposed(by: disposeBag)
     
-    problemServicesView.touchEventRelay
-      .map { event in
-        switch event {
-        case .problemNotice:
-          return TouchEventType.problemNotice
-        case .problemFrequentlyQuestion:
-          return TouchEventType.problemFrequentlyQuestion
-        case .problemContactService:
-          return TouchEventType.problemContactService
-        }
-      }
-      .bind(to: touchEventRelay)
-      .disposed(by: disposeBag)
+//    problemServicesView.touchEventRelay
+//      .map { event in
+//        switch event {
+//        case .problemNotice:
+//          return TouchEventType.problemNotice
+//        case .problemFrequentlyQuestion:
+//          return TouchEventType.problemFrequentlyQuestion
+//        case .problemContactService:
+//          return TouchEventType.problemContactService
+//        }
+//      }
+//      .bind(to: touchEventRelay)
+//      .disposed(by: disposeBag)
   }
 }
 
@@ -127,12 +128,11 @@ extension ProfileMainView {
 //      $0.width.equalToSuperview()
 //    }
     
-    stackView.addArrangedSubview(problemServicesView)
-    problemServicesView.snp.makeConstraints {
-      $0.width.equalToSuperview()
-    }
+//    stackView.addArrangedSubview(problemServicesView)
+//    problemServicesView.snp.makeConstraints {
+//      $0.width.equalToSuperview()
+//    }
     
-
   }
 }
 
