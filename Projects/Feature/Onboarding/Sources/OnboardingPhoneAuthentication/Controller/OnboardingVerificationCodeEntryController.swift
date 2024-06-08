@@ -42,6 +42,7 @@ public final class OnboardingVerificationCodeEntryController: BaseController {
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     mainView.activateVerificationCodeField()
+    reactor?.action.onNext(.viewDidAppear)
   }
   
   public override func configureUI() {
@@ -63,7 +64,20 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
       .disposed(by: disposeBag)
     
     reactor.state
+      .map(\.isViewDidAppear)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, isViewDidAppear in
+        if isViewDidAppear {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.7, execute: {
+            owner.mainView.setVerificationCode(code: owner.reactor?.currentState.testVerificationCode ?? "")
+          })
+        }
+      }
+      .disposed(by: disposeBag)
+    
+    reactor.state
       .map(\.phoneNumber)
+      .distinctUntilChanged()
       .bind(with: self) { owner, phoneNumber in
         owner.mainView.phoneNumber = phoneNumber
       }

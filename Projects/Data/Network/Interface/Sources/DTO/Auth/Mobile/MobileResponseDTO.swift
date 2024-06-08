@@ -6,19 +6,24 @@
 //
 
 import Foundation
+import DomainAuthInterface
 
 public struct MobileResponseDTO: CommonResponseDTO {
   public var code: Int
   public var status: String
   public var message: String
-  public var data: AuthNumber
+  public var data: AuthNumberResponse
   
-  public func toDomain() -> Int {
-    return data.limitNumber
+  public func toDomain() -> AuthNumber {
+    return data.toDomain()
   }
 }
 
-public struct AuthNumber: Decodable {
+public struct AuthNumberResponse: Decodable {
   public let authNumber: String
   public let limitNumber: Int
+  
+  public func toDomain() -> AuthNumber {
+    return AuthNumber(authNumber: authNumber, limitNumber: limitNumber)
+  }
 }
