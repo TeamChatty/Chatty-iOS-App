@@ -25,6 +25,7 @@ public final class OnboardingPhoneAuthenticationReactor: Reactor {
     case viewDidAppear
     case phoneNumberEntered(String)
     case sendSMS
+    case resendSMS
     case sendVerificationCode(String)
     case sendVerificationCodeWithout
   }
@@ -97,6 +98,19 @@ extension OnboardingPhoneAuthenticationReactor {
             return error.toMutation()
           },
         .just(.setSendSMSState(.idle))
+      ])
+    case .resendSMS:
+      return .concat([
+        self.sendVerificationCodeUseCase.execute(mobileNumber: self.currentState.phoneNumber)
+          .asObservable()
+          .flatMap { count -> Observable<Mutation> in
+            return .concat([
+              .just(.setIsViewDidAppear(false)),
+              .just(.setSendCount(count.limitNumber)),
+              .just(.setTestAccessVerificationCode(count.authNumber)),
+              .just(.setIsViewDidAppear(true))
+            ])
+          }
       ])
     case .sendVerificationCode(let code):
       switch type {
@@ -208,6 +222,7 @@ extension OnboardingPhoneAuthenticationReactor {
     case profileNotCompleted
     case smsFailed
     case unknownError
+    case phoneAuthentificationDailyRequestLimitExceeded
   }
 }
 
@@ -224,6 +239,8 @@ extension Error {
         return .just(.setError(.alreadyExistUser))
       case .E023MismatchedAccountAndDeviceId:
         return .just(.setError(.mismatchedDeviceId))
+      case .E036PhoneAuthentificationDailyRequestLimitExceeded:
+        return .just(.setError(.phoneAuthentificationDailyRequestLimitExceeded))
       default:
         return .just(.setError(.unknownError))
       }

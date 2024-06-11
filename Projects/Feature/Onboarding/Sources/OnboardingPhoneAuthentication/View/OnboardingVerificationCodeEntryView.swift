@@ -48,7 +48,21 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
     $0.title = "인증번호 다시 받기"
   }
   
+  private let continueButton: FillButton = FillButton().then {
+    typealias Config = FillButton.Configuration
+    let enabled = Config(backgroundColor: SystemColor.primaryNormal.uiColor, isEnabled: true)
+    let disabled = Config(backgroundColor: SystemColor.gray300.uiColor, isEnabled: false)
+    
+    $0.title = "계속하기"
+    $0.setState(enabled, for: .enabled)
+    $0.setState(disabled, for: .disabled)
+    $0.cornerRadius = 8
+    $0.currentState = .disabled
+  }
+  
   // MARK: - Stored Property
+  private var inputedNumber: String = ""
+  
   public var phoneNumber: String? {
     didSet {
       setSubtitleLabel(phoneNumber)
@@ -70,7 +84,7 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
       guard let errorNoticeType else { return }
       switch errorNoticeType {
       case .authentificationError(let count):
-        let value = count < 5 ? "오늘 \(5 - count)번 더 요청할 수 있어요" : "오늘 요청 횟수를 전부 사용했어요"
+        let value = count == 5 ? "오늘 요청 횟수를 전부 사용했어요" : "오늘 \(5 - count)번 더 요청할 수 있어요"
         verificationCodeField.noticeValue = value
       }
     }
@@ -80,7 +94,11 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
   private let disposeBag = DisposeBag()
   
   // MARK: - Touchable
-  public let touchEventRelay: PublishRelay<Void> = .init()
+  public var touchEventRelay: PublishRelay<TouchEventType> = .init()
+  public enum TouchEventType {
+    case requestSNS
+    case tapContinueButton(String)
+  }
   
   // MARK: - InputReceivable
   public let inputEventRelay: PublishRelay<String> = .init()
@@ -95,6 +113,26 @@ final class OnboardingVerificationCodeEntryView: BaseView, Touchable, InputRecei
   override func bind() {
     verificationCodeField.inputEventRelay
       .bind(to: inputEventRelay)
+      .disposed(by: disposeBag)
+    
+    requestSMSButton.touchEventRelay
+      .map { TouchEventType.requestSNS }
+      .bind(to: touchEventRelay)
+      .disposed(by: disposeBag)
+    
+    inputEventRelay
+      .bind(with: self) { owner, input in
+        owner.continueButton.currentState = input.count == 6 ? .enabled : .disabled
+        owner.inputedNumber = input
+      }
+      .disposed(by: disposeBag)
+    
+    continueButton.touchEventRelay
+      .withUnretained(self)
+      .map { owner, _ in
+        TouchEventType.tapContinueButton(owner.inputedNumber)
+      }
+      .bind(to: touchEventRelay)
       .disposed(by: disposeBag)
   }
 }
@@ -132,11 +170,19 @@ extension OnboardingVerificationCodeEntryView {
   
   private func setupRequestSMSButton() {
     addSubview(requestSMSButton)
+    addSubview(continueButton)
     requestSMSButton.snp.makeConstraints {
       $0.leading.equalToSuperview()
-      $0.bottom.equalTo(self.keyboardLayoutGuide.snp.top)
+      $0.bottom.equalTo(continueButton.snp.top).offset(-10)
       $0.height.equalTo(60)
     }
+    
+    continueButton.snp.makeConstraints {
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.bottom.equalTo(self.keyboardLayoutGuide.snp.top).offset(-16)
+      $0.height.equalTo(52)
+    }
+    
   }
   
   private func setSubtitleLabel(_ phoneNumber: String?) {

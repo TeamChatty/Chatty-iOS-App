@@ -119,5 +119,17 @@ extension OnboardingPhoneNumberEntryController: ReactorKit.View {
         }
       }
       .disposed(by: disposeBag)
+    
+    reactor.state
+      .map(\.errorState)
+      .distinctUntilChanged()
+      .bind(with: self) { owner, errorState in
+        switch errorState {
+        case .phoneAuthentificationDailyRequestLimitExceeded:
+          owner.showErrorAlert(title: "일일 인증횟수 초과", positiveLabel: "확인", positiveAction:  { })
+        default: break
+        }
+      }
+      .disposed(by: disposeBag)
   }
 }
