@@ -101,7 +101,6 @@ extension FeedMyCommentTableViewController: ReactorKit.View {
         case .loadedEmpty:
           owner.tableView.reloadData()
           owner.tableView.tableFooterView = UIView(frame: .zero)
-          owner.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
           owner.setupEmptyView(feedListType: .myComments)
 
         case .paged:
