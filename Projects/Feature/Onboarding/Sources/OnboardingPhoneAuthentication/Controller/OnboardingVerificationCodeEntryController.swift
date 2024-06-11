@@ -57,12 +57,26 @@ public final class OnboardingVerificationCodeEntryController: BaseController {
 
 extension OnboardingVerificationCodeEntryController: ReactorKit.View {
   public func bind(reactor: OnboardingPhoneAuthenticationReactor) {
-    mainView.inputEventRelay
-      .filter { $0.count == 6 }
-      .map { .sendVerificationCode($0) }
-      .bind(to: reactor.action)
-      .disposed(by: disposeBag)
     
+    mainView.touchEventRelay
+      .bind(with: self) { owner, event in
+        switch event {
+        case .requestSNS:
+          if owner.reactor?.currentState.sendCount ?? 5 == 5 {
+            owner.showErrorAlert(title: "일일 인증횟수 초과", positiveLabel: "확인", positiveAction:  { })
+          } else {
+            owner.showErrorAlert(title: "인증번호 재전송", subTitle: "다시 요청하였습니다.", positiveLabel: "확인", positiveAction:  {
+              reactor.action.onNext(.resendSMS)
+            })
+          }
+          
+          
+        case .tapContinueButton(let verificationCode):
+          owner.reactor?.action.onNext(.sendVerificationCode(verificationCode))
+        }
+      }
+      .disposed(by: disposeBag)
+      
     reactor.state
       .map(\.isViewDidAppear)
       .distinctUntilChanged()
@@ -85,6 +99,7 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
     
     reactor.state
       .map(\.sendVerificationCodeState)
+      .observe(on: MainScheduler.asyncInstance)
       .subscribe(with: self) { owner, state in
         switch state {
         case .idle: break
@@ -140,6 +155,8 @@ extension OnboardingVerificationCodeEntryController: ReactorKit.View {
         case .profileNotCompleted:
           print("프로필 미완성! 닉네임으로~")
           owner.delegate?.pushToNickNameView()
+        case .phoneAuthentificationDailyRequestLimitExceeded:
+          break
         }
       }
       .disposed(by: disposeBag)
