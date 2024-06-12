@@ -24,6 +24,7 @@ public final class CommentInputBar: BaseView, InputReceivable, Touchable {
     $0.isScrollEnabled = false
     $0.textContainerInset = .init(top: 2, left: 0, bottom: 0, right: 0)
     $0.backgroundColor = SystemColor.gray100.uiColor
+    $0.keyboardType = .default
   }
   
   private let inputBar: UIView = UIView().then {
@@ -104,7 +105,6 @@ public final class CommentInputBar: BaseView, InputReceivable, Touchable {
   private func setupTextView() {
     textView.delegate = self
     textView.enablesReturnKeyAutomatically = true
-    self.textView.isSecureTextEntry = true
 
     inputBar.addSubview(textView)
     textView.snp.makeConstraints {
