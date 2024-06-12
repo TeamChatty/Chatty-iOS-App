@@ -112,7 +112,7 @@ extension LiveEditConditionModalReactor {
         gender: currentState.matchConditionState.gender.requestString,
         scope: nil,
         category: "category",
-        blueCheck: false
+        blueCheck: currentState.matchConditionState.isProfileAuthenticationConnection
       )
       .asObservable()
       .map { _ -> Mutation in
